@@ -1,16 +1,27 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:somoa/screens/auth/registration_screen.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
+import 'package:somoa/providers/user_provider.dart';
 
-import 'registration_screen.dart';
-
-class LoginPage extends StatelessWidget {
-  LoginPage({super.key});
+class LoginScreen extends StatelessWidget {
+  LoginScreen({super.key});
 
   final TextEditingController idController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
   Future<void> login(BuildContext context) async {
+// Check if test mode is enabled
+    bool testMode = true; // Set this flag to true to enable test mode
+
+    // If test mode is enabled, simulate a successful login without making a network call
+    if (testMode) {
+      print("아무거나");
+      _simulateSuccessfulLogin(context);
+      return;
+    }
+
     // 로그인 요청을 보낼 서버의 URL
     String url = 'YOUR_LOGIN_API_ENDPOINT';
 
@@ -33,6 +44,7 @@ class LoginPage extends StatelessWidget {
       if (response.statusCode == 200) {
         // 로그인 성공
         if (context.mounted) {
+          Provider.of<UserProvider>(context, listen: false).login(id);
           Navigator.pushReplacementNamed(context, '/main');
         }
       } else {
@@ -70,6 +82,16 @@ class LoginPage extends StatelessWidget {
           ),
         );
       }
+    }
+  }
+
+  // Function to simulate a successful login
+  void _simulateSuccessfulLogin(BuildContext context) {
+    if (context.mounted) {
+      print({"id": idController.text, "password": passwordController.text});
+      Provider.of<UserProvider>(context, listen: false)
+          .login(idController.text);
+      Navigator.pushReplacementNamed(context, '/main');
     }
   }
 
@@ -134,7 +156,7 @@ class LoginPage extends StatelessWidget {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => const RegistrationPage()),
+                              builder: (context) => const RegistrationScreen()),
                         );
                       },
                       child: const Text(
