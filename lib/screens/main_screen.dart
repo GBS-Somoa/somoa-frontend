@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
+import 'package:somoa/utils/bottom_navigation_bar.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -37,90 +38,97 @@ class _MainScreenState extends State<MainScreen> {
 
         // 사용자 이름이 있는 경우 메인 페이지를 표시합니다.
         return Scaffold(
-          appBar: AppBar(
-            title: Text(username != "" ? 'Main Page - $username' : 'Main Page'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () {
-                  userProvider.logout();
-                  Navigator.pushReplacementNamed(context, '/login');
-                },
-              )
-            ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.home),
-                      SizedBox(
-                        width: 150.0,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedLocation,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedLocation = newValue ?? '';
-                              });
-                            },
-                            items: locationList
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
+            appBar: AppBar(
+              title:
+                  Text(username != "" ? 'Main Page - $username' : 'Main Page'),
+              actions: [
+                IconButton(
+                  icon: const Icon(Icons.logout),
+                  onPressed: () {
+                    userProvider.logout();
+                    Navigator.pushReplacementNamed(context, '/login');
+                  },
+                )
+              ],
+              bottom: PreferredSize(
+                preferredSize: const Size.fromHeight(40.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.home),
+                        SizedBox(
+                          width: 150.0,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 10.0),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: _selectedLocation,
+                              onChanged: (String? newValue) {
+                                setState(() {
+                                  _selectedLocation = newValue ?? '';
+                                });
+                              },
+                              items: locationList.map<DropdownMenuItem<String>>(
+                                  (String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: () {
-                      showMenu(
-                        context: context,
-                        position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                        items: [
-                          const PopupMenuItem(
-                            value: '장소 추가',
-                            child: Text('장소 추가'),
-                          ),
-                          const PopupMenuItem(
-                            value: '장소 관리',
-                            child: Text('장소 관리'),
-                          ),
-                          const PopupMenuItem(
-                            value: '기기 추가',
-                            child: Text('기기 추가'),
-                          ),
-                          const PopupMenuItem(
-                            value: '주문 목록',
-                            child: Text('주문 목록'),
-                          ),
-                        ],
-                        elevation: 8.0,
-                      ).then((value) {
-                        if (value != null) {
-                          // Handle menu item selection here
-                          print('Selected: $value');
-                        }
-                      });
-                    },
-                  ),
-                ],
+                      ],
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.more_vert),
+                      onPressed: () {
+                        showMenu(
+                          context: context,
+                          position: const RelativeRect.fromLTRB(100, 100, 0, 0),
+                          items: [
+                            const PopupMenuItem(
+                              value: '장소 추가',
+                              child: Text('장소 추가'),
+                            ),
+                            const PopupMenuItem(
+                              value: '장소 관리',
+                              child: Text('장소 관리'),
+                            ),
+                            const PopupMenuItem(
+                              value: '기기 추가',
+                              child: Text('기기 추가'),
+                            ),
+                            const PopupMenuItem(
+                              value: '주문 목록',
+                              child: Text('주문 목록'),
+                            ),
+                          ],
+                          elevation: 8.0,
+                        ).then((value) {
+                          if (value != null) {
+                            // Handle menu item selection here
+                            print('Selected: $value');
+                          }
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
-          body: const Center(
-            child: Text("main page"),
-          ),
-        );
+            body: const Center(
+              child: Text("main page"),
+            ),
+            bottomNavigationBar: const BottomNavBar(
+              selectedIndex: 0,
+              // onItemTapped: (int index) {
+              //   print('Selected index: $index');
+              // },
+            ));
       },
     );
   }
