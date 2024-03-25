@@ -173,10 +173,10 @@ class _MainScreenState extends State<MainScreen> {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         // 사용자 이름을 가져옵니다.
-        bool isLoggedIn = userProvider.isLoggedIn;
+        bool username = userProvider.username?.isNotEmpty ?? false;
 
         // 사용자 이름이 없는 경우 로그인 화면으로 이동합니다.
-        if (isLoggedIn == false) {
+        if (username == false) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.pushReplacementNamed(context, '/login');
           });
