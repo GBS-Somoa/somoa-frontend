@@ -138,7 +138,16 @@ class DeviceWidget extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               '포화정도: ${supply['supplyAmount']}/10',
-              style: const TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 20),
+            ),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                const Text('최근 교체 날짜'),
+                Text('${supply['supplyChangeDate']}',
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold)),
+              ],
             ),
             const SizedBox(height: 8),
           ],

@@ -16,6 +16,7 @@ class _MainScreenState extends State<MainScreen> {
   static const locationList = ['내 자취방', '부모님집', '할머니댁'];
   late String _selectedLocation;
 
+  // 임시 기기-소모품 데이터
   List<Map<String, Object>> deviceList = [
     {
       "deviceId": 1,
@@ -165,10 +166,10 @@ class _MainScreenState extends State<MainScreen> {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         // 사용자 이름을 가져옵니다.
-        String username = userProvider.username;
+        bool isLoggedIn = userProvider.isLoggedIn;
 
         // 사용자 이름이 없는 경우 로그인 화면으로 이동합니다.
-        if (username.isEmpty) {
+        if (isLoggedIn == false) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.pushReplacementNamed(context, '/login');
           });
@@ -178,83 +179,70 @@ class _MainScreenState extends State<MainScreen> {
         // 사용자 이름이 있는 경우 메인 페이지를 표시합니다.
         return Scaffold(
           appBar: AppBar(
-            title: Text(username != "" ? 'Main Page - $username' : 'Main Page'),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: () {
-                  userProvider.logout();
-                  Navigator.pushReplacementNamed(context, '/login');
-                },
-              )
-            ],
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(40.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.home),
-                      SizedBox(
-                        width: 150.0,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                          child: DropdownButton<String>(
-                            isExpanded: true,
-                            value: _selectedLocation,
-                            onChanged: (String? newValue) {
-                              setState(() {
-                                _selectedLocation = newValue ?? '';
-                              });
-                            },
-                            items: locationList
-                                .map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Icon(Icons.home),
+                    SizedBox(
+                      width: 150.0,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                        child: DropdownButton<String>(
+                          isExpanded: true,
+                          value: _selectedLocation,
+                          onChanged: (String? newValue) {
+                            setState(() {
+                              _selectedLocation = newValue ?? '';
+                            });
+                          },
+                          items: locationList
+                              .map<DropdownMenuItem<String>>((String value) {
+                            return DropdownMenuItem<String>(
+                              value: value,
+                              child: Text(value),
+                            );
+                          }).toList(),
                         ),
                       ),
-                    ],
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.more_vert),
-                    onPressed: () {
-                      showMenu(
-                        context: context,
-                        position: const RelativeRect.fromLTRB(100, 100, 0, 0),
-                        items: [
-                          const PopupMenuItem(
-                            value: '장소 추가',
-                            child: Text('장소 추가'),
-                          ),
-                          const PopupMenuItem(
-                            value: '장소 관리',
-                            child: Text('장소 관리'),
-                          ),
-                          const PopupMenuItem(
-                            value: '기기 추가',
-                            child: Text('기기 추가'),
-                          ),
-                          const PopupMenuItem(
-                            value: '주문 목록',
-                            child: Text('주문 목록'),
-                          ),
-                        ],
-                        elevation: 8.0,
-                      ).then((value) {
-                        if (value != null) {
-                          // Handle menu item selection here
-                          print('Selected: $value');
-                        }
-                      });
-                    },
-                  ),
-                ],
-              ),
+                    ),
+                  ],
+                ),
+                IconButton(
+                  icon: const Icon(Icons.more_vert),
+                  onPressed: () {
+                    showMenu(
+                      context: context,
+                      position: const RelativeRect.fromLTRB(90, 70, 0, 0),
+                      items: [
+                        const PopupMenuItem(
+                          value: '장소 추가',
+                          child: Text('장소 추가'),
+                        ),
+                        const PopupMenuItem(
+                          value: '장소 관리',
+                          child: Text('장소 관리'),
+                        ),
+                        const PopupMenuItem(
+                          value: '기기 추가',
+                          child: Text('기기 추가'),
+                        ),
+                        const PopupMenuItem(
+                          value: '주문 목록',
+                          child: Text('주문 목록'),
+                        ),
+                      ],
+                      elevation: 8.0,
+                    ).then((value) {
+                      if (value != null) {
+                        // Handle menu item selection here
+                        print('Selected: $value');
+                      }
+                    });
+                  },
+                ),
+              ],
             ),
           ),
           body: Center(
