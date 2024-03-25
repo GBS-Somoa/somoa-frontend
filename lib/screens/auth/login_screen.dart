@@ -65,6 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
               keepLoggedIn: _keepLoggedIn,
               username: id,
               password: password,
+              nickname: jsonDecode(response.body)['nickname'] ?? '임시 닉네임',
               accessToken: jsonDecode(response.body)['accessToken'],
               refreshToken: jsonDecode(response.body)['refreshToken']);
           Navigator.pushReplacementNamed(context, '/main');
@@ -115,6 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
         keepLoggedIn: _keepLoggedIn,
         username: idController.text,
         password: passwordController.text,
+        nickname: "테스트 모드",
         accessToken: "asdf",
         refreshToken: "qwer",
       );

@@ -3,10 +3,12 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class UserProvider with ChangeNotifier {
   String? _username = "";
+  String? _nickname = "";
   late String? _accessToken;
   late String? _refreshToken;
 
   String? get username => _username;
+  String? get nickname => _nickname;
   String? get accessToken => _accessToken;
   String? get refreshToken => _refreshToken;
 
@@ -16,9 +18,11 @@ class UserProvider with ChangeNotifier {
       {required bool keepLoggedIn,
       required String username,
       required String password,
+      required String nickname,
       required accessToken,
       required refreshToken}) async {
     _username = username;
+    _nickname = nickname;
     _accessToken = accessToken;
     _refreshToken = refreshToken;
 

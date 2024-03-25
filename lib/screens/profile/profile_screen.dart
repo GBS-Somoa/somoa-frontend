@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/utils/bottom_navigation_bar.dart';
@@ -22,8 +23,70 @@ class ProfileScreen extends StatelessWidget {
             )
           ],
         ),
-        body: const Center(
-          child: Text('Profile Screen'),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              children: [
+                SizedBox(
+                  height: 150,
+                  child: Center(
+                    child: Column(
+                      children: [
+                        Text(
+                          '${userProvider.nickname}',
+                          style: const TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.bold),
+                        ),
+                        Text('${userProvider.username}')
+                      ],
+                    ),
+                  ),
+                ),
+                ListView(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  children: [
+                    Card(
+                      child: ListTile(
+                        title: Text('프로필 관리'),
+                        onTap: () {
+                          print('Item 1 tapped');
+                        },
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        title: Text('장소 관리'),
+                        onTap: () {
+                          print('Item 2 tapped');
+                        },
+                      ),
+                    ),
+                    Card(
+                      child: ListTile(
+                        title: Text('즐겨찾는 쇼핑몰 관리'),
+                        onTap: () {
+                          print('Item 3 tapped');
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                const Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Text(
+                        '진행중인 배송',
+                        textAlign: TextAlign.start,
+                        style: TextStyle(fontSize: 16),
+                      )
+                      // TODO: orderList 들어감
+                    ])
+              ],
+            ),
+          ),
         ),
         bottomNavigationBar: const BottomNavBar(
           selectedIndex: 3,

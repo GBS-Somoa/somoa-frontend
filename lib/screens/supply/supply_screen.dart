@@ -13,6 +13,9 @@ class _SupplyScreenState extends State<SupplyScreen> {
   // TODO: user가 포함된 장소 목록 가져오고(전역에 저장), 장소 돌면서 (장소id, 조건)에 해당하는 소모품 목록 가져와서 append
 
   // 임시 데이터
+  List<Object> supplyNeedClean = [];
+  List<Object> supplyNeedCharge = [];
+  List<Object> supplyNeedReplace = [];
 
   @override
   Widget build(BuildContext context) {
