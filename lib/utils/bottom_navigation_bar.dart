@@ -41,14 +41,14 @@ class BottomNavBar extends StatelessWidget {
       items: const <BottomNavigationBarItem>[
         BottomNavigationBarItem(
           icon: Icon(
-            Icons.home,
+            Icons.widgets,
             size: 30,
           ),
-          label: '장소',
+          label: '기기',
         ),
         BottomNavigationBarItem(
           icon: Icon(
-            Icons.inventory_2,
+            Icons.inventory_outlined,
             size: 30,
           ),
           label: '소모품',
