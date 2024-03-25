@@ -26,7 +26,7 @@ class _MainScreenState extends State<MainScreen> {
   // 임시 기기-소모품 데이터
   List<Map<String, Object>> deviceList = [
     {
-      "deviceId": 1,
+      "deviceId": "asdf1",
       "deviceNickname": "세탁기",
       "deviceType": "Washer",
       "deviceModel": "최신형 세탁기",
@@ -55,7 +55,7 @@ class _MainScreenState extends State<MainScreen> {
       ]
     },
     {
-      "deviceId": 2,
+      "deviceId": "asdf12",
       "deviceNickname": "가습기",
       "deviceType": "Humidifier",
       "deviceModel": "최신 가습기",
@@ -74,7 +74,7 @@ class _MainScreenState extends State<MainScreen> {
       ]
     },
     {
-      "deviceId": 3,
+      "deviceId": "asdf123",
       "deviceNickname": "제습기",
       "deviceType": "Dehumidifier",
       "deviceModel": "최신 제습기",
@@ -93,7 +93,7 @@ class _MainScreenState extends State<MainScreen> {
       ]
     },
     {
-      "deviceId": 5,
+      "deviceId": "asdf1234",
       "deviceNickname": "공기청정기",
       "deviceType": "airPurifier",
       "deviceModel": "최신 공기청정기",
@@ -112,7 +112,7 @@ class _MainScreenState extends State<MainScreen> {
       ]
     },
     {
-      "deviceId": 6,
+      "deviceId": "asdf12345",
       "deviceNickname": "에어컨",
       "deviceType": "airConditioner",
       "deviceModel": "최신 에어컨",
@@ -131,7 +131,7 @@ class _MainScreenState extends State<MainScreen> {
       ]
     },
     {
-      "deviceId": 7,
+      "deviceId": "asdf123456",
       "deviceNickname": "청소기",
       "deviceType": "vacuumCleaner",
       "deviceModel": "최신 청소기",
@@ -263,7 +263,10 @@ class _MainScreenState extends State<MainScreen> {
                                         }
                                         Navigator.pop(context);
                                       },
-                                      child: const Text('확인'),
+                                      child: const Text(
+                                        '확인',
+                                        style: TextStyle(fontSize: 15),
+                                      ),
                                     ),
                                   ],
                                 );
@@ -275,24 +278,21 @@ class _MainScreenState extends State<MainScreen> {
                           value: '장소 관리',
                           child: const Text('장소 관리'),
                           onTap: () {
-                            Navigator.pushReplacementNamed(
-                                context, '/locationDetail');
+                            Navigator.pushNamed(context, '/locationDetail');
                           },
                         ),
                         PopupMenuItem(
                           value: '기기 추가',
                           child: const Text('기기 추가'),
                           onTap: () {
-                            Navigator.pushReplacementNamed(
-                                context, '/addDevice');
+                            Navigator.pushNamed(context, '/addDevice');
                           },
                         ),
                         PopupMenuItem(
                           value: '주문 목록',
                           child: const Text('주문 목록'),
                           onTap: () {
-                            Navigator.pushReplacementNamed(
-                                context, '/orderList');
+                            Navigator.pushNamed(context, '/orderList');
                           },
                         ),
                       ],

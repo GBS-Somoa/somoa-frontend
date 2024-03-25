@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:somoa/screens/device/device_detail_screen.dart';
 import 'package:somoa/widgets/water_saturation_widget.dart';
 
 class DeviceWidget extends StatelessWidget {
@@ -29,7 +30,18 @@ class DeviceWidget extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                const Icon(Icons.navigate_next, size: 35)
+                IconButton(
+                    onPressed: () {
+                      // deviceDetailScreen으로 이동하는 코드
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => DeviceDetailScreen(
+                              deviceId: deviceInfo['deviceId'] as String),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.navigate_next, size: 35))
               ],
             ),
             const SizedBox(height: 8),
