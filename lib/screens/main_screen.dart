@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/utils/bottom_navigation_bar.dart';
@@ -12,6 +13,12 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  //dotenv을 가져오는 코드
+  void getEnv() async {
+    await dotenv.load();
+    String url = dotenv.get("PROJECT_URL");
+  }
+
   // 임시 데이터 -> 사용자가 포함된 장소 데이터 서버로부터 받아야함 (-> 전역 상태로 저장 후 받아서 써야함)
   static const locationList = ['내 자취방', '부모님집', '할머니댁'];
   late String _selectedLocation;
