@@ -223,21 +223,77 @@ class _MainScreenState extends State<MainScreen> {
                       context: context,
                       position: const RelativeRect.fromLTRB(90, 70, 0, 0),
                       items: [
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: '장소 추가',
-                          child: Text('장소 추가'),
+                          child: const Text('장소 추가'),
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                String placeName = '';
+
+                                return AlertDialog(
+                                  title: const Text(
+                                    '장소 추가',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextField(
+                                        onChanged: (value) {
+                                          placeName = value;
+                                        },
+                                        decoration: const InputDecoration(
+                                            hintText: "장소 이름을 입력하세요",
+                                            border: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: Colors.black))),
+                                      ),
+                                    ],
+                                  ),
+                                  actions: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // 확인 버튼을 눌렀을 때의 동작을 구현합니다.
+                                        if (placeName.isNotEmpty) {
+                                          // 장소 이름이 입력되었을 경우에만 처리합니다.
+                                          print('장소 이름: $placeName');
+                                          // TODO: 장소 추가 로직을 구현합니다.
+                                        }
+                                        Navigator.pop(context);
+                                      },
+                                      child: const Text('확인'),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: '장소 관리',
-                          child: Text('장소 관리'),
+                          child: const Text('장소 관리'),
+                          onTap: () {
+                            Navigator.pushReplacementNamed(
+                                context, '/locationDetail');
+                          },
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: '기기 추가',
-                          child: Text('기기 추가'),
+                          child: const Text('기기 추가'),
+                          onTap: () {
+                            Navigator.pushReplacementNamed(
+                                context, '/addDevice');
+                          },
                         ),
-                        const PopupMenuItem(
+                        PopupMenuItem(
                           value: '주문 목록',
-                          child: Text('주문 목록'),
+                          child: const Text('주문 목록'),
+                          onTap: () {
+                            Navigator.pushReplacementNamed(
+                                context, '/orderList');
+                          },
                         ),
                       ],
                       elevation: 8.0,

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
+import 'package:somoa/screens/device/device_create_screen.dart';
+import 'package:somoa/screens/location/location_detail_screen.dart';
 import 'package:somoa/screens/notification/notification_screen.dart';
+import 'package:somoa/screens/order/order_list_screen.dart';
 import 'package:somoa/screens/profile/profile_screen.dart';
 import 'package:somoa/screens/supply/supply_screen.dart';
 import 'screens/auth/registration_screen.dart';
@@ -75,6 +78,11 @@ class MyApp extends StatelessWidget {
           '/supply': (context) => const SupplyScreen(),
           '/notification': (context) => const NotificationScreen(),
           '/profile': (context) => const ProfileScreen(),
+          '/addDevice': (context) => DeviceCreateScreen(),
+          '/orderList': (context) => OrderListScreen(
+                groupId: '',
+              ),
+          '/locationDetail': (context) => LocationDetailScreen(),
         },
       ),
     );
