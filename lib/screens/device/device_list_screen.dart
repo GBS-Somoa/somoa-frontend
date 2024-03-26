@@ -36,7 +36,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
           "supplyName": "세탁 세제",
           "supplyDuration": null,
           "supplyStatus": null,
-          "supplyAmount": 1000,
+          "supplyAmount": 100,
           "limit": {"option": "amount", "description": 150},
           "supplyAmountTmp": null
         },

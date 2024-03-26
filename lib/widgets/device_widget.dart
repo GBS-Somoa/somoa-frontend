@@ -73,7 +73,7 @@ class DeviceWidget extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('현재 보유량'),
+                const Text('현재 보유량'),
                 Text(
                   '${supply['supplyAmount']} ml',
                   style: const TextStyle(

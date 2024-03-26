@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import 'package:somoa/widgets/supply_widget.dart';
+
 class DeviceDetailScreen extends StatefulWidget {
   final String deviceId;
 
@@ -14,7 +16,7 @@ class DeviceDetailScreen extends StatefulWidget {
 class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   bool isLoading = true;
 
-  Map<String, Object>? data;
+  Map<String, Object> data = {};
 
   Map<String, Object> dummyData = {
     "id": "06b76c4725ddc59b",
@@ -27,8 +29,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         "id": "6601bb29c4ec1e75ed8670bb",
         "type": "fabricSoftener",
         "name": "ㅁ",
-        "details": {"supplyAmount": 0},
-        "limit": {"supplyAmount": 0}
+        "details": {"supplyAmount": 1000},
+        "limit": {"supplyAmount": 100}
       },
       {
         "id": "6601bb29c4ec1e75ed8670ba",
@@ -44,8 +46,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         "id": "6601bb29c4ec1e75ed8670be",
         "type": "washerDetergent",
         "name": "ㅗ",
-        "details": {"supplyAmount": 0},
-        "limit": {"supplyAmount": 0}
+        "details": {"supplyAmount": 100},
+        "limit": {"supplyAmount": 300}
       },
       {
         "id": "6601bb29c4ec1e75ed8670bf",
@@ -169,6 +171,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        // toolbarHeight: 100,
+        // elevation: 10,
         title: Text('${data?['nickname'] ?? '이름 없는 기기'}',
             style: const TextStyle(fontSize: 30)),
         centerTitle: true,
@@ -209,11 +213,11 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Center(
+          : Padding(
+              padding: const EdgeInsets.all(30.0),
+              child: Column(
+                children: [
+                  Center(
                     child: Image.asset(
                       statusSummary == 0
                           ? 'assets/images/face=good.png'
@@ -221,11 +225,28 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                       height: 160, // Specify height
                     ),
                   ),
-                ),
-                ListView(
-                    // 소모품별(type으로 구분) 카드 렌더링 -> widgets/supplies에서 불러오기
+                  const SizedBox(height: 30),
+                  const Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Text(
+                          '진행중인 배송',
+                          textAlign: TextAlign.start,
+                        ),
+                      ]),
+                  Expanded(
+                    // Added Expanded widget
+                    child: ListView.builder(
+                      itemCount: (data['supplies'] as List).length,
+                      itemBuilder: (context, index) {
+                        return SupplyWidget(
+                          supplyInfo: (data['supplies'] as List)[index],
+                        );
+                      },
                     ),
-              ],
+                  ),
+                ],
+              ),
             ),
     );
   }
