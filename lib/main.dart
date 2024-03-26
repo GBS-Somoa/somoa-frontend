@@ -22,12 +22,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('백그라운드 메세지 내용: ${message.notification?.body}');
 
   if (message.notification != null) {
-    await saveNotification(
-        message.notification!.title!, message.notification!.body!);
+    await saveNotification(message.notification!.title!,
+        message.notification!.body!, message.data);
   }
 }
 
-Future<void> saveNotification(String title, String body) async {
+Future<void> saveNotification(
+    String title, String body, Map<String, dynamic> data) async {
   final prefs = await SharedPreferences.getInstance();
 
   // 알림 리스트를 가져옴. 없으면 빈 리스트를 사용
@@ -37,7 +38,8 @@ Future<void> saveNotification(String title, String body) async {
   final notification = {
     "title": title,
     "body": body,
-    "date": DateTime.now().toIso8601String()
+    "date": DateTime.now().toIso8601String(),
+    "data": json.encode(data)
   };
 
   print(notification['date']);
@@ -95,13 +97,14 @@ void main() async {
     print('Got a message whilst in the foreground!');
     print('알림 제목: ${message.notification?.title}');
     print('알림 내용: ${message.notification?.body}');
+    print('알림 데이터: ${message.data}');
 
     RemoteNotification? notification = message.notification;
 
     if (message.notification != null) {
       print('Message also contained a notification: ${message.notification}');
-      saveNotification(
-          message.notification!.title!, message.notification!.body!);
+      saveNotification(message.notification!.title!,
+          message.notification!.body!, message.data);
     }
 
     if (notification != null) {
