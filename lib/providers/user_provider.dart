@@ -1,5 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class UserProvider with ChangeNotifier {
   String? _username = "";
@@ -14,28 +18,74 @@ class UserProvider with ChangeNotifier {
 
   final storage = const FlutterSecureStorage();
 
-  Future<void> login(
-      {required bool keepLoggedIn,
-      required String username,
-      required String password,
-      required String nickname,
-      required accessToken,
-      required refreshToken}) async {
-    _username = username;
-    _nickname = nickname;
-    _accessToken = accessToken;
-    _refreshToken = refreshToken;
+  Future<String?> login({
+    required bool keepLoggedIn,
+    required String username,
+    required String password,
+  }) async {
+    String url = dotenv.get("SERVER_URL");
 
-    // TODO : 로그인 유지 시의 로직 작성
-    if (keepLoggedIn) {
-      await storage.write(key: 'username', value: username);
-      await storage.write(key: 'password', value: password);
+    Map<String, String> data = {'username': username, 'password': password};
+
+    try {
+      final response = await http.post(
+        Uri.parse('${url}user/login'),
+        body: jsonEncode(data),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        var responseBody = jsonDecode(response.body);
+        _username = username;
+        _nickname = responseBody['data']['nickname'];
+        _accessToken = responseBody['data']['accessToken'];
+        _refreshToken = responseBody['data']['refreshToken'];
+
+        if (keepLoggedIn) {
+          await storage.write(key: 'username', value: username);
+          await storage.write(key: 'password', value: password);
+        }
+
+        await storage.write(key: 'accessToken', value: _accessToken);
+        await storage.write(key: 'refreshToken', value: _refreshToken);
+
+        notifyListeners();
+
+        return "success";
+      } else {
+        return "아이디 또는 비밀번호가 올바르지 않습니다.";
+      }
+    } catch (e) {
+      return "로그인 요청 중 오류가 발생했습니다.";
+    }
+  }
+
+  Future<bool> autoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    final keepLoggedIn = prefs.getBool('keepLoggedIn') ?? false;
+
+    if (!keepLoggedIn) {
+      return false;
     }
 
-    await storage.write(key: 'accessToken', value: accessToken);
-    await storage.write(key: 'refreshToken', value: refreshToken);
+    final username = await storage.read(key: 'username');
+    final password = await storage.read(key: 'password');
 
-    notifyListeners();
+    if (username == null || password == null) {
+      return false;
+    }
+
+    final loginResult = await login(
+      keepLoggedIn: keepLoggedIn,
+      username: username,
+      password: password,
+    );
+
+    if (loginResult == "success") {
+      return true;
+    } else {
+      return false;
+    }
   }
 
   Future<void> logout() async {

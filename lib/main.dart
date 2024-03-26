@@ -119,7 +119,7 @@ void main() async {
                 ),
               ))
           .then((_) {
-        Future.delayed(Duration(seconds: 5), () {
+        Future.delayed(const Duration(seconds: 5), () {
           flutterLocalNotificationsPlugin.cancel(notification.hashCode);
         });
       });
@@ -143,7 +143,11 @@ void main() async {
   print('FCM Token: $token');
 
   await dotenv.load();
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => UserProvider()),
+    ], child: const MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -158,7 +162,6 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // 로컬 알림 플러그인 초기화
   }
 
   @override
@@ -178,67 +181,87 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => UserProvider()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Somoa',
-        theme: ThemeData(
-          primaryColor: Colors.blue[900],
-          colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.grey,
-            backgroundColor: Colors.grey[100],
-          ),
-          focusColor: Colors.redAccent, // Color for focus highlight
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors
-                .transparent, // Set app bar background color to transparent
-            elevation: 0, // Remove app bar elevation
-            iconTheme: IconThemeData(color: Colors.black), // Set icon color
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor:
-                  Colors.blue[900], // Text color for elevated buttons
-            ),
-          ),
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.blue[900], // Text color for text buttons
-            ),
-          ),
-          outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              foregroundColor:
-                  Colors.blue[900], // Border color for outlined buttons
-            ),
-          ),
-          inputDecorationTheme: const InputDecorationTheme(
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue),
-            ),
-            contentPadding: EdgeInsets.all(15.0),
-            labelStyle: TextStyle(color: Colors.black),
-          ),
-          popupMenuTheme: const PopupMenuThemeData(
-            color: Colors.white,
-            textStyle: TextStyle(color: Colors.black),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Somoa',
+      theme: ThemeData(
+        primaryColor: Colors.blue[900],
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.grey,
+          backgroundColor: Colors.grey[100],
+        ),
+        focusColor: Colors.redAccent, // Color for focus highlight
+        appBarTheme: const AppBarTheme(
+          backgroundColor:
+              Colors.transparent, // Set app bar background color to transparent
+          elevation: 0, // Remove app bar elevation
+          iconTheme: IconThemeData(color: Colors.black), // Set icon color
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor:
+                Colors.blue[900], // Text color for elevated buttons
           ),
         ),
-        home: MainScreen(),
-        routes: {
-          '/registration': (context) => const RegistrationScreen(),
-          '/login': (context) => LoginScreen(),
-          '/main': (context) => MainScreen(),
-          '/addDevice': (context) => DeviceCreateScreen(),
-          '/orderList': (context) => OrderListScreen(
-                groupId: '',
-              ),
-          '/locationDetail': (context) => LocationDetailScreen(),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.blue[900], // Text color for text buttons
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor:
+                Colors.blue[900], // Border color for outlined buttons
+          ),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+          ),
+          contentPadding: EdgeInsets.all(15.0),
+          labelStyle: TextStyle(color: Colors.black),
+        ),
+        popupMenuTheme: const PopupMenuThemeData(
+          color: Colors.white,
+          textStyle: TextStyle(color: Colors.black),
+        ),
+      ),
+      home: FutureBuilder(
+        future: Provider.of<UserProvider>(context, listen: false).autoLogin(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == true) {
+              return MainScreen();
+            } else {
+              return const LoginScreen();
+            }
+          }
+          return const SplashScreen(); // 로딩 중에는 스플래시 화면을 보여줍니다.
         },
+      ),
+      routes: {
+        '/registration': (context) => const RegistrationScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/main': (context) => MainScreen(),
+        '/addDevice': (context) => DeviceCreateScreen(),
+        '/orderList': (context) => OrderListScreen(
+              groupId: '',
+            ),
+        '/locationDetail': (context) => LocationDetailScreen(),
+      },
+    );
+  }
+}
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(), // 로딩 인디케이터
       ),
     );
   }
