@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:somoa/utils/bottom_navigation_bar.dart';
 import 'package:intl/intl.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -195,9 +194,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
             : const Center(
                 child: Text('알림 없음'),
               ),
-      ),
-      bottomNavigationBar: const BottomNavBar(
-        selectedIndex: 2,
       ),
     );
   }

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/screens/location/location_detail_screen.dart';
-import 'package:somoa/screens/notification/notification_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';
-import 'package:somoa/screens/profile/profile_screen.dart';
-import 'package:somoa/screens/supply/supply_screen.dart';
 import 'screens/auth/registration_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
@@ -144,6 +142,7 @@ void main() async {
 
   print('FCM Token: $token');
 
+  await dotenv.load();
   runApp(const MyApp());
 }
 
@@ -229,14 +228,11 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
             textStyle: TextStyle(color: Colors.black),
           ),
         ),
-        home: const MainScreen(),
+        home: MainScreen(),
         routes: {
           '/registration': (context) => const RegistrationScreen(),
           '/login': (context) => LoginScreen(),
-          '/main': (context) => const MainScreen(),
-          '/supply': (context) => const SupplyScreen(),
-          '/notification': (context) => const NotificationScreen(),
-          '/profile': (context) => const ProfileScreen(),
+          '/main': (context) => MainScreen(),
           '/addDevice': (context) => DeviceCreateScreen(),
           '/orderList': (context) => OrderListScreen(
                 groupId: '',
