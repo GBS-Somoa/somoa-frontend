@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:somoa/utils/bottom_navigation_bar.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -28,9 +27,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
             title: Text(notifications[index]),
           );
         },
-      ),
-      bottomNavigationBar: const BottomNavBar(
-        selectedIndex: 2,
       ),
     );
   }
