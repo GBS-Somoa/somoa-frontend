@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     // 로그인 요청을 보낼 서버의 URL
-    String url = dotenv.get("PROJECT_URL");
+    String url = dotenv.get("SERVER_URL");
 
     // 사용자가 입력한 아이디와 비밀번호
     String id = idController.text;
@@ -49,7 +49,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // 로그인 요청 보내기
     try {
       final response = await http.post(
-        Uri.parse(url + '/user/login'),
+        Uri.parse(url + 'user/login'),
         body: jsonEncode(data),
         headers: {'Content-Type': 'application/json'},
       );

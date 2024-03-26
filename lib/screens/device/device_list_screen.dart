@@ -15,7 +15,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
   //dotenv을 가져오는 코드
   void getEnv() async {
     await dotenv.load();
-    String url = dotenv.get("PROJECT_URL");
+    String url = dotenv.get("SERVER_URL");
   }
 
   // 임시 데이터 -> 사용자가 포함된 장소 데이터 서버로부터 받아야함 (-> 전역 상태로 저장 후 받아서 써야함)
@@ -172,10 +172,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
     return Consumer<UserProvider>(
       builder: (context, userProvider, child) {
         // 사용자 이름을 가져옵니다.
-        bool isLoggedIn = userProvider.isLoggedIn;
+        String username = userProvider.username ?? "";
 
         // 사용자 이름이 없는 경우 로그인 화면으로 이동합니다.
-        if (isLoggedIn == false) {
+        if (username == "") {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             Navigator.pushReplacementNamed(context, '/login');
           });
