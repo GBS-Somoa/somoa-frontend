@@ -173,7 +173,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       appBar: AppBar(
         // toolbarHeight: 100,
         // elevation: 10,
-        title: Text('${data?['nickname'] ?? '이름 없는 기기'}',
+        title: Text('${data['nickname'] ?? '이름 없는 기기'}',
             style: const TextStyle(fontSize: 30)),
         centerTitle: true,
         actions: [
@@ -213,30 +213,29 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : Padding(
-              padding: const EdgeInsets.all(30.0),
-              child: Column(
-                children: [
-                  Center(
-                    child: Image.asset(
-                      statusSummary == 0
-                          ? 'assets/images/face=good.png'
-                          : 'assets/images/face=bad.png',
-                      height: 160, // Specify height
+          : SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Center(
+                      child: Image.asset(
+                        statusSummary == 0
+                            ? 'assets/images/face=good.png'
+                            : 'assets/images/face=bad.png',
+                        height: 160, // Specify height
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 30),
-                  const Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Text(
-                          '진행중인 배송',
-                          textAlign: TextAlign.start,
-                        ),
-                      ]),
-                  Expanded(
-                    // Added Expanded widget
-                    child: ListView.builder(
+                    const SizedBox(height: 30),
+                    const Text(
+                      '진행중인 배송',
+                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 10),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: (data['supplies'] as List).length,
                       itemBuilder: (context, index) {
                         return SupplyWidget(
@@ -244,8 +243,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                         );
                       },
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
     );
