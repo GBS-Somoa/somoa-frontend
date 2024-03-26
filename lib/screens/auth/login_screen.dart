@@ -1,19 +1,33 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:somoa/screens/auth/registration_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:somoa/screens/auth/registration_screen.dart';
 import 'package:somoa/providers/user_provider.dart';
 
-class LoginScreen extends StatelessWidget {
-  LoginScreen({super.key});
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
 
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController idController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
+  bool _keepLoggedIn = false;
+
+  Future<void> _saveKeepLoggedIn(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('keepLoggedIn', value);
+  }
+
   Future<void> login(BuildContext context) async {
 // Check if test mode is enabled
-    bool testMode = true; // Set this flag to true to enable test mode
+    bool testMode = false; // Set this flag to true to enable test mode
 
     // If test mode is enabled, simulate a successful login without making a network call
     if (testMode) {
@@ -23,19 +37,19 @@ class LoginScreen extends StatelessWidget {
     }
 
     // 로그인 요청을 보낼 서버의 URL
-    String url = 'YOUR_LOGIN_API_ENDPOINT';
+    String url = dotenv.get("PROJECT_URL");
 
     // 사용자가 입력한 아이디와 비밀번호
     String id = idController.text;
     String password = passwordController.text;
 
     // 서버에 보낼 데이터
-    Map<String, String> data = {'id': id, 'password': password};
+    Map<String, String> data = {'username': id, 'password': password};
 
     // 로그인 요청 보내기
     try {
       final response = await http.post(
-        Uri.parse(url),
+        Uri.parse(url + '/user/login'),
         body: jsonEncode(data),
         headers: {'Content-Type': 'application/json'},
       );
@@ -44,7 +58,16 @@ class LoginScreen extends StatelessWidget {
       if (response.statusCode == 200) {
         // 로그인 성공
         if (context.mounted) {
-          Provider.of<UserProvider>(context, listen: false).login(id);
+          print('로그인 성공');
+          print(response.body);
+          await _saveKeepLoggedIn(_keepLoggedIn);
+          Provider.of<UserProvider>(context, listen: false).login(
+              keepLoggedIn: _keepLoggedIn,
+              username: id,
+              password: password,
+              nickname: jsonDecode(response.body)['nickname'] ?? '임시 닉네임',
+              accessToken: jsonDecode(response.body)['accessToken'],
+              refreshToken: jsonDecode(response.body)['refreshToken']);
           Navigator.pushReplacementNamed(context, '/main');
         }
       } else {
@@ -53,12 +76,12 @@ class LoginScreen extends StatelessWidget {
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('로그인 실패'),
-              content: Text('아이디 또는 비밀번호가 올바르지 않습니다.'),
+              title: const Text('로그인 실패'),
+              content: const Text('아이디 또는 비밀번호가 올바르지 않습니다.'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text('확인'),
+                  child: const Text('확인'),
                 ),
               ],
             ),
@@ -71,12 +94,12 @@ class LoginScreen extends StatelessWidget {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: Text('오류'),
-            content: Text('로그인 요청 중 오류가 발생했습니다.'),
+            title: const Text('오류'),
+            content: const Text('로그인 요청 중 오류가 발생했습니다.'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
-                child: Text('확인'),
+                child: const Text('확인'),
               ),
             ],
           ),
@@ -89,8 +112,14 @@ class LoginScreen extends StatelessWidget {
   void _simulateSuccessfulLogin(BuildContext context) {
     if (context.mounted) {
       print({"id": idController.text, "password": passwordController.text});
-      Provider.of<UserProvider>(context, listen: false)
-          .login(idController.text);
+      Provider.of<UserProvider>(context, listen: false).login(
+        keepLoggedIn: _keepLoggedIn,
+        username: idController.text,
+        password: passwordController.text,
+        nickname: "테스트 모드",
+        accessToken: "asdf",
+        refreshToken: "qwer",
+      );
       Navigator.pushReplacementNamed(context, '/main');
     }
   }
@@ -136,7 +165,33 @@ class LoginScreen extends StatelessWidget {
                       ),
                       obscureText: true,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 15),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.0),
+                          child: Text('로그인 유지'),
+                        ),
+                        Switch(
+                          trackOutlineColor:
+                              MaterialStateProperty.all(Colors.grey),
+                          inactiveThumbColor: Colors.grey[500],
+                          inactiveTrackColor: Colors.grey[100],
+                          activeTrackColor: Colors.blue[200],
+                          activeColor: Colors.blue[900],
+                          value: _keepLoggedIn,
+                          onChanged: (value) {
+                            // Update the state of _keepLoggedIn
+                            setState(
+                              () {
+                                _keepLoggedIn = value;
+                              },
+                            );
+                          },
+                        ),
+                      ],
+                    ),
                     SizedBox(
                       width: 250.0,
                       child: ElevatedButton(
