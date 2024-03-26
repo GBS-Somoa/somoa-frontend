@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "444858710838",
+    "project_id": "somoa-8dea6",
+    "storage_bucket": "somoa-8dea6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444858710838:android:db543f8c56f0972f98d197",
+        "android_client_info": {
+          "package_name": "com.asd.asd"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqD4ZF5ovalI556NzDFm6mFNENcMda2qw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:444858710838:android:3771661054b5d35498d197",
+        "android_client_info": {
+          "package_name": "com.example.somoa"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCqD4ZF5ovalI556NzDFm6mFNENcMda2qw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
