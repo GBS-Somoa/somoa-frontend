@@ -173,12 +173,92 @@ class SupplyWidget extends StatelessWidget {
     );
   }
 
+  // Widget _buildFilterCard() {
+  //   return Card(
+  //     child: ListTile(
+  //       title: Text(supplyInfo['name'].toString()),
+  //       subtitle: Text(supplyInfo['type'].toString()),
+  //       // Add further widget customization as needed
+  //     ),
+  //   );
+  // }
+
+// TODO: 필터 상태 막대바 임시
   Widget _buildFilterCard() {
+    final String supplyStatus =
+        (supplyInfo['details'] as Map)['supplyStatus'].toString().toLowerCase();
+
+    Color barColor;
+    switch (supplyStatus) {
+      case 'bad':
+        barColor = Colors.red;
+        break;
+      case 'average':
+        barColor = Colors.orange;
+        break;
+      case 'good':
+        barColor = Colors.green;
+        break;
+      default:
+        barColor = Colors.grey; // Default color
+        break;
+    }
+
     return Card(
-      child: ListTile(
-        title: Text(supplyInfo['name'].toString()),
-        subtitle: Text(supplyInfo['type'].toString()),
-        // Add further widget customization as needed
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ListTile(
+            title: Text(supplyInfo['name'].toString()),
+            subtitle: Text(supplyInfo['type'].toString()),
+          ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: SizedBox(
+              height: 20,
+              child: Stack(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.grey[300], // Background color for the bar
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                  ),
+                  Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: supplyStatus == 'bad'
+                              ? barColor
+                              : Colors.transparent,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: supplyStatus == 'average'
+                              ? barColor
+                              : Colors.transparent,
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          color: supplyStatus == 'good'
+                              ? barColor
+                              : Colors.transparent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

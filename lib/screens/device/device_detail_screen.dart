@@ -38,7 +38,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         "name": "ㅇ",
         "details": {
           "supplyChangeDate": "2024-03-25T17:58:01.580+00:00",
-          "supplyStatus": "bad"
+          "supplyStatus": "average"
         },
         "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
       },
