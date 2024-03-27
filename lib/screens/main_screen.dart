@@ -13,10 +13,6 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   List<Widget> _screens = [
-    // Add your screens here
-    // Example: Screen1(),
-    //          Screen2(),
-    //          Screen3(),
     DeviceScreen(),
     SupplyScreen(),
     NotificationScreen(),

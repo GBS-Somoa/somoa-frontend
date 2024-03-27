@@ -28,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // // If test mode is enabled, simulate a successful login without making a network call
     // if (testMode) {
-    //   print("아무거나");
     //   _simulateSuccessfulLogin(context);
     //   return;
     // }
