@@ -739,6 +739,7 @@ class SupplyWidget extends StatelessWidget {
     );
   }
 
+  // 보유량 변경 다이얼로그
   void _showInventoryChangeDialog(BuildContext context) {
     TextEditingController _controller = TextEditingController();
     showDialog(
@@ -763,9 +764,13 @@ class SupplyWidget extends StatelessWidget {
           ),
           actions: <Widget>[
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 String newValue = _controller.text;
-                // TODO: 보유량 변경 api 호출 & maxAmount 갱신
+                // TODO: 보유량 변경 api 호출
+                if ((supplyInfo['details'] as Map)['supplyAmount'] < newValue) {
+                  await setMaxAmount(
+                      supplyInfo['id'] as String, newValue as int);
+                }
                 print('변경된 값: $newValue');
                 Navigator.of(context).pop();
               },
