@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:somoa/widgets/order_widget.dart';
 
 class OrderListScreen extends StatefulWidget {
   final String groupId;
@@ -13,14 +14,27 @@ class OrderListScreen extends StatefulWidget {
 }
 
 class _OrderListScreenState extends State<OrderListScreen> {
-  // List<Order> orders = [];
-  List<Order> orders = [
+  List<Map<String, Object>> orders = [
     {
-      "orderId": "asdf",
-      "storeName": "SSAPANG",
+      "orderId": 0,
+      "orderStore": "SSAPANG",
       "productName": "다우니 세제 1L",
       "orderDate": "2024-03-25",
       "orderStatus": "배송완료"
+    },
+    {
+      "orderId": 1,
+      "orderStore": "SSAPANG",
+      "productName": "다우니 세제 1L",
+      "orderDate": "2024-03-25",
+      "orderStatus": "결제완료"
+    },
+    {
+      "orderId": 2,
+      "orderStore": "삼성몰",
+      "productName": "어쩌구저쩌구 정품 필터",
+      "orderDate": "2024-03-25",
+      "orderStatus": "결제완료"
     },
   ];
 
@@ -38,9 +52,9 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
       if (response.statusCode == 200) {
         // Parse the response body and update the orders list
-        final List<dynamic> data = jsonDecode(response.body);
+        final List<Map<String, Object>> data = jsonDecode(response.body);
         setState(() {
-          orders = data.map((item) => Order.fromJson(item)).toList();
+          orders = data;
         });
       } else {
         // Handle error response
@@ -56,44 +70,19 @@ class _OrderListScreenState extends State<OrderListScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Order List'),
+        title: Text('주문 목록'),
       ),
       body: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, index) {
-          return OrderWidget(order: orders[index]);
+          final order = orders[index];
+          if (order['orderStatus'] != '주문취소') {
+            return OrderWidget(orderInfo: order);
+          } else {
+            return SizedBox(); // 주문 취소인 경우 아무 것도 렌더링하지 않음
+          }
         },
       ),
-    );
-  }
-}
-
-class Order {
-  final String id;
-  final String name;
-  // Add more properties as needed
-
-  Order({required this.id, required this.name});
-
-  factory Order.fromJson(Map<String, dynamic> json) {
-    return Order(
-      id: json['id'],
-      name: json['name'],
-      // Parse other properties from JSON
-    );
-  }
-}
-
-class OrderWidget extends StatelessWidget {
-  final Order order;
-
-  OrderWidget({required this.order});
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(order.name),
-      // Customize the widget as needed
     );
   }
 }
