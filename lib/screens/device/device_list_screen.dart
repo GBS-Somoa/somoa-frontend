@@ -29,28 +29,22 @@ class _DeviceScreenState extends State<DeviceScreen> {
       "deviceNickname": "세탁기",
       "deviceType": "Washer",
       "deviceModel": "최신형 세탁기",
+      "manufacturer": "LG",
       "supplies": [
         {
-          "supplyId": 101,
-          "supplyType": "washerDetergent",
-          "supplyName": "세탁 세제",
-          "supplyDuration": null,
-          "supplyStatus": null,
-          "supplyAmount": 1000,
-          "limit": {"option": "amount", "description": 150},
-          "supplyAmountTmp": null
+          "id": "6601bb29c4ec1e75ed8670be",
+          "type": "washerDetergent",
+          "name": "세탁세제",
+          "details": {"supplyAmount": 100},
+          "limit": {"supplyAmount": 300}
         },
         {
-          "supplyId": 102,
-          "supplyType": "fabricSoftener",
-          "supplyName": "섬유유연제",
-          "supplyDuration": null,
-          "supplyStatus": null,
-          "supplyAmount": 2000,
-          "supplyChangeDate": null,
-          "limit": {"option": "amount", "description": 100},
-          "supplyAmountTmp": null
-        }
+          "id": "6601bb29c4ec1e75ed8670bb",
+          "type": "fabricSoftener",
+          "name": "섬유유연제",
+          "details": {"supplyAmount": 1000},
+          "limit": {"supplyAmount": 100}
+        },
       ]
     },
     {
@@ -58,18 +52,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
       "deviceNickname": "가습기",
       "deviceType": "Humidifier",
       "deviceModel": "최신 가습기",
+      "manufacturer": "삼성",
       "supplies": [
         {
-          "supplyId": 201,
-          "supplyType": "supplyTank",
-          "supplyName": "물탱크",
-          "supplyDuration": null,
-          "supplyStatus": null,
-          "supplyAmount": 50,
-          "supplyChangeDate": "2024-03-21",
-          "limit": {"option": "amount", "description": 5},
-          "supplyAmountTmp": null,
-        }
+          "id": "6601bb29c4ec1e75ed8670sd",
+          "type": "supplyTank",
+          "name": "급수 탱크",
+          "details": {
+            "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+            "supplyLevel": 50
+          },
+          "limit": {"supplyChangeDate": 0, "supplyLevel": 10}
+        },
       ]
     },
     {
@@ -77,18 +71,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
       "deviceNickname": "제습기",
       "deviceType": "Dehumidifier",
       "deviceModel": "최신 제습기",
+      "manufacturer": "삼성",
       "supplies": [
         {
-          "supplyId": 301,
-          "supplyType": "drainTank",
-          "supplyName": "물탱크",
-          "supplyDuration": null,
-          "supplyStatus": null,
-          "supplyAmount": 10,
-          "supplyChangeDate": "2024-03-21",
-          "limit": {"option": "amount", "description": 195},
-          "supplyAmountTmp": null,
-        }
+          "id": "6601bb29c4ec1e75ed8645sd",
+          "type": "drainTank",
+          "name": "배수 탱크",
+          "details": {
+            "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+            "supplyLevel": 91
+          },
+          "limit": {"supplyChangeDate": 0, "supplyLevel": 90}
+        },
       ]
     },
     {
@@ -98,16 +92,15 @@ class _DeviceScreenState extends State<DeviceScreen> {
       "deviceModel": "최신 공기청정기",
       "supplies": [
         {
-          "supplyId": 501,
-          "supplyType": "replaceableFilter",
-          "supplyName": "필터",
-          "supplyDuration": 6,
-          "supplyStatus": "보통",
-          "supplyAmount": null,
-          "supplyChangeDate": "2024-03-10",
-          "limit": {"option": "status", "description": "나쁨"},
-          "supplyAmountTmp": null
-        }
+          "id": "6601bb29c4ec1e75ed8670ba",
+          "type": "replaceableFilter",
+          "name": "교체형 필터",
+          "details": {
+            "supplyChangeDate": "2024-03-25T17:58:01.580+00:00",
+            "supplyStatus": "normal"
+          },
+          "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
+        },
       ]
     },
     {
@@ -115,18 +108,18 @@ class _DeviceScreenState extends State<DeviceScreen> {
       "deviceNickname": "에어컨",
       "deviceType": "airConditioner",
       "deviceModel": "최신 에어컨",
+      "manufacturer": "삼성",
       "supplies": [
         {
-          "supplyId": 601,
-          "supplyType": "cleanableFilter",
-          "supplyName": "필터",
-          "supplyDuration": null,
-          "supplyStatus": "나쁨",
-          "supplyAmount": null,
-          "supplyChangeDate": "2023-03-21",
-          "limit": {"option": "status", "description": "나쁨"},
-          "supplyAmountTmp": null
-        }
+          "id": "6601bb29c4ec1e75ed8670bc",
+          "type": "cleanableFilter",
+          "name": "청소형 필터",
+          "details": {
+            "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+            "supplyStatus": "good"
+          },
+          "limit": {"supplyChangeDate": 365, "supplyStatus": "null"}
+        },
       ]
     },
     {
@@ -136,26 +129,14 @@ class _DeviceScreenState extends State<DeviceScreen> {
       "deviceModel": "최신 청소기",
       "supplies": [
         {
-          "supplyId": 701,
-          "supplyType": "cleanableFilter",
-          "supplyName": "필터",
-          "supplyDuration": null,
-          "supplyStatus": "나쁨",
-          "supplyAmount": null,
-          "supplyChangeDate": "2023-03-21",
-          "limit": {"option": "status", "description": "나쁨"},
-          "supplyAmountTmp": null
-        },
-        {
-          "supplyId": 702,
-          "supplyType": "dustBin",
-          "supplyName": "먼지봉투",
-          "supplyDuration": null,
-          "supplyStatus": null,
-          "supplyAmount": 8,
-          "supplyChangeDate": "2023-12-21",
-          "limit": {"option": "amount", "description": 10},
-          "supplyAmountTmp": null
+          "id": "6601bb29c4ec1ewerd8645sd",
+          "type": "dustBin",
+          "name": "먼지봉투",
+          "details": {
+            "supplyChangeDate": "2023-03-25T17:58:01.584+00:00",
+            "supplyStatus": 7
+          },
+          "limit": {"supplyChangeDate": 0, "supplyStatus": 9}
         }
       ]
     },

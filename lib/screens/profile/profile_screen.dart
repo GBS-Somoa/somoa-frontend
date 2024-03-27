@@ -55,7 +55,7 @@ class ProfileScreen extends StatelessWidget {
                         title: Text('장소 관리'),
                         onTap: () {
                           print('Item 2 tapped');
-                          Navigator.pushNamed(context, '/location-setting-screen');
+                          Navigator.pushNamed(context, '/locationSetting');
                         },
                       ),
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:somoa/screens/device/device_detail_screen.dart';
 import 'package:somoa/widgets/water_saturation_widget.dart';
 
@@ -9,6 +10,10 @@ class DeviceWidget extends StatelessWidget {
     super.key,
     required this.deviceInfo,
   });
+
+  transformDate(String date) {
+    return DateFormat('yyyy-MM-dd').format(DateTime.parse(date));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +63,7 @@ class DeviceWidget extends StatelessWidget {
   List<Widget> _buildSupplyList(List<dynamic> supplies) {
     List<Widget> supplyWidgets = [];
     for (var supply in supplies) {
-      String supplyType = supply['supplyType'];
+      String supplyType = supply['type'];
       Widget supplyInfoWidget;
 
       if (supplyType == 'washerDetergent' || supplyType == 'fabricSoftener') {
@@ -66,16 +71,16 @@ class DeviceWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '${supply['supplyName']}',
+              '${supply['name']}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 4),
             Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('현재 보유량'),
+                const Text('현재 보유량'),
                 Text(
-                  '${supply['supplyAmount']} ml',
+                  '${supply['details']['supplyAmount']} ml',
                   style: const TextStyle(
                       fontSize: 18, fontWeight: FontWeight.bold),
                 ),
@@ -88,7 +93,7 @@ class DeviceWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '${supply['supplyName']}',
+              '${supply['name']}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 4),
@@ -97,16 +102,17 @@ class DeviceWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const Text('최근 교체 날짜'),
-                  Text('${supply['supplyChangeDate']}',
+                  Text(transformDate(supply['details']['supplyChangeDate']),
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
-              if (supply['supplyAmount']
+              if (supply['details']['supplyLevel']
                   is int) // Check if supplyAmount is an integer
                 Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: WaterSaturationWidget(amount: supply['supplyAmount']),
+                  child: WaterSaturationWidget(
+                      level: supply['details']['supplyLevel']),
                 ),
             ])
           ],
@@ -117,24 +123,36 @@ class DeviceWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '${supply['supplyName']}',
+              '${supply['name']}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 4),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '상태: ${supply['supplyStatus'] ?? 'N/A'}',
-                  style: const TextStyle(fontSize: 14),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('최근 교체 날짜'),
+                  Text(transformDate(supply['details']['supplyChangeDate']),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    const Text('필터 상태'),
+                    const SizedBox(height: 5),
+                    Image.asset(
+                      'assets/images/face=${supply['details']['supplyStatus']}.png',
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '${supplyType == 'cleanableFilter' ? '최근 청소 날짜' : '최근 교체 날짜'}: ${supply['supplyChangeDate']}',
-                  style: const TextStyle(fontSize: 14),
-                )
-              ],
-            ),
+              ),
+            ]),
             const SizedBox(height: 8),
           ],
         );
@@ -144,23 +162,37 @@ class DeviceWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '${supply['supplyName']}',
+              '${supply['name']}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 4),
-            Text(
-              '포화정도: ${supply['supplyAmount']}/10',
-              style: const TextStyle(fontSize: 20),
-            ),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                const Text('최근 교체 날짜'),
-                Text('${supply['supplyChangeDate']}',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold)),
-              ],
-            ),
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('최근 교체 날짜'),
+                  Text(transformDate(supply['details']['supplyChangeDate']),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Column(
+                  children: [
+                    const Text(
+                      '포화 정도',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                    Text(
+                      '${supply['details']['supplyStatus']} / 10',
+                      style: const TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+            ]),
             const SizedBox(height: 8),
           ],
         );
@@ -169,7 +201,7 @@ class DeviceWidget extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Text(
-              '${supply['supplyName']}',
+              '${supply['name']}',
               style: const TextStyle(fontSize: 16),
             ),
             const SizedBox(height: 4),

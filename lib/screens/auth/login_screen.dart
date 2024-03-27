@@ -1,8 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:somoa/screens/auth/registration_screen.dart';
 import 'package:somoa/providers/user_provider.dart';
@@ -27,75 +24,32 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> login(BuildContext context) async {
 // Check if test mode is enabled
-    bool testMode = false; // Set this flag to true to enable test mode
+    // bool testMode = false; // Set this flag to true to enable test mode
 
-    // If test mode is enabled, simulate a successful login without making a network call
-    if (testMode) {
-      print("아무거나");
-      _simulateSuccessfulLogin(context);
-      return;
-    }
+    // // If test mode is enabled, simulate a successful login without making a network call
+    // if (testMode) {
+    //   _simulateSuccessfulLogin(context);
+    //   return;
+    // }
 
-    // 로그인 요청을 보낼 서버의 URL
-    String url = dotenv.get("SERVER_URL");
+    final loginResult = await Provider.of<UserProvider>(context, listen: false)
+        .login(
+            keepLoggedIn: _keepLoggedIn,
+            username: idController.text,
+            password: passwordController.text);
 
-    // 사용자가 입력한 아이디와 비밀번호
-    String id = idController.text;
-    String password = passwordController.text;
-
-    // 서버에 보낼 데이터
-    Map<String, String> data = {'username': id, 'password': password};
-
-    // 로그인 요청 보내기
-    try {
-      final response = await http.post(
-        Uri.parse(url + 'user/login'),
-        body: jsonEncode(data),
-        headers: {'Content-Type': 'application/json'},
-      );
-
-      // 서버에서 받은 응답 확인
-      if (response.statusCode == 200) {
-        // 로그인 성공
-        if (context.mounted) {
-          print('로그인 성공');
-          print(response.body);
-          await _saveKeepLoggedIn(_keepLoggedIn);
-          Provider.of<UserProvider>(context, listen: false).login(
-              keepLoggedIn: _keepLoggedIn,
-              username: id,
-              password: password,
-              nickname: jsonDecode(response.body)['nickname'] ?? '임시 닉네임',
-              accessToken: jsonDecode(response.body)['accessToken'],
-              refreshToken: jsonDecode(response.body)['refreshToken']);
-          Navigator.pushReplacementNamed(context, '/main');
-        }
-      } else {
-        // 로그인 실패
-        if (context.mounted) {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('로그인 실패'),
-              content: const Text('아이디 또는 비밀번호가 올바르지 않습니다.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('확인'),
-                ),
-              ],
-            ),
-          );
-        }
+    if (loginResult == "success") {
+      await _saveKeepLoggedIn(_keepLoggedIn);
+      if (context.mounted) {
+        Navigator.pushReplacementNamed(context, '/main');
       }
-    } catch (e) {
-      print('로그인 요청 중 오류 발생: $e');
+    } else {
       if (context.mounted) {
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
-            title: const Text('오류'),
-            content: const Text('로그인 요청 중 오류가 발생했습니다.'),
+            title: const Text('로그인 실패'),
+            content: Text(loginResult!),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -109,20 +63,20 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   // Function to simulate a successful login
-  void _simulateSuccessfulLogin(BuildContext context) {
-    if (context.mounted) {
-      print({"id": idController.text, "password": passwordController.text});
-      Provider.of<UserProvider>(context, listen: false).login(
-        keepLoggedIn: _keepLoggedIn,
-        username: idController.text,
-        password: passwordController.text,
-        nickname: "테스트 모드",
-        accessToken: "asdf",
-        refreshToken: "qwer",
-      );
-      Navigator.pushReplacementNamed(context, '/main');
-    }
-  }
+  // void _simulateSuccessfulLogin(BuildContext context) {
+  //   if (context.mounted) {
+  //     print({"id": idController.text, "password": passwordController.text});
+  //     Provider.of<UserProvider>(context, listen: false).login(
+  //       keepLoggedIn: _keepLoggedIn,
+  //       username: idController.text,
+  //       password: passwordController.text,
+  //       nickname: "테스트 모드",
+  //       accessToken: "asdf",
+  //       refreshToken: "qwer",
+  //     );
+  //     Navigator.pushReplacementNamed(context, '/main');
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
