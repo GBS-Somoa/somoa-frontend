@@ -102,11 +102,11 @@ class DeviceWidget extends StatelessWidget {
                           fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
-              if (supply['supplyAmount']
+              if (supply['supplyLevel']
                   is int) // Check if supplyAmount is an integer
                 Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: WaterSaturationWidget(amount: supply['supplyAmount']),
+                  child: WaterSaturationWidget(level: supply['supplyLevel']),
                 ),
             ])
           ],
@@ -149,7 +149,7 @@ class DeviceWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              '포화정도: ${supply['supplyAmount']}/10',
+              '포화정도: ${supply['supplyStatus']}/10',
               style: const TextStyle(fontSize: 20),
             ),
             Column(

@@ -28,50 +28,80 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       {
         "id": "6601bb29c4ec1e75ed8670bb",
         "type": "fabricSoftener",
-        "name": "ㅁ",
+        "name": "섬유유연제",
         "details": {"supplyAmount": 1000},
         "limit": {"supplyAmount": 100}
       },
       {
         "id": "6601bb29c4ec1e75ed8670ba",
         "type": "replaceableFilter",
-        "name": "ㅇ",
+        "name": "교체형 필터",
         "details": {
           "supplyChangeDate": "2024-03-25T17:58:01.580+00:00",
-          "supplyStatus": "average"
+          "supplyStatus": "normal"
         },
         "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
       },
       {
         "id": "6601bb29c4ec1e75ed8670be",
         "type": "washerDetergent",
-        "name": "ㅗ",
+        "name": "세탁세제",
         "details": {"supplyAmount": 100},
         "limit": {"supplyAmount": 300}
       },
       {
         "id": "6601bb29c4ec1e75ed8670bf",
         "type": "dishRinse",
-        "name": "ㅇ",
+        "name": "식기세척기 린스",
         "details": {"supplyAmount": 0},
         "limit": {"supplyAmount": 0}
       },
       {
         "id": "6601bb29c4ec1e75ed8670bd",
         "type": "dishDetergent",
-        "name": "ㄹ",
+        "name": "세제",
         "details": {"supplyAmount": 0},
         "limit": {"supplyAmount": 0}
       },
       {
         "id": "6601bb29c4ec1e75ed8670bc",
         "type": "cleanableFilter",
-        "name": "ㅎ",
+        "name": "청소형 필터",
         "details": {
           "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
           "supplyStatus": "good"
         },
-        "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
+        "limit": {"supplyChangeDate": 365, "supplyStatus": "null"}
+      },
+      {
+        "id": "6601bb29c4ec1e75ed8670sd",
+        "type": "supplyTank",
+        "name": "급수 탱크",
+        "details": {
+          "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+          "supplyLevel": 50
+        },
+        "limit": {"supplyChangeDate": 0, "supplyLevel": 10}
+      },
+      {
+        "id": "6601bb29c4ec1e75ed8645sd",
+        "type": "drainTank",
+        "name": "배수 탱크",
+        "details": {
+          "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+          "supplyLevel": 91
+        },
+        "limit": {"supplyChangeDate": 0, "supplyLevel": 90}
+      },
+      {
+        "id": "6601bb29c4ec1ewerd8645sd",
+        "type": "dustBin",
+        "name": "먼지봉투",
+        "details": {
+          "supplyChangeDate": "2023-03-25T17:58:01.584+00:00",
+          "supplyStatus": 7
+        },
+        "limit": {"supplyChangeDate": 0, "supplyStatus": 9}
       }
     ]
   };
@@ -91,18 +121,23 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       if (details.containsKey('supplyAmount') &&
           limit.containsKey('supplyAmount')) {
         if (
+            // 다른 것들은 limit 보다 작으면 관리 필요로 판단
+            details['supplyAmount'] <= limit['supplyAmount']) {
+          statusSummary++;
+        }
+      }
+
+      if (details.containsKey('supplyLevel') &&
+          limit.containsKey('supplyLevel')) {
+        if (
             // 배수 탱크인 경우, 임계치 이상이면 관리 필요로 판단
             supply['type'] == 'drainTank' &&
-                details['supplyAmount'] <= limit['supplyAmount']) {
+                details['supplyLevel'] >= limit['supplyLevel']) {
           statusSummary++;
         } else if (
             // 급수 탱크인 경우, 임계치 이하면 관리 필요로 판단
             supply['type'] == 'supplyTank' &&
-                details['supplyAmount'] <= limit['supplyAmount']) {
-          statusSummary++;
-        } else if (
-            // 다른 것들은 limit 보다 작으면 관리 필요로 판단
-            details['supplyAmount'] <= limit['supplyAmount']) {
+                details['supplyLevel'] <= limit['supplyLevel']) {
           statusSummary++;
         }
       }
@@ -118,11 +153,17 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
       if (details.containsKey('supplyStatus') &&
           limit.containsKey('supplyStatus')) {
-        List<String> statusOrder = ['good', 'normal', 'bad'];
-        int detailIndex = statusOrder.indexOf(details['supplyStatus']);
-        int limitIndex = statusOrder.indexOf(limit['supplyStatus']);
-        if (detailIndex <= limitIndex) {
-          statusSummary++;
+        if (supply['type'] == 'dustBin') {
+          if (details['supplyStatus'] >= limit['supplyStatus']) {
+            statusSummary++;
+          }
+        } else {
+          List<String> statusOrder = ['good', 'normal', 'bad'];
+          int detailIndex = statusOrder.indexOf(details['supplyStatus']);
+          int limitIndex = statusOrder.indexOf(limit['supplyStatus']);
+          if (detailIndex <= limitIndex) {
+            statusSummary++;
+          }
         }
       }
     });

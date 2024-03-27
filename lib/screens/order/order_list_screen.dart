@@ -13,7 +13,16 @@ class OrderListScreen extends StatefulWidget {
 }
 
 class _OrderListScreenState extends State<OrderListScreen> {
-  List<Order> orders = [];
+  // List<Order> orders = [];
+  List<Order> orders = [
+    {
+      "orderId": "asdf",
+      "storeName": "SSAPANG",
+      "productName": "다우니 세제 1L",
+      "orderDate": "2024-03-25",
+      "orderStatus": "배송완료"
+    },
+  ];
 
   @override
   void initState() {

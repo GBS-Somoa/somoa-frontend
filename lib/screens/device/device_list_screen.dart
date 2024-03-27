@@ -65,9 +65,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
           "supplyName": "물탱크",
           "supplyDuration": null,
           "supplyStatus": null,
-          "supplyAmount": 50,
+          "supplyLevel": 50,
           "supplyChangeDate": "2024-03-21",
-          "limit": {"option": "amount", "description": 5},
+          "limit": {"option": "level", "description": 5},
           "supplyAmountTmp": null,
         }
       ]
@@ -84,9 +84,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
           "supplyName": "물탱크",
           "supplyDuration": null,
           "supplyStatus": null,
-          "supplyAmount": 10,
+          "supplyLevel": 10,
           "supplyChangeDate": "2024-03-21",
-          "limit": {"option": "amount", "description": 195},
+          "limit": {"option": "level", "description": 195},
           "supplyAmountTmp": null,
         }
       ]
@@ -151,10 +151,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
           "supplyType": "dustBin",
           "supplyName": "먼지봉투",
           "supplyDuration": null,
-          "supplyStatus": null,
-          "supplyAmount": 8,
+          "supplyStatus": 8,
           "supplyChangeDate": "2023-12-21",
-          "limit": {"option": "amount", "description": 10},
+          "limit": {"option": "status", "description": 10},
           "supplyAmountTmp": null
         }
       ]
