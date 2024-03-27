@@ -40,11 +40,9 @@ class _LoginScreenState extends State<LoginScreen> {
             password: passwordController.text);
 
     if (loginResult == "success") {
+      await _saveKeepLoggedIn(_keepLoggedIn);
       if (context.mounted) {
-        await _saveKeepLoggedIn(_keepLoggedIn);
-        if (context.mounted) {
-          Navigator.pushReplacementNamed(context, '/main');
-        }
+        Navigator.pushReplacementNamed(context, '/main');
       }
     } else {
       if (context.mounted) {

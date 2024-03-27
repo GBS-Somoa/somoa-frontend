@@ -84,7 +84,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
           "supplyName": "물탱크",
           "supplyDuration": null,
           "supplyStatus": null,
-          "supplyAmount": 10,
+          "supplyAmount": 80,
           "supplyChangeDate": "2024-03-21",
           "limit": {"option": "amount", "description": 195},
           "supplyAmountTmp": null,

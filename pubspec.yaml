@@ -43,6 +43,8 @@ dependencies:
   shared_preferences: ^2.2.2
   intl: ^0.19.0
   flutter_secure_storage: ^9.0.0
+  android_id: ^0.3.6
+  liquid_progress_indicator_v2: ^0.5.0
 
 dev_dependencies:
   flutter_test:

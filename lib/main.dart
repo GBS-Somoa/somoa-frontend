@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_create_screen.dart';
@@ -69,6 +70,8 @@ void main() async {
   );
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
+  const FlutterSecureStorage storage = FlutterSecureStorage();
 
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // id
@@ -142,6 +145,7 @@ void main() async {
   print('User granted permission: ${settings.authorizationStatus}');
 
   String? token = await messaging.getToken();
+  await storage.write(key: 'fcmToken', value: token);
 
   print('FCM Token: $token');
 
