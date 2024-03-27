@@ -9,8 +9,8 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
   const MenuBarWidget({
     super.key,
     required this.titleText,
-    this.appBarHeight = 85.0, // AppBar의 높이 기본값
-    this.topPadding = 25.0, // 상단 여백 기본값
+    this.appBarHeight = 85.0,
+    this.topPadding = 25.0,
     this.title,
   });
 
@@ -18,7 +18,7 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(height: topPadding), // 상단 여백
+        SizedBox(height: topPadding),
         Container(
           height: appBarHeight,
           alignment: Alignment.center,
@@ -35,5 +35,5 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
   }
 
   @override
-  Size get preferredSize => Size.fromHeight(appBarHeight + topPadding); // AppBar 높이와 상단 패딩을 합한 값을 반환
+  Size get preferredSize => Size.fromHeight(appBarHeight + topPadding);
 }

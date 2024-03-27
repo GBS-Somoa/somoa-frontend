@@ -97,11 +97,9 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
           });
         }
       } else {
-        // 서버 에러 처리
         print('장소 로딩 실패');
       }
     } catch (e) {
-      // 예외 처리
       print(e.toString());
     }
   }
@@ -129,7 +127,6 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
       }
 
     } catch (e) {
-      // 예외 처리
       print(e.toString());
     }
   }
