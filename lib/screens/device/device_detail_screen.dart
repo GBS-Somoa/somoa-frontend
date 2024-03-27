@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:somoa/screens/device/device_info_screen.dart';
 import 'dart:convert';
 
 import 'package:somoa/widgets/supply_widget.dart';
@@ -234,9 +235,20 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               }
             },
             itemBuilder: (BuildContext context) => [
-              const PopupMenuItem<String>(
-                value: 'device_info',
-                child: Text('기기 정보'),
+              PopupMenuItem<String>(
+                value: '기기 정보',
+                child: const Text('기기 정보'),
+                onTap: () {
+                  // deviceDetailScreen으로 이동하는 코드
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DeviceInfoScreen(
+                        deviceInfo: data,
+                      ),
+                    ),
+                  );
+                },
               ),
               const PopupMenuItem<String>(
                 value: 'change_name',
