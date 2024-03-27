@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String titleText;
   final double appBarHeight;
   final double topPadding;
   final String? title;
 
-  const CustomAppBar({
+  const MenuBarWidget({
     super.key,
     required this.titleText,
     this.appBarHeight = 85.0, // AppBar의 높이 기본값
