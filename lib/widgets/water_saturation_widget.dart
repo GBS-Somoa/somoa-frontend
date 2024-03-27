@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 class WaterSaturationWidget extends StatelessWidget {
-  final int amount;
+  final int level;
 
   const WaterSaturationWidget({
     super.key,
-    required this.amount,
+    required this.level,
   });
 
   @override
@@ -15,16 +15,16 @@ class WaterSaturationWidget extends StatelessWidget {
       height: 100,
       child: CustomPaint(
         size: const Size(100, 100),
-        painter: _WaterSaturationPainter(amount: amount),
+        painter: _WaterSaturationPainter(level: level),
       ),
     );
   }
 }
 
 class _WaterSaturationPainter extends CustomPainter {
-  final int amount;
+  final int level;
 
-  _WaterSaturationPainter({required this.amount});
+  _WaterSaturationPainter({required this.level});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -37,7 +37,7 @@ class _WaterSaturationPainter extends CustomPainter {
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.0;
 
-    double filledHeight = size.height * (amount / 100);
+    double filledHeight = size.height * (level / 100);
     double unfilledHeight = size.height - filledHeight;
 
     // Draw the filled area
@@ -49,9 +49,9 @@ class _WaterSaturationPainter extends CustomPainter {
     // Draw the border of the box
     canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), borderPaint);
 
-    // Render the amount text inside the box
+    // Render the level text inside the box
     TextSpan span = TextSpan(
-      text: '$amount%', // Render the amount as percentage
+      text: '$level%', // Render the level as percentage
       style: TextStyle(color: Colors.black, fontSize: 16),
     );
     TextPainter tp = TextPainter(

@@ -37,10 +37,16 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
                 children: [
                   TextField(
                     controller: _deviceCodeController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '기기 코드',
-                      border: OutlineInputBorder(
+                      border: const OutlineInputBorder(
                         borderSide: BorderSide(color: Colors.black),
+                      ),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.qr_code),
+                        onPressed: () {
+                          // TODO: Implement QR code scanning functionality
+                        },
                       ),
                     ),
                   ),

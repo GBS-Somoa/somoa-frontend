@@ -77,7 +77,7 @@ class ProfileScreen extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        '진행중인 배송',
+                        '나의 주문 목록',
                         textAlign: TextAlign.start,
                         style: TextStyle(fontSize: 16),
                       )

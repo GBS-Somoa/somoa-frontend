@@ -31,7 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // If test mode is enabled, simulate a successful login without making a network call
     if (testMode) {
-      print("아무거나");
       _simulateSuccessfulLogin(context);
       return;
     }
@@ -73,6 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         // 로그인 실패
         if (context.mounted) {
+          print(jsonDecode(response.body));
           showDialog(
             context: context,
             builder: (context) => AlertDialog(
