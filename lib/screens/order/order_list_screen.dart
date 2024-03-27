@@ -77,7 +77,23 @@ class _OrderListScreenState extends State<OrderListScreen> {
         itemBuilder: (context, index) {
           final order = orders[index];
           if (order['orderStatus'] != '주문취소') {
-            return OrderWidget(orderInfo: order);
+            return Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    order['orderDate'] as String,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black87,
+                    ),
+                    textAlign: TextAlign.start,
+                  ),
+                  OrderWidget(orderInfo: order),
+                ],
+              ),
+            );
           } else {
             return SizedBox(); // 주문 취소인 경우 아무 것도 렌더링하지 않음
           }

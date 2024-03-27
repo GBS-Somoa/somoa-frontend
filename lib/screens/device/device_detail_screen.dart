@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/screens/device/device_info_screen.dart';
+import 'package:somoa/widgets/order_widget.dart';
 import 'dart:convert';
 
 import 'package:somoa/widgets/supply_widget.dart';
@@ -106,6 +107,31 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       }
     ]
   };
+
+  // 임시 기기와 연관된 소모품 주문 데이터
+  List<Map<String, Object>> orders = [
+    {
+      "orderId": 0,
+      "orderStore": "SSAPANG",
+      "productName": "다우니 세제 1L",
+      "orderDate": "2024-03-25",
+      "orderStatus": "배송완료"
+    },
+    {
+      "orderId": 1,
+      "orderStore": "SSAPANG",
+      "productName": "다우니 세제 1L",
+      "orderDate": "2024-03-25",
+      "orderStatus": "결제완료"
+    },
+    {
+      "orderId": 2,
+      "orderStore": "삼성몰",
+      "productName": "어쩌구저쩌구 정품 필터",
+      "orderDate": "2024-03-25",
+      "orderStatus": "결제완료"
+    },
+  ];
 
   int statusSummary = 0;
 
@@ -220,23 +246,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         centerTitle: true,
         actions: [
           PopupMenuButton<String>(
-            onSelected: (String choice) {
-              // Handle choice selection
-              switch (choice) {
-                case 'device_info':
-                  // Handle device information action
-                  break;
-                case 'change_name':
-                  // Handle change name action
-                  break;
-                case 'delete_device':
-                  // Handle delete device action
-                  break;
-              }
-            },
             itemBuilder: (BuildContext context) => [
               PopupMenuItem<String>(
-                value: '기기 정보',
                 child: const Text('기기 정보'),
                 onTap: () {
                   // deviceDetailScreen으로 이동하는 코드
@@ -251,11 +262,9 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                 },
               ),
               const PopupMenuItem<String>(
-                value: 'change_name',
                 child: Text('이름 변경'),
               ),
               const PopupMenuItem<String>(
-                value: 'delete_device',
                 child: Text('기기 삭제', style: TextStyle(color: Colors.red)),
               ),
             ],
@@ -281,20 +290,29 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: 30),
-                    const Text(
-                      '진행중인 배송',
-                      textAlign: TextAlign.start,
-                    ),
+                    if (orders.isNotEmpty)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          const Text(
+                            '진행중인 배송',
+                            textAlign: TextAlign.start,
+                          ),
+                          for (var order in orders)
+                            OrderWidget(orderInfo: order),
+                        ],
+                      ),
                     const SizedBox(height: 10),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: (data['supplies'] as List).length,
-                      itemBuilder: (context, index) {
-                        return SupplyWidget(
-                          supplyInfo: (data['supplies'] as List)[index],
-                        );
-                      },
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        const Text(
+                          '소모품 목록',
+                          textAlign: TextAlign.start,
+                        ),
+                        for (var supply in data['supplies'] as List)
+                          SupplyWidget(supplyInfo: supply),
+                      ],
                     ),
                   ],
                 ),
