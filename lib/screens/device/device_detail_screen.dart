@@ -32,7 +32,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         "type": "fabricSoftener",
         "name": "섬유유연제",
         "details": {"supplyAmount": 1000},
-        "limit": {"supplyAmount": 100}
+        "limit": {"supplyAmount": 100},
+        'supplyAmountTmp': 0,
       },
       {
         "id": "6601bb29c4ec1e75ed8670ba",
@@ -49,21 +50,24 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         "type": "washerDetergent",
         "name": "세탁세제",
         "details": {"supplyAmount": 100},
-        "limit": {"supplyAmount": 300}
+        "limit": {"supplyAmount": 300},
+        'supplyAmountTmp': 0,
       },
       {
         "id": "6601bb29c4ec1e75ed8670bf",
         "type": "dishRinse",
         "name": "식기세척기 린스",
-        "details": {"supplyAmount": 0},
-        "limit": {"supplyAmount": 0}
+        "details": {"supplyAmount": 100},
+        "limit": {"supplyAmount": 0},
+        'supplyAmountTmp': 500,
       },
       {
         "id": "6601bb29c4ec1e75ed8670bd",
         "type": "dishDetergent",
         "name": "세제",
         "details": {"supplyAmount": 0},
-        "limit": {"supplyAmount": 0}
+        "limit": {"supplyAmount": 0},
+        'supplyAmountTmp': 2000,
       },
       {
         "id": "6601bb29c4ec1e75ed8670bc",
@@ -91,7 +95,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         "name": "배수 탱크",
         "details": {
           "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-          "supplyLevel": 91
+          "supplyLevel": 95
         },
         "limit": {"supplyChangeDate": 0, "supplyLevel": 90}
       },

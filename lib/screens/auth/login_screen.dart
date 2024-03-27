@@ -72,7 +72,7 @@ class _LoginScreenState extends State<LoginScreen> {
       } else {
         // 로그인 실패
         if (context.mounted) {
-          print(response.body);
+          print(jsonDecode(response.body));
           showDialog(
             context: context,
             builder: (context) => AlertDialog(

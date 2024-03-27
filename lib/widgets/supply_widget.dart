@@ -1,19 +1,42 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SupplyWidget extends StatelessWidget {
   final Map<String, Object> supplyInfo;
 
   const SupplyWidget({super.key, required this.supplyInfo});
 
+  Future<String?> getAccessToken() async {
+    final storage = FlutterSecureStorage();
+    return await storage.read(key: 'accessToken');
+  }
+
   @override
   Widget build(BuildContext context) {
+    void fetchData() async {
+      String? accessToken = await getAccessToken();
+      print(accessToken);
+    }
+
+    fetchData();
     switch (supplyInfo['type']) {
       case 'washerDetergent':
       case 'fabricSoftener':
       case 'dishDetergent':
       case 'dishRinse':
-        return _buildDetergentCard(context);
+        return FutureBuilder<Widget>(
+          future: _buildDetergentCard(context),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return snapshot.data!;
+            } else {
+              return CircularProgressIndicator();
+            }
+          },
+        );
       case 'cleanableFilter':
       case 'replaceableFilter':
         return _buildFilterCard(context);
@@ -27,9 +50,30 @@ class SupplyWidget extends StatelessWidget {
     }
   }
 
-  Widget _buildDetergentCard(BuildContext context) {
+  // shared preference 저장소에서 supplyId에 해당하는 maxAmount 값을 가져오는 함수
+  static Future<int> getMaxAmount(supplyId) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String key = "maxAmount_$supplyId";
+    int? maxAmount = prefs.getInt(key);
+    return maxAmount ?? 1000;
+  }
+
+  // shared preference 저장소에서 supplyId에 해당하는 maxAmount 값을 저장하는 함수
+  static Future<void> setMaxAmount(String supplyId, int maxAmount) async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String key = "maxAmount_$supplyId";
+    await prefs.setInt(key, maxAmount);
+  }
+
+  Future<Widget> _buildDetergentCard(BuildContext context) async {
     // TODO: 기기 내부에 저장된 데이터에서 supplyId에 맞는 maxAmount를 가져오도록 작성해야함
-    int maxAmount = 1000;
+    int maxAmount = await getMaxAmount(supplyInfo['id']);
+
+    bool isSupplyAmountTmp = supplyInfo['supplyAmountTmp'] != 0 ? true : false;
+
+    if (isSupplyAmountTmp) {
+      maxAmount = maxAmount + (supplyInfo['supplyAmountTmp'] as int);
+    }
 
     int supplyAmount = (supplyInfo['details'] as Map)['supplyAmount'];
     int limitAmount = (supplyInfo['limit'] as Map)['supplyAmount'];
@@ -46,11 +90,14 @@ class SupplyWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(supplyInfo['name'].toString()),
-                Text('${supplyAmount}ml'),
+                isSupplyAmountTmp
+                    ? Text(
+                        '${supplyAmount}(+${supplyInfo['supplyAmountTmp']})ml')
+                    : Text('${supplyAmount}ml'),
               ],
             ),
           ),
-          // 보유량 막대바 -> AmountTmp 추가해야함(TODO)
+          // 보유량 막대바
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: SizedBox(
@@ -68,7 +115,9 @@ class SupplyWidget extends StatelessWidget {
                             width: double.infinity,
                             height: double.infinity,
                             decoration: BoxDecoration(
-                              color: const Color.fromARGB(255, 219, 219, 219),
+                              color: isSupplyAmountTmp
+                                  ? Colors.lightGreen[200]
+                                  : Color.fromARGB(255, 219, 219, 219),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
@@ -186,7 +235,7 @@ class SupplyWidget extends StatelessWidget {
     double supplyAmount = supplyStatus == 'bad'
         ? 0.33
         : supplyStatus == 'normal'
-            ? 0.66
+            ? 0.67
             : supplyStatus == 'good'
                 ? 1.0
                 : 0.0;
@@ -194,7 +243,7 @@ class SupplyWidget extends StatelessWidget {
     double limitAmount = limitStatus == 'bad'
         ? 0.33
         : limitStatus == 'normal'
-            ? 0.66
+            ? 0.67
             : limitStatus == 'good'
                 ? 1.0
                 : 0.0;
@@ -696,27 +745,27 @@ class SupplyWidget extends StatelessWidget {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('${supplyInfo['name']} 보유량 변경'),
+          title: Text(
+            '${supplyInfo['name']} 보유량 변경',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 20),
+          ),
           content: TextFormField(
             controller: _controller,
             keyboardType: TextInputType.number,
+            inputFormatters: <TextInputFormatter>[
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // 숫자만 입력 허용
+            ],
             decoration: const InputDecoration(
               hintText: '변경할 보유량을 입력하세요',
+              suffixText: 'ml',
             ),
           ),
           actions: <Widget>[
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: const Text('취소'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // 처리할 로직 추가 (예: 보유량 변경)
                 String newValue = _controller.text;
-                // 여기서 변경된 값을 처리하거나 전달할 수 있습니다.
-                // 예를 들어, 변경된 값으로 API 호출을 하거나 상태를 업데이트할 수 있습니다.
+                // TODO: 보유량 변경 api 호출 & maxAmount 갱신
                 print('변경된 값: $newValue');
                 Navigator.of(context).pop();
               },
