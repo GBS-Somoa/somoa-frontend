@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:somoa/providers/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -14,22 +17,49 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
       TextEditingController();
   final TextEditingController nicknameController = TextEditingController();
 
-  String confirmPasswordErrorText = '';
+  Future<void> _saveKeepLoggedIn(bool value) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('keepLoggedIn', value);
+  }
 
-  bool isKeepLoggedIn = false; // Default value for keepLoggedIn checkbox
+  bool isKeepLoggedIn = false;
+
+  bool _isFormValid = false;
+  bool _isIdFormValid = false;
+  bool _isPasswordValid = false;
+  bool _isPassword1Valid = false;
+  bool _isPasswordMatch = false;
+  bool _isNicknameFormValid = false;
 
   @override
   void initState() {
     super.initState();
-    // 비밀번호, 비밀번호 확인에 담긴 문자열이 일치하는지 확인 => 불일치하면 에러메시지 생성됨
-    confirmPasswordController.addListener(() {
-      setState(() {
-        if (confirmPasswordController.text != passwordController.text) {
-          confirmPasswordErrorText = "비밀번호가 일치하지 않습니다";
-        } else {
-          confirmPasswordErrorText = '';
-        }
-      });
+
+    idController.addListener(_validateForm);
+    passwordController.addListener(_validateForm);
+    confirmPasswordController.addListener(_validateForm);
+    nicknameController.addListener(_validateForm);
+  }
+
+  bool _validatePassword(String password) {
+    RegExp regex = RegExp(r'^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,20}$');
+    return regex.hasMatch(password);
+  }
+
+  void _validateForm() {
+    bool isPasswordCompliant = _validatePassword(passwordController.text);
+    bool isPasswordsMatch =
+        passwordController.text == confirmPasswordController.text;
+    setState(() {
+      _isFormValid = idController.text.isNotEmpty &&
+          isPasswordCompliant &&
+          isPasswordsMatch &&
+          nicknameController.text.isNotEmpty;
+      _isPassword1Valid = isPasswordCompliant;
+      _isPasswordMatch = isPasswordsMatch;
+      _isPasswordValid = isPasswordCompliant && isPasswordsMatch;
+      _isIdFormValid = idController.text.isNotEmpty;
+      _isNicknameFormValid = nicknameController.text.isNotEmpty;
     });
   }
 
@@ -42,65 +72,102 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
     super.dispose();
   }
 
-  void signUp(BuildContext context) {
+  Future<void> signUp(BuildContext context) async {
     // signUp 로직 작성
-    Map<String, String> data = {
-      "id": idController.text,
-      "password": passwordController.text,
-      "nickname": nicknameController.text
-    };
-
-    print(data);
-
-    // TODO : 서버로 요청 전송, 회원가입 성공하면 로그인화면 띄움
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: Text('${data["nickname"]}님 환영합니다.'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('성공적으로 회원가입되었습니다.'),
-                  const SizedBox(height: 10),
-                  Row(
+    final signUpResult = await Provider.of<UserProvider>(context, listen: false)
+        .signUp(
+            username: idController.text,
+            password: passwordController.text,
+            nickname: nicknameController.text);
+    if (signUpResult == "success") {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) {
+            return StatefulBuilder(
+              builder: (context, setState) {
+                return AlertDialog(
+                  title: Text('${nicknameController.text}님 환영합니다.'),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Checkbox(
-                        value: isKeepLoggedIn,
-                        onChanged: (value) {
-                          setState(() {
-                            isKeepLoggedIn = value!;
-                          });
-                        },
+                      const Text('성공적으로 회원가입되었습니다.'),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: isKeepLoggedIn,
+                            onChanged: (value) {
+                              setState(() {
+                                isKeepLoggedIn = value!;
+                              });
+                            },
+                          ),
+                          const Text('로그인 유지'),
+                        ],
                       ),
-                      const Text('로그인 유지'),
                     ],
                   ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    if (isKeepLoggedIn) {
-                      // TODO: keep login 로직 작성
-                      print("로그인 유지");
-                    }
-                    Navigator.pushReplacementNamed(context, '/main');
-                  },
-                  child: const Text("확인"),
-                )
-              ],
+                  actions: [
+                    TextButton(
+                      onPressed: () async {
+                        if (isKeepLoggedIn) {
+                          // TODO: keep login 로직 작성
+                          print("로그인 유지");
+                        }
+                        await _saveKeepLoggedIn(isKeepLoggedIn);
+                        final loginResult = await Provider.of<UserProvider>(
+                                context,
+                                listen: false)
+                            .login(
+                                keepLoggedIn: isKeepLoggedIn,
+                                username: idController.text,
+                                password: passwordController.text);
+                        if (loginResult == "success") {
+                          Navigator.pushReplacementNamed(context, '/main');
+                        } else {
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              title: const Text('로그인 실패'),
+                              content: Text(loginResult!),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: const Text('확인'),
+                                ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                      child: const Text("확인"),
+                    )
+                  ],
+                );
+              },
             );
           },
         );
-      },
-    );
-
-    // Navigator.pushReplacementNamed(context, '/login');
+      }
+    } else {
+      if (context.mounted) {
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('회원가입 실패'),
+            content: Text(signUpResult!),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -133,10 +200,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     child: Column(children: [
                   TextFormField(
                     controller: idController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '아이디',
                       hintText: "아이디를 입력하세요",
-                      border: OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: _isIdFormValid
+                                ? const Color.fromARGB(255, 49, 195, 97)
+                                : Colors.grey),
+                      ),
                     ),
                   ),
                   const SizedBox(
@@ -144,11 +216,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                   TextFormField(
                     controller: passwordController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '비밀번호',
                       hintText: "비밀번호를 입력하세요",
-                      counterText: "영어, 숫자 8 - 20자", // 글자수, 형식 제한 (검증과정 없음)
-                      border: OutlineInputBorder(),
+                      errorText: !_isPassword1Valid &&
+                              passwordController.text.isNotEmpty
+                          ? "영어와 숫자를 포함하여 8 - 20자로 입력하세요"
+                          : null,
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: _isPasswordValid
+                                ? const Color.fromARGB(255, 49, 195, 97)
+                                : Colors.grey),
+                      ),
+                      errorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
                     ),
                     obscureText: true,
                   ),
@@ -160,10 +246,25 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                     decoration: InputDecoration(
                       labelText: '비밀번호 확인',
                       hintText: "비밀번호를 재입력하세요",
-                      errorText: confirmPasswordErrorText.isNotEmpty
-                          ? confirmPasswordErrorText
+                      helperText: _isPasswordValid ? "비밀번호가 일치합니다" : null,
+                      helperStyle: const TextStyle(
+                          color: Color.fromARGB(255, 49, 195, 97)),
+                      errorText: confirmPasswordController.text.isNotEmpty &&
+                              !_isPasswordMatch
+                          ? "비밀번호가 일치하지 않습니다"
                           : null,
-                      border: const OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: _isPasswordValid
+                                ? const Color.fromARGB(255, 49, 195, 97)
+                                : Colors.grey),
+                      ),
+                      errorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
+                      focusedErrorBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.red),
+                      ),
                     ),
                     obscureText: true,
                   ),
@@ -172,10 +273,15 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   ),
                   TextFormField(
                     controller: nicknameController,
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       labelText: '닉네임',
                       hintText: '닉네임을 입력하세요',
-                      border: OutlineInputBorder(),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: _isNicknameFormValid
+                                ? const Color.fromARGB(255, 49, 195, 97)
+                                : Colors.grey),
+                      ),
                     ),
                   ),
                   const SizedBox(
@@ -184,7 +290,12 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   SizedBox(
                     width: 250,
                     child: ElevatedButton(
-                      onPressed: () => signUp(context),
+                      onPressed: _isFormValid ? () => signUp(context) : null,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: _isFormValid
+                            ? Theme.of(context).primaryColor
+                            : Colors.grey,
+                      ),
                       child: const Padding(
                         padding: EdgeInsets.all(12.0),
                         child: Text(

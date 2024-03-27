@@ -35,6 +35,22 @@ class _NotificationScreenState extends State<NotificationScreen> {
     });
   }
 
+  Icon getIconFromData(String? iconType) {
+    switch (iconType) {
+      case "clean":
+        return const Icon(Icons.cleaning_services_outlined,
+            color: Colors.blue, size: 30.0);
+      case "add":
+        return const Icon(Icons.add_circle_outline_sharp,
+            color: Colors.blue, size: 30.0);
+      case "change":
+        return const Icon(Icons.change_circle, color: Colors.blue, size: 30.0);
+      default:
+        return const Icon(Icons.notifications_outlined,
+            color: Colors.blue, size: 30.0);
+    }
+  }
+
   String _getSectionTitle(DateTime notificationDate) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -52,6 +68,48 @@ class _NotificationScreenState extends State<NotificationScreen> {
     } else {
       return ''; // 6일 이상이면 비어있는 문자열 반환
     }
+  }
+
+  Future<void> _deleteAllNotifications() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('notifications', '[]');
+    setState(() {
+      notifications = [];
+    });
+  }
+
+  Future<void> _showDeleteConfirmationDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('모든 알림 삭제'),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text('모든 알림을 삭제하시겠습니까?'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('삭제', style: TextStyle(color: Colors.red)),
+              onPressed: () {
+                _deleteAllNotifications();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('취소'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -73,6 +131,24 @@ class _NotificationScreenState extends State<NotificationScreen> {
       appBar: AppBar(
         title: const Text('알림', style: TextStyle(fontSize: 26.0)),
         centerTitle: true,
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'delete_all') {
+                _showDeleteConfirmationDialog();
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                const PopupMenuItem<String>(
+                  value: 'delete_all',
+                  height: BorderSide.strokeAlignCenter,
+                  child: Text('모든 알림 삭제'),
+                ),
+              ];
+            },
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 40.0),
@@ -129,11 +205,8 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                           });
                                         },
                                         child: ListTile(
-                                          leading: const Icon(
-                                            Icons.cleaning_services_outlined,
-                                            color: Colors.blue,
-                                            size: 30.0,
-                                          ),
+                                          leading: getIconFromData(json.decode(
+                                              notification['data'])['Icon']),
                                           title: Padding(
                                             padding: const EdgeInsets.only(
                                                 bottom: 5.0),
