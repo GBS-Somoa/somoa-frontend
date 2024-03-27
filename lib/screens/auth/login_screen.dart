@@ -27,7 +27,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> login(BuildContext context) async {
 // Check if test mode is enabled
-    bool testMode = true; // Set this flag to true to enable test mode
+    bool testMode = false; // Set this flag to true to enable test mode
 
     // If test mode is enabled, simulate a successful login without making a network call
     if (testMode) {

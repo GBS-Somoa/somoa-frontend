@@ -235,6 +235,44 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
     }
   }
 
+  Widget _statusSummaryWidget(statusSummary) {
+    return statusSummary == 0
+        ? Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SizedBox(
+                    height: 120,
+                    child: Image.asset(
+                      'assets/images/face=good.png',
+                    )),
+              ),
+              const Text(
+                '모든 소모품이 \n 잘 관리되고 있어요!',
+                style: TextStyle(fontSize: 25),
+                textAlign: TextAlign.center,
+              )
+            ],
+          )
+        : Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: SizedBox(
+                    height: 120,
+                    child: Image.asset('assets/images/face=bad.png')),
+              ),
+              const Text(
+                '관리가 필요한 \n 소모품이 있어요.',
+                style: TextStyle(fontSize: 25),
+                textAlign: TextAlign.center,
+              )
+            ],
+          );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -281,14 +319,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Center(
-                      child: Image.asset(
-                        statusSummary == 0
-                            ? 'assets/images/face=good.png'
-                            : 'assets/images/face=bad.png',
-                        height: 160, // Specify height
-                      ),
-                    ),
+                    _statusSummaryWidget(statusSummary),
                     const SizedBox(height: 30),
                     if (orders.isNotEmpty)
                       Column(
