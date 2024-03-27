@@ -58,15 +58,19 @@ class _LoginScreenState extends State<LoginScreen> {
         // 로그인 성공
         if (context.mounted) {
           print('로그인 성공');
-          print(response.body);
+          // print(jsonDecode(response.body).keys.toList());
           await _saveKeepLoggedIn(_keepLoggedIn);
           Provider.of<UserProvider>(context, listen: false).login(
               keepLoggedIn: _keepLoggedIn,
               username: id,
               password: password,
-              nickname: jsonDecode(response.body)['nickname'] ?? '임시 닉네임',
-              accessToken: jsonDecode(response.body)['accessToken'],
-              refreshToken: jsonDecode(response.body)['refreshToken']);
+              nickname: jsonDecode(utf8.decode(response.bodyBytes))['data']
+                      ['nickname'] ??
+                  '임시 닉네임',
+              accessToken: jsonDecode(utf8.decode(response.bodyBytes))['data']
+                  ['accessToken'],
+              refreshToken: jsonDecode(utf8.decode(response.bodyBytes))['data']
+                  ['refreshToken']);
           Navigator.pushReplacementNamed(context, '/main');
         }
       } else {

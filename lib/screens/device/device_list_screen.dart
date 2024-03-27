@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
+import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/device_widget.dart';
 
 class DeviceScreen extends StatefulWidget {
@@ -12,15 +14,8 @@ class DeviceScreen extends StatefulWidget {
 }
 
 class _DeviceScreenState extends State<DeviceScreen> {
-  //dotenv을 가져오는 코드
-  void getEnv() async {
-    await dotenv.load();
-    String url = dotenv.get("SERVER_URL");
-  }
-
-  // 임시 데이터 -> 사용자가 포함된 장소 데이터 서버로부터 받아야함 (-> 전역 상태로 저장 후 받아서 써야함)
-  static const locationList = ['내 자취방', '부모님집', '할머니댁'];
-  late String _selectedLocation;
+  late List<dynamic> locationList;
+  late int _selectedLocation;
 
   // 임시 기기-소모품 데이터
   List<Map<String, Object>> deviceList = [
@@ -145,7 +140,43 @@ class _DeviceScreenState extends State<DeviceScreen> {
   @override
   void initState() {
     super.initState();
-    _selectedLocation = locationList.first;
+    locationList = [];
+    _selectedLocation = 0;
+    fetchLocationData();
+  }
+
+  // 사용자가 포함된 그룹 리스트 가져오는 코드
+  Future<void> fetchLocationData() async {
+    String? accessToken = await getAccessToken();
+
+    // accessToken이 있는 경우에만 요청을 보냅니다.
+    if (accessToken != null) {
+      Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      http.Response response = await http.get(
+        Uri.parse('${await getServerUrl()}groups'),
+        headers: headers,
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData =
+            jsonDecode(utf8.decode(response.bodyBytes));
+        setState(() {
+          locationList = responseData['data'];
+          _selectedLocation = locationList[0]['groupId'];
+          // print(locationList);
+        });
+        // print(responseData);
+      } else {
+        print(response.body);
+        print('Failed to fetch location data: ${response.statusCode}');
+      }
+    } else {
+      print('Access token is null');
+    }
   }
 
   @override
@@ -176,19 +207,19 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       width: 150.0,
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: DropdownButton<String>(
+                        child: DropdownButton<int>(
                           isExpanded: true,
                           value: _selectedLocation,
-                          onChanged: (String? newValue) {
+                          onChanged: (newValue) {
                             setState(() {
-                              _selectedLocation = newValue ?? '';
+                              _selectedLocation = newValue!;
                             });
                           },
-                          items: locationList
-                              .map<DropdownMenuItem<String>>((String value) {
-                            return DropdownMenuItem<String>(
-                              value: value,
-                              child: Text(value),
+                          items:
+                              locationList.map<DropdownMenuItem<int>>((value) {
+                            return DropdownMenuItem<int>(
+                              value: value['groupId'],
+                              child: Text(value['groupName']),
                             );
                           }).toList(),
                         ),
