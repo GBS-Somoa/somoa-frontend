@@ -142,7 +142,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
     },
   ];
 
-
   @override
   void initState() {
     super.initState();

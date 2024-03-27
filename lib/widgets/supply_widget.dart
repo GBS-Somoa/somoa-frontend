@@ -13,21 +13,21 @@ class SupplyWidget extends StatelessWidget {
       case 'fabricSoftener':
       case 'dishDetergent':
       case 'dishRinse':
-        return _buildDetergentCard();
+        return _buildDetergentCard(context);
       case 'cleanableFilter':
       case 'replaceableFilter':
-        return _buildFilterCard();
+        return _buildFilterCard(context);
       case 'supplyTank':
       case 'drainTank':
-        return _buildTankCard();
+        return _buildTankCard(context);
       case 'dustBin':
-        return _buildDustBinCard();
+        return _buildDustBinCard(context);
       default:
         return const SizedBox();
     }
   }
 
-  Widget _buildDetergentCard() {
+  Widget _buildDetergentCard(BuildContext context) {
     // TODO: 기기 내부에 저장된 데이터에서 supplyId에 맞는 maxAmount를 가져오도록 작성해야함
     int maxAmount = 1000;
 
@@ -130,6 +130,7 @@ class SupplyWidget extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         // Add functionality to edit inventory button
+                        _showInventoryChangeDialog(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[300],
@@ -174,7 +175,7 @@ class SupplyWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildFilterCard() {
+  Widget _buildFilterCard(BuildContext context) {
     final String supplyStatus =
         (supplyInfo['details'] as Map)['supplyStatus'].toString().toLowerCase();
     final String limitStatus =
@@ -372,7 +373,7 @@ class SupplyWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTankCard() {
+  Widget _buildTankCard(BuildContext context) {
     int maxAmount = 100;
 
     int supplyAmount = (supplyInfo['details'] as Map)['supplyLevel'];
@@ -526,7 +527,7 @@ class SupplyWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildDustBinCard() {
+  Widget _buildDustBinCard(BuildContext context) {
     int maxAmount = 10;
 
     int supplyAmount = (supplyInfo['details'] as Map)['supplyStatus'];
@@ -686,6 +687,44 @@ class SupplyWidget extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+
+  void _showInventoryChangeDialog(BuildContext context) {
+    TextEditingController _controller = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('${supplyInfo['name']} 보유량 변경'),
+          content: TextFormField(
+            controller: _controller,
+            keyboardType: TextInputType.number,
+            decoration: const InputDecoration(
+              hintText: '변경할 보유량을 입력하세요',
+            ),
+          ),
+          actions: <Widget>[
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('취소'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // 처리할 로직 추가 (예: 보유량 변경)
+                String newValue = _controller.text;
+                // 여기서 변경된 값을 처리하거나 전달할 수 있습니다.
+                // 예를 들어, 변경된 값으로 API 호출을 하거나 상태를 업데이트할 수 있습니다.
+                print('변경된 값: $newValue');
+                Navigator.of(context).pop();
+              },
+              child: const Text('변경'),
+            ),
+          ],
+        );
+      },
     );
   }
 }
