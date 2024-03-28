@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class Order {
   final int orderId;
   final String supplyId;
@@ -26,14 +28,16 @@ class Order {
   factory Order.fromJson(Map<String, dynamic> json) {
     return Order(
       orderId: json['orderId'],
-      supplyId: json['supplyId'],
-      orderStatus: json['orderStatus'],
-      orderStore: json['orderStore'],
-      orderStoreId: json['orderStoreId'],
-      productName: json['productName'],
-      productImg: json['productImg'],
+      supplyId: json['supplyId'] ?? '',
+      orderStatus: json['orderStatus'] ?? '',
+      orderStore: json['orderStore'] ?? '',
+      orderStoreId: json['orderStoreId'] ?? '',
+      productName: json['productName'] ?? '',
+      productImg: json['productImg'] != null && json['productImg'].startsWith('http')
+          ? json['productImg']
+          : 'https://i.ibb.co/K9B80fg/no-image.jpg',
       orderCount: json['orderCount'],
-      orderAmount: json['orderAmount'],
+      orderAmount: json['orderAmount'] ?? '',
       createdAt: DateTime.parse(json['createdAt']),
     );
   }
