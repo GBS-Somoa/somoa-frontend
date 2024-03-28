@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:somoa/models/order_model.dart';
 import 'package:somoa/screens/device/device_info_screen.dart';
 import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/order_widget.dart';
@@ -20,6 +21,7 @@ class DeviceDetailScreen extends StatefulWidget {
 class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   bool isLoading = true;
   late Device deviceInfo;
+  List orderList = [];
 
   // 더미 기기 데이터
   // Map<String, Object> dummyData = {
@@ -210,6 +212,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
     fetchDeviceData(widget.deviceId);
   }
 
+  // device 상세 정보 가져오기
   Future<void> fetchDeviceData(String deviceId) async {
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
@@ -235,8 +238,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         print(_deviceInfo.nickname);
         setState(() {
           deviceInfo = _deviceInfo;
-          isLoading = false;
           statusSummary = calculateStatusSummary(deviceInfo);
+          fetchOrderData(deviceInfo);
         });
       } else {
         print(response.body);
@@ -247,9 +250,44 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
     }
   }
 
-  Future<void> fetchOrderData(String stringId) async {
-    // /api/orders?supply_id={supply_id}&order_status=배송중
-    // device에 포함된 supplyid 순회하면서 조회하고 list로 합치기
+  // 소모품 별 주문 데이터 가져오기
+  Future<void> fetchOrderData(Device deviceInfo) async {
+    // deviceInfo에 포함된 supplyid 순회하면서 url로 요청을 보내고 결과를 orderList로 합치기
+    print("주문 조회 요청");
+    for (Supply supply in deviceInfo.supplies) {
+      String supplyId = supply.id;
+      String serverUrl = dotenv.get("SERVER_URL");
+      String? accessToken = await getAccessToken();
+
+      String url =
+          '${serverUrl}api/orders?supply_id=$supplyId&order_status=Delivering';
+
+      try {
+        http.Response response = await http.get(Uri.parse(url),
+            headers: {"Authentication": "Bearer $accessToken"});
+
+        if (response.statusCode == 200) {
+          List<dynamic> data = jsonDecode(response.body);
+          List<Order> orders =
+              data.map((json) => Order.fromJson(json)).toList();
+
+          orderList.addAll(orders);
+        } else {
+          // Handle the error scenario
+          print(
+              'Failed to fetch order data for supply ID $supplyId: ${response.statusCode}');
+        }
+      } catch (e) {
+        // Handle any exceptions
+        print('Error fetching order data for supply ID $supplyId: $e');
+      }
+    }
+    setState(
+      () {
+        orderList = orderList;
+        isLoading = false;
+      },
+    );
   }
 
   void deleteDevice(BuildContext context, String deviceId) async {
