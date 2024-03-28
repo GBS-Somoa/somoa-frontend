@@ -10,6 +10,7 @@ import 'package:somoa/widgets/confirm_widget.dart';
 import 'package:somoa/widgets/list_container_widget.dart';
 import 'package:somoa/widgets/menu_bar_widget.dart';
 import 'package:http/http.dart' as http;
+import 'package:somoa/widgets/radio_widget.dart';
 
 class LocationSettingScreen extends StatefulWidget {
   const LocationSettingScreen({super.key});
@@ -40,7 +41,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
   static const String ADMIN = '관리자';
   static const String ALL_GRANTED = '모든 권한';
   static const String ONLY_SUPPLY = '소모품 관리';
-  static const List roles = [ADMIN, ALL_GRANTED, ONLY_SUPPLY];
+  static List<String> roles = [ALL_GRANTED, ONLY_SUPPLY];
   static const storage = FlutterSecureStorage();
 
   MyGroup _group = MyGroup(id: 0, name: '', myRole: '', alarm: false);
@@ -206,6 +207,38 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
     }
   }
 
+  Future<void> changeMemberRole(Member member, String role) async {
+    final accessToken = await storage.read(key: 'accessToken');
+    final url = getApiUrl('groups/$groupId/users/${member.id}/permission');
+
+    try {
+      final response = await http.patch(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode({
+          'role': role,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        final String decodedBody = utf8.decode(response.bodyBytes);
+        final data = json.decode(decodedBody);
+        print(data);
+        print("멤버 역할 변경 실패");
+      } else {
+        setState(() {
+          member.role = role;
+        });
+      }
+
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> deleteMember(int id) async {
     final accessToken = await storage.read(key: 'accessToken');
     final url = getApiUrl('groups/$groupId/users');
@@ -344,6 +377,26 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                   return ListTile(
                     title: Text(member.name),
                     subtitle: Text(member.role, style: TextStyle(color: Colors.indigo)),
+                    onTap: member.role != ONLY_SUPPLY && userProvider.username != member.username ? () {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                        ),
+                        builder: (BuildContext context) {
+                          return RadioWidget(
+                            title: '${member.name} 님에게 허용할 기능을 선택하세요.',
+                            choices: roles,
+                            selectedValue: member.role,
+                            onChanged: (String selectedValue) {
+                              changeMemberRole(member, selectedValue);
+                            },
+                          );
+                        },
+                      );
+                    } : null,
                     trailing: SizedBox(
                       width: 48,
                       height: 48,
