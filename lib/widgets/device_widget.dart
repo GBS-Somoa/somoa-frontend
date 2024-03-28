@@ -42,7 +42,7 @@ class DeviceWidget extends StatelessWidget {
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
-                              DeviceDetailScreen(deviceId: deviceInfo.id),
+                              DeviceDetailScreen(deviceId: deviceInfo.username),
                         ),
                       );
                     },
