@@ -18,7 +18,7 @@ class DeviceInfoScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('기기 코드 : ${deviceInfo.username}',
+              Text('기기 코드 : ${deviceInfo.id}',
                   style: const TextStyle(fontSize: 20)),
               Text('제조사 : ${deviceInfo.manufacturer}',
                   style: const TextStyle(fontSize: 20)),
