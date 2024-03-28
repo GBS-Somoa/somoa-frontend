@@ -45,9 +45,10 @@ class _Order {
       orderStore: json['orderStore'] ?? '',
       orderStoreId: json['orderStoreId'] ?? '',
       productName: json['productName'] ?? '',
-      productImg: json['productImg'] != null && json['productImg'].startsWith('http')
-          ? json['productImg']
-          : 'https://i.ibb.co/K9B80fg/no-image.jpg',
+      productImg:
+          json['productImg'] != null && json['productImg'].startsWith('http')
+              ? json['productImg']
+              : 'https://i.ibb.co/K9B80fg/no-image.jpg',
       groupName: json['groupName'] ?? '우리집',
       deviceName: json['deviceName'] ?? '세탁기',
     );
@@ -55,7 +56,6 @@ class _Order {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-
   static const storage = FlutterSecureStorage();
   List<_Order> orders = [];
 
@@ -117,7 +117,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Profile'),
+          title: const Text('내 정보'),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
@@ -148,29 +148,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                ListContainerWidget(
-                    children: [
-                      ListTile(
-                        title: Text('프로필 관리'),
-                        onTap: () {
-                          print('Item 1 tapped');
-                        },
-                      ),
-                      ListTile(
-                        title: Text('장소 관리'),
-                        onTap: () {
-                          print('Item 2 tapped');
-                          Navigator.pushNamed(context, '/locationList');
-                        },
-                      ),
-                      ListTile(
-                        title: Text('즐겨찾는 쇼핑몰 관리'),
-                        onTap: () {
-                          print('Item 3 tapped');
-                        },
-                      ),
-                    ]
-                ),
+                ListContainerWidget(children: [
+                  ListTile(
+                    title: Text('프로필 관리'),
+                    onTap: () {
+                      print('Item 1 tapped');
+                    },
+                  ),
+                  ListTile(
+                    title: Text('장소 관리'),
+                    onTap: () {
+                      print('Item 2 tapped');
+                      Navigator.pushNamed(context, '/locationList');
+                    },
+                  ),
+                  ListTile(
+                    title: Text('즐겨찾는 쇼핑몰 관리'),
+                    onTap: () {
+                      print('Item 3 tapped');
+                    },
+                  ),
+                ]),
                 SizedBox(height: 20),
                 Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -178,7 +176,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         '      진행중인 배송',
                         textAlign: TextAlign.start,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 15),
                       ListView.builder(
@@ -189,12 +188,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           final order = orders[index];
                           if (order.orderStatus != '주문취소') {
                             return Padding(
-                              padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
+                              padding: const EdgeInsets.fromLTRB(
+                                  10.0, 0.0, 10.0, 10.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 20.0), // 왼쪽에 20 픽셀의 패딩 추가
+                                    padding: const EdgeInsets.only(
+                                        left: 20.0), // 왼쪽에 20 픽셀의 패딩 추가
                                     child: Text(
                                       '${order.groupName} > ${order.deviceName}',
                                       style: const TextStyle(

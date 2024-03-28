@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
 import 'package:somoa/models/device_model.dart';
-import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/device_widget.dart';
@@ -288,162 +286,147 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<UserProvider>(
-      builder: (context, userProvider, child) {
-        // 사용자 이름을 가져옵니다.
-        String username = userProvider.username ?? "";
-
-        // 사용자 이름이 없는 경우 로그인 화면으로 이동합니다.
-        if (username == "") {
-          WidgetsBinding.instance.addPostFrameCallback((_) {
-            Navigator.pushReplacementNamed(context, '/login');
-          });
-          return Container(); // 빈 컨테이너를 반환하여 렌더링하지 않습니다.
-        }
-
-        // 사용자 이름이 있는 경우 메인 페이지를 표시합니다.
-        return Scaffold(
-          appBar: AppBar(
-            title: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Row(
               children: [
-                Row(
-                  children: [
-                    const Icon(Icons.home),
-                    SizedBox(
-                      width: 150.0,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                        child: DropdownButton<int>(
-                          isExpanded: true,
-                          value: _selectedLocation,
-                          onChanged: (newValue) {
-                            setState(() {
-                              _selectedLocation = newValue!;
-                              fetchDeviceData(_selectedLocation.toString());
-                            });
-                          },
-                          items:
-                              locationList.map<DropdownMenuItem<int>>((value) {
-                            return DropdownMenuItem<int>(
-                              value: value['groupId'],
-                              child: Text(value['groupName']),
-                            );
-                          }).toList(),
-                        ),
-                      ),
+                const Icon(Icons.home),
+                SizedBox(
+                  width: 150.0,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                    child: DropdownButton<int>(
+                      isExpanded: true,
+                      value: _selectedLocation,
+                      onChanged: (newValue) {
+                        setState(() {
+                          _selectedLocation = newValue!;
+                          fetchDeviceData(_selectedLocation.toString());
+                        });
+                      },
+                      items: locationList.map<DropdownMenuItem<int>>((value) {
+                        return DropdownMenuItem<int>(
+                          value: value['groupId'],
+                          child: Text(value['groupName']),
+                        );
+                      }).toList(),
                     ),
-                  ],
-                ),
-                IconButton(
-                  icon: const Icon(Icons.more_vert),
-                  onPressed: () {
-                    showMenu(
-                      context: context,
-                      position: const RelativeRect.fromLTRB(90, 70, 0, 0),
-                      items: [
-                        PopupMenuItem(
-                          value: '장소 추가',
-                          child: const Text('장소 추가'),
-                          onTap: () {
-                            showDialog(
-                              context: context,
-                              builder: (BuildContext context) {
-                                String placeName = '';
-
-                                return AlertDialog(
-                                  title: const Text(
-                                    '장소 추가',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextField(
-                                        onChanged: (value) {
-                                          placeName = value;
-                                        },
-                                        decoration: const InputDecoration(
-                                            hintText: "장소 이름을 입력하세요",
-                                            border: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.black))),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        if (placeName.isNotEmpty) {
-                                          // 장소 이름이 입력되었을 경우에만 처리합니다.
-                                          _registerLoctaion(placeName);
-                                        }
-                                      },
-                                      child: const Text(
-                                        '확인',
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        PopupMenuItem(
-                          value: '장소 관리',
-                          child: const Text('장소 관리'),
-                          onTap: () {
-                            Navigator.pushNamed(context, '/locationSetting', arguments: _selectedLocation);
-                          },
-                        ),
-                        PopupMenuItem(
-                          value: '기기 추가',
-                          child: const Text('기기 추가'),
-                          onTap: () {
-                            // deviceCreateScreen으로 이동하는 코드
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DeviceCreateScreen(
-                                    groupId: _selectedLocation.toString()),
-                              ),
-                            );
-                          },
-                        ),
-                        PopupMenuItem(
-                          value: '주문 목록',
-                          child: const Text('주문 목록'),
-                          onTap: () {
-                            Navigator.pushNamed(context, '/orderList');
-                          },
-                        ),
-                      ],
-                      elevation: 8.0,
-                    ).then((value) {
-                      if (value != null) {
-                        // Handle menu item selection here
-                        print('Selected: $value');
-                      }
-                    });
-                  },
+                  ),
                 ),
               ],
             ),
-          ),
-          body: Center(
-            child: SingleChildScrollView(
-              child: deviceList.isNotEmpty
-                  ? Column(
-                      children: deviceList
-                          .map((device) => DeviceWidget(deviceInfo: device))
-                          .toList(),
-                    )
-                  : const Center(child: Text('등록된 기기가 없습니다.')),
+            IconButton(
+              icon: const Icon(Icons.more_vert),
+              onPressed: () {
+                showMenu(
+                  context: context,
+                  position: const RelativeRect.fromLTRB(90, 70, 0, 0),
+                  items: [
+                    PopupMenuItem(
+                      value: '장소 추가',
+                      child: const Text('장소 추가'),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            String placeName = '';
+
+                            return AlertDialog(
+                              title: const Text(
+                                '장소 추가',
+                                textAlign: TextAlign.center,
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
+                                    onChanged: (value) {
+                                      placeName = value;
+                                    },
+                                    decoration: const InputDecoration(
+                                        hintText: "장소 이름을 입력하세요",
+                                        border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.black))),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (placeName.isNotEmpty) {
+                                      // 장소 이름이 입력되었을 경우에만 처리합니다.
+                                      _registerLoctaion(placeName);
+                                    }
+                                  },
+                                  child: const Text(
+                                    '확인',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: '장소 관리',
+                      child: const Text('장소 관리'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/locationSetting',
+                            arguments: _selectedLocation);
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: '기기 추가',
+                      child: const Text('기기 추가'),
+                      onTap: () {
+                        // deviceCreateScreen으로 이동하는 코드
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DeviceCreateScreen(
+                                groupId: _selectedLocation.toString()),
+                          ),
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: '주문 목록',
+                      child: const Text('주문 목록'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/orderList');
+                      },
+                    ),
+                  ],
+                  elevation: 8.0,
+                ).then((value) {
+                  if (value != null) {
+                    // Handle menu item selection here
+                    print('Selected: $value');
+                  }
+                });
+              },
             ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: deviceList.isNotEmpty
+              ? Column(
+                  children: deviceList
+                      .map((device) => DeviceWidget(deviceInfo: device))
+                      .toList(),
+                )
+              : const Center(child: Text('등록된 기기가 없습니다.')),
+        ),
+      ),
     );
   }
 }

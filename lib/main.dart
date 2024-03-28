@@ -3,7 +3,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
-import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/screens/location/location_detail_screen.dart';
 import 'package:somoa/screens/location/location_list_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';

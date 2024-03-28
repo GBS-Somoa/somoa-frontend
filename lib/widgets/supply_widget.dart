@@ -761,7 +761,6 @@ class SupplyWidget extends StatelessWidget {
   // 보유량 변경 api 요청 함수
   Future<void> _changeSupplyAmount(BuildContext context, int amount,
       String deviceId, String supplyId) async {
-    print("함수");
     var bodyData = jsonEncode({
       "supplyAmount": amount,
     });
@@ -858,7 +857,7 @@ class SupplyWidget extends StatelessWidget {
                     context, int.parse(newValue), deviceId, supplyInfo.username);
 
                 if (supplyInfo.details['supplyAmount'] < int.parse(newValue)) {
-                  await setMaxAmount(supplyInfo.username, newValue as int);
+                  await setMaxAmount(supplyInfo.id, int.parse(newValue));
                 }
                 print('변경된 값: $newValue');
               },

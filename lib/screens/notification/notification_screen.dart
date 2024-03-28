@@ -129,6 +129,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('알림', style: TextStyle(fontSize: 26.0)),
         centerTitle: true,
         actions: <Widget>[
