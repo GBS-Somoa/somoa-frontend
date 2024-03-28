@@ -70,12 +70,7 @@ class _LocationListScreenState extends State<LocationListScreen> {
     String serverUrl = dotenv.get("SERVER_URL");
     final url = Uri.parse('$serverUrl' 'groups/group-order');
 
-    // groups.sort((a, b) => a.order.compareTo(b.order));
-    for (int i = 0; i < groups.length; i++) {
-      print('그룹 ${groups[i].name} : ${groups[i].id}');
-    }
     List<int> groupIds = groups.map((group) => group.id).toList();
-    print(groupIds);
 
     try {
       final response = await http.patch(
