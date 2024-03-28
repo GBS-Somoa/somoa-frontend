@@ -19,13 +19,13 @@ class ConfirmWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10), // Add horizontal padding
+      padding: EdgeInsets.all(10),
       child: Container(
-        padding: EdgeInsets.fromLTRB(20, 20, 20, 0), // Add inner padding
-        height: 150,
+        padding: EdgeInsets.fromLTRB(25, 20, 25, 0),
+        height: 170,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20), // Optional: if you want rounded corners
+          borderRadius: BorderRadius.circular(30),
         ),
         child: Column(
           children: [
@@ -53,8 +53,8 @@ class ConfirmWidget extends StatelessWidget {
                 TextButton(
                   child: Text(yesText, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                   onPressed: () {
-                    onYes(); // 확인 버튼의 동작을 호출합니다.
-                    Navigator.pop(context); // 모달을 닫습니다.
+                    onYes();
+                    Navigator.pop(context);
                   },
                 ),
               ],

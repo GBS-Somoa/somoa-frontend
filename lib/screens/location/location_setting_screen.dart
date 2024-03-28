@@ -359,7 +359,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                             builder: (BuildContext context) {
                               return ConfirmWidget(
                                 title: '${member.name} 님을 삭제할까요?',
-                                text: '삭제한 멤버는 ${_group.name} 기기를 제어할 수 없게 됩니다.',
+                                text: '삭제한 멤버는 ${_group.name} 기기의 소모품을 관리할 수 없게 됩니다.',
                                 onYes: () {
                                   deleteMember(member.id);
                                 },
