@@ -176,6 +176,36 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
     }
   }
 
+  Future<void> toggleAlarm(bool value) async {
+    final accessToken = await storage.read(key: 'accessToken');
+    final url = getApiUrl('groups/$groupId/alarm');
+
+    try {
+      final response = await http.patch(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode({
+          'alarm': value,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        print(response.body);
+        print("알림 토글 실패");
+      } else {
+        setState(() {
+          _group.alarm = value;
+        });
+      }
+
+    } catch (e) {
+      print(e.toString());
+    }
+  }
+
   Future<void> deleteMember(int id) async {
     final accessToken = await storage.read(key: 'accessToken');
     final url = getApiUrl('groups/$groupId/users');
@@ -280,7 +310,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                       value: _group.alarm,
                       onChanged: (value) {
                         setState(() {
-                          _group.alarm = value;
+                          toggleAlarm(value);
                         });
                       },
                     ),
