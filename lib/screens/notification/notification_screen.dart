@@ -26,7 +26,9 @@ class _NotificationScreenState extends State<NotificationScreen>
     WidgetsBinding.instance.addObserver(this);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       if (mounted) {
-        _loadNotifications();
+        Future.delayed(const Duration(milliseconds: 500), () {
+          _loadNotifications();
+        });
       }
     });
     _loadNotifications();
