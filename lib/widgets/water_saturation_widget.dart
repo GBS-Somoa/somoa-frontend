@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_progress_indicator_v2/liquid_progress_indicator.dart';
 
 class WaterSaturationWidget extends StatelessWidget {
   final int level;
@@ -13,59 +14,15 @@ class WaterSaturationWidget extends StatelessWidget {
     return SizedBox(
       width: 100,
       height: 100,
-      child: CustomPaint(
-        size: const Size(100, 100),
-        painter: _WaterSaturationPainter(level: level),
+      child: LiquidCircularProgressIndicator(
+        value: level / 100, // 0에서 1 사이의 값
+        valueColor: const AlwaysStoppedAnimation(Colors.blue), // 프로그레스 색상
+        backgroundColor: Colors.white, // 배경 색상
+        borderColor: Colors.blue,
+        borderWidth: 3.0,
+        direction: Axis.vertical, // 액체 움직임 방향
+        center: Text('$level%'), // 중앙에 표시될 위젯
       ),
     );
-  }
-}
-
-class _WaterSaturationPainter extends CustomPainter {
-  final int level;
-
-  _WaterSaturationPainter({required this.level});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    Paint fillPaint = Paint()
-      ..color = Colors.blue
-      ..style = PaintingStyle.fill;
-
-    Paint borderPaint = Paint()
-      ..color = Colors.grey
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0;
-
-    double filledHeight = size.height * (level / 100);
-    double unfilledHeight = size.height - filledHeight;
-
-    // Draw the filled area
-    canvas.drawRect(
-      Rect.fromLTWH(0, unfilledHeight, size.width, filledHeight),
-      fillPaint,
-    );
-
-    // Draw the border of the box
-    canvas.drawRect(Rect.fromLTWH(0, 0, size.width, size.height), borderPaint);
-
-    // Render the level text inside the box
-    TextSpan span = TextSpan(
-      text: '$level%', // Render the level as percentage
-      style: TextStyle(color: Colors.black, fontSize: 16),
-    );
-    TextPainter tp = TextPainter(
-      text: span,
-      textAlign: TextAlign.center,
-      textDirection: TextDirection.ltr,
-    );
-    tp.layout();
-    tp.paint(canvas,
-        Offset((size.width - tp.width) / 2, (size.height - tp.height) / 2));
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
   }
 }

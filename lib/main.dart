@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/screens/location/location_detail_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';
+import 'package:somoa/screens/profile/location_setting_screen.dart';
 import 'screens/auth/registration_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
@@ -22,12 +24,13 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('백그라운드 메세지 내용: ${message.notification?.body}');
 
   if (message.notification != null) {
-    await saveNotification(
-        message.notification!.title!, message.notification!.body!);
+    await saveNotification(message.notification!.title!,
+        message.notification!.body!, message.data);
   }
 }
 
-Future<void> saveNotification(String title, String body) async {
+Future<void> saveNotification(
+    String title, String body, Map<String, dynamic> data) async {
   final prefs = await SharedPreferences.getInstance();
 
   // 알림 리스트를 가져옴. 없으면 빈 리스트를 사용
@@ -37,7 +40,8 @@ Future<void> saveNotification(String title, String body) async {
   final notification = {
     "title": title,
     "body": body,
-    "date": DateTime.now().toIso8601String()
+    "date": DateTime.now().toIso8601String(),
+    "data": json.encode(data)
   };
 
   print(notification['date']);
@@ -68,6 +72,8 @@ void main() async {
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+  const FlutterSecureStorage storage = FlutterSecureStorage();
+
   const AndroidNotificationChannel channel = AndroidNotificationChannel(
     'high_importance_channel', // id
     'High Importance Notifications', // title
@@ -95,13 +101,14 @@ void main() async {
     print('Got a message whilst in the foreground!');
     print('알림 제목: ${message.notification?.title}');
     print('알림 내용: ${message.notification?.body}');
+    print('알림 데이터: ${message.data}');
 
     RemoteNotification? notification = message.notification;
 
     if (message.notification != null) {
       print('Message also contained a notification: ${message.notification}');
-      saveNotification(
-          message.notification!.title!, message.notification!.body!);
+      saveNotification(message.notification!.title!,
+          message.notification!.body!, message.data);
     }
 
     if (notification != null) {
@@ -119,7 +126,7 @@ void main() async {
                 ),
               ))
           .then((_) {
-        Future.delayed(Duration(seconds: 5), () {
+        Future.delayed(const Duration(seconds: 5), () {
           flutterLocalNotificationsPlugin.cancel(notification.hashCode);
         });
       });
@@ -139,11 +146,16 @@ void main() async {
   print('User granted permission: ${settings.authorizationStatus}');
 
   String? token = await messaging.getToken();
+  await storage.write(key: 'fcmToken', value: token);
 
   print('FCM Token: $token');
 
   await dotenv.load();
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(providers: [
+      ChangeNotifierProvider(create: (context) => UserProvider()),
+    ], child: const MyApp()),
+  );
 }
 
 class MyApp extends StatefulWidget {
@@ -158,7 +170,6 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // 로컬 알림 플러그인 초기화
   }
 
   @override
@@ -178,67 +189,88 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return MultiProvider(
-      providers: [
-        ChangeNotifierProvider(create: (context) => UserProvider()),
-      ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Somoa',
-        theme: ThemeData(
-          primaryColor: Colors.blue[900],
-          colorScheme: ColorScheme.fromSwatch(
-            primarySwatch: Colors.grey,
-            backgroundColor: Colors.grey[100],
-          ),
-          focusColor: Colors.redAccent, // Color for focus highlight
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors
-                .transparent, // Set app bar background color to transparent
-            elevation: 0, // Remove app bar elevation
-            iconTheme: IconThemeData(color: Colors.black), // Set icon color
-          ),
-          elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(
-              foregroundColor: Colors.white,
-              backgroundColor:
-                  Colors.blue[900], // Text color for elevated buttons
-            ),
-          ),
-          textButtonTheme: TextButtonThemeData(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.blue[900], // Text color for text buttons
-            ),
-          ),
-          outlinedButtonTheme: OutlinedButtonThemeData(
-            style: OutlinedButton.styleFrom(
-              foregroundColor:
-                  Colors.blue[900], // Border color for outlined buttons
-            ),
-          ),
-          inputDecorationTheme: const InputDecorationTheme(
-            focusedBorder: OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.blue),
-            ),
-            contentPadding: EdgeInsets.all(15.0),
-            labelStyle: TextStyle(color: Colors.black),
-          ),
-          popupMenuTheme: const PopupMenuThemeData(
-            color: Colors.white,
-            textStyle: TextStyle(color: Colors.black),
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Somoa',
+      theme: ThemeData(
+        primaryColor: Colors.blue[900],
+        colorScheme: ColorScheme.fromSwatch(
+          primarySwatch: Colors.grey,
+          backgroundColor: Colors.grey[100],
+        ),
+        focusColor: Colors.redAccent, // Color for focus highlight
+        appBarTheme: const AppBarTheme(
+          backgroundColor:
+              Colors.transparent, // Set app bar background color to transparent
+          elevation: 0, // Remove app bar elevation
+          iconTheme: IconThemeData(color: Colors.black), // Set icon color
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor:
+                Colors.blue[900], // Text color for elevated buttons
           ),
         ),
-        home: MainScreen(),
-        routes: {
-          '/registration': (context) => const RegistrationScreen(),
-          '/login': (context) => LoginScreen(),
-          '/main': (context) => MainScreen(),
-          '/addDevice': (context) => DeviceCreateScreen(),
-          '/orderList': (context) => OrderListScreen(
-                groupId: '',
-              ),
-          '/locationDetail': (context) => LocationDetailScreen(),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.blue[900], // Text color for text buttons
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor:
+                Colors.blue[900], // Border color for outlined buttons
+          ),
+        ),
+        inputDecorationTheme: const InputDecorationTheme(
+          focusedBorder: OutlineInputBorder(
+            borderSide: BorderSide(color: Colors.blue),
+          ),
+          contentPadding: EdgeInsets.all(15.0),
+          labelStyle: TextStyle(color: Colors.black),
+        ),
+        popupMenuTheme: const PopupMenuThemeData(
+          color: Colors.white,
+          textStyle: TextStyle(color: Colors.black),
+        ),
+      ),
+      home: FutureBuilder(
+        future: Provider.of<UserProvider>(context, listen: false).autoLogin(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.done) {
+            if (snapshot.data == true) {
+              return MainScreen();
+            } else {
+              return const LoginScreen();
+            }
+          }
+          return const SplashScreen(); // 로딩 중에는 스플래시 화면을 보여줍니다.
         },
+      ),
+      routes: {
+        '/registration': (context) => const RegistrationScreen(),
+        '/login': (context) => const LoginScreen(),
+        '/main': (context) => MainScreen(),
+        '/addDevice': (context) => DeviceCreateScreen(),
+        '/locationSetting': (context) => LocationSettingScreen(),
+        '/orderList': (context) => OrderListScreen(
+              groupId: '',
+            ),
+        '/locationDetail': (context) => LocationDetailScreen(),
+      },
+    );
+  }
+}
+
+class SplashScreen extends StatelessWidget {
+  const SplashScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(
+        child: CircularProgressIndicator(), // 로딩 인디케이터
       ),
     );
   }
