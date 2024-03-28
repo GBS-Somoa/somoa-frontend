@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class DeviceInfoScreen extends StatelessWidget {
-  final Map<String, dynamic> deviceInfo;
+  final dynamic deviceInfo;
 
   const DeviceInfoScreen({super.key, required this.deviceInfo});
 
@@ -18,15 +18,15 @@ class DeviceInfoScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('기기 코드 : ${deviceInfo['id']}',
+              Text('기기 코드 : ${deviceInfo.id}',
                   style: const TextStyle(fontSize: 20)),
-              Text('제조사 : ${deviceInfo['manufacturer']}',
+              Text('제조사 : ${deviceInfo.manufacturer}',
                   style: const TextStyle(fontSize: 20)),
-              Text('기기 종류 : ${deviceInfo['type']}',
+              Text('기기 종류 : ${deviceInfo.type}',
                   style: const TextStyle(fontSize: 20)),
-              Text('모델명 : ${deviceInfo['model']}',
+              Text('모델명 : ${deviceInfo.model}',
                   style: const TextStyle(fontSize: 20)),
-              Text('기기 이름 : ${deviceInfo['nickname']}',
+              Text('기기 이름 : ${deviceInfo.nickname}',
                   style: const TextStyle(fontSize: 20)),
               // Add more device information widgets as needed
             ],

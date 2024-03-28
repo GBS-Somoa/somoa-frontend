@@ -3,11 +3,11 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
-import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/screens/location/location_detail_screen.dart';
 import 'package:somoa/screens/notification/notification_screen.dart';
+import 'package:somoa/screens/location/location_list_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';
-import 'package:somoa/screens/profile/location_setting_screen.dart';
+import 'package:somoa/screens/location/location_setting_screen.dart';
 import 'screens/auth/registration_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
@@ -273,11 +273,9 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
         '/registration': (context) => const RegistrationScreen(),
         '/login': (context) => const LoginScreen(),
         '/main': (context) => MainScreen(),
-        '/addDevice': (context) => DeviceCreateScreen(),
+        '/orderList': (context) => OrderListScreen(),
         '/locationSetting': (context) => LocationSettingScreen(),
-        '/orderList': (context) => OrderListScreen(
-              groupId: '',
-            ),
+        '/locationList': (context) => LocationListScreen(),
         '/locationDetail': (context) => LocationDetailScreen(),
         '/notification': (context) => const NotificationScreen(),
       },
@@ -300,7 +298,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: CircularProgressIndicator(), // 로딩 인디케이터
+        child: CircularProgressIndicator(),
       ),
     );
   }

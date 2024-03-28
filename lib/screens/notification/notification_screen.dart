@@ -164,6 +164,7 @@ class _NotificationScreenState extends State<NotificationScreen>
     }
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: const Text('알림', style: TextStyle(fontSize: 26.0)),
         centerTitle: true,
         actions: <Widget>[
@@ -272,9 +273,9 @@ class _NotificationScreenState extends State<NotificationScreen>
                                                           MaterialPageRoute(
                                                               builder: (context) =>
                                                                   OrderListScreen(
-                                                                      groupId: data[
-                                                                              'pathData']
-                                                                          as String)));
+                                                                      groupId: int
+                                                                          .parse(
+                                                                              data['pathData']))));
                                                     } else if (path ==
                                                         'DeviceListScreen') {
                                                       Navigator.push(
