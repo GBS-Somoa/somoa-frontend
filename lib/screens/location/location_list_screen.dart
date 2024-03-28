@@ -70,13 +70,18 @@ class _LocationListScreenState extends State<LocationListScreen> {
     String serverUrl = dotenv.get("SERVER_URL");
     final url = Uri.parse('$serverUrl' 'groups/group-order');
 
-    groups.sort((a, b) => a.order.compareTo(b.order));
+    // groups.sort((a, b) => a.order.compareTo(b.order));
+    for (int i = 0; i < groups.length; i++) {
+      print('그룹 ${groups[i].name} : ${groups[i].id}');
+    }
     List<int> groupIds = groups.map((group) => group.id).toList();
+    print(groupIds);
 
     try {
       final response = await http.patch(
         url,
         headers: {
+          'Content-Type': 'application/json',
           'Authorization': 'Bearer $accessToken',
         },
         body: jsonEncode({
@@ -85,7 +90,8 @@ class _LocationListScreenState extends State<LocationListScreen> {
       );
 
       if (response.statusCode != 200) {
-        print('그룹 로딩 실패');
+        print(response.statusCode);
+        print('그룹 순서 업데이트 실패');
       }
     } catch (e) {
       print(e.toString());
