@@ -247,6 +247,11 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
     }
   }
 
+  Future<void> fetchOrderData(String stringId) async {
+    // /api/orders?supply_id={supply_id}&order_status=배송중
+    // device에 포함된 supplyid 순회하면서 조회하고 list로 합치기
+  }
+
   void deleteDevice(BuildContext context, String deviceId) async {
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
