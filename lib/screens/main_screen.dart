@@ -5,18 +5,29 @@ import 'package:somoa/screens/profile/profile_screen.dart';
 import 'package:somoa/screens/supply/supply_screen.dart';
 
 class MainScreen extends StatefulWidget {
+  final int? index;
+
+  MainScreen({Key? key, this.index}) : super(key: key);
+
   @override
   _MainScreenState createState() => _MainScreenState();
 }
 
 class _MainScreenState extends State<MainScreen> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
 
-  List<Widget> _screens = [
-    DeviceScreen(),
-    SupplyScreen(),
-    NotificationScreen(),
-    ProfileScreen()
+  @override
+  void initState() {
+    super.initState();
+    // index가 null이 아니면 해당 값을 사용하고, null이면 0을 기본값으로 사용
+    _selectedIndex = widget.index ?? 0;
+  }
+
+  final List<Widget> _screens = [
+    const DeviceScreen(),
+    const SupplyScreen(),
+    const NotificationScreen(),
+    const ProfileScreen()
   ];
 
   void _onItemTapped(int index) {

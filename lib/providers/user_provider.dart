@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -93,6 +94,17 @@ class UserProvider with ChangeNotifier {
     } else {
       return false;
     }
+  }
+
+  Future<Map<String, dynamic>> checkLoginAndInitialMessage() async {
+    bool isLoggedIn = await autoLogin();
+    RemoteMessage? initialMessage =
+        await FirebaseMessaging.instance.getInitialMessage();
+
+    return {
+      'isLoggedIn': isLoggedIn,
+      'hasInitialMessage': initialMessage != null,
+    };
   }
 
   Future<void> logout() async {
