@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
+import 'package:somoa/models/device_model.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/services/api_services.dart';
@@ -187,6 +188,66 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
+  void _registerLoctaion(String groupName) async {
+    var bodyData = jsonEncode({
+      "groupName": groupName,
+    });
+
+    // .env 파일에서 서버 URL을 가져옵니다.
+    String serverUrl = dotenv.get("SERVER_URL");
+    String? accessToken = await getAccessToken();
+
+    // accessToken이 있는 경우에만 요청을 보냅니다.
+    if (accessToken != null) {
+      Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      http.Response response = await http.post(
+        Uri.parse(serverUrl + 'groups'),
+        headers: headers,
+        body: bodyData,
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData =
+            jsonDecode(utf8.decode(response.bodyBytes));
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('$groupName 장소가 추가 되었습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    Navigator.pushReplacementNamed(context, '/main'),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+        print(responseData);
+      } else {
+        print(response.body);
+        print('Failed to fetch location data: ${response.statusCode}');
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('장소 추가에 실패했습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      print('Access token is null');
+    }
+  }
+
   Future<void> fetchDeviceData(String groupId) async {
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
@@ -313,13 +374,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                   actions: [
                                     ElevatedButton(
                                       onPressed: () {
-                                        // 확인 버튼을 눌렀을 때의 동작을 구현합니다.
                                         if (placeName.isNotEmpty) {
                                           // 장소 이름이 입력되었을 경우에만 처리합니다.
-                                          print('장소 이름: $placeName');
-                                          // TODO: 장소 추가 로직을 구현합니다.
+                                          _registerLoctaion(placeName);
                                         }
-                                        Navigator.pop(context);
                                       },
                                       child: const Text(
                                         '확인',
@@ -387,64 +445,5 @@ class _DeviceScreenState extends State<DeviceScreen> {
         );
       },
     );
-  }
-}
-
-class Device {
-  final String id;
-  final String nickname;
-  final String type;
-  final String model;
-  final String manufacturer;
-  final List<Supply> supplies;
-
-  Device({
-    required this.id,
-    required this.nickname,
-    required this.type,
-    required this.model,
-    required this.manufacturer,
-    required this.supplies,
-  });
-
-  factory Device.fromJson(Map<String, dynamic> json) {
-    return Device(
-      id: json['id'],
-      nickname: json['nickname'],
-      type: json['type'],
-      model: json['model'],
-      manufacturer: json['manufacturer'],
-      supplies: (json['supplies'] as List<dynamic>)
-          .map((supplyJson) => Supply.fromJson(supplyJson))
-          .toList(),
-    );
-  }
-}
-
-class Supply {
-  final String id;
-  final String type;
-  final String name;
-  final Map<String, dynamic>? details;
-  final Map<String, dynamic>? limit;
-  final String? supplyAmountTmp;
-
-  Supply({
-    required this.id,
-    required this.type,
-    required this.name,
-    required this.details,
-    required this.limit,
-    this.supplyAmountTmp,
-  });
-
-  factory Supply.fromJson(Map<String, dynamic> json) {
-    return Supply(
-        id: json['id'],
-        type: json['type'],
-        name: json['name'],
-        details: json['details'],
-        limit: json['limit'],
-        supplyAmountTmp: json['supplyAmountTmp']);
   }
 }

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:somoa/models/device_model.dart';
+import 'package:somoa/models/supply_model.dart';
 import 'package:somoa/models/order_model.dart';
 import 'package:somoa/screens/device/device_info_screen.dart';
-import 'package:somoa/screens/device/device_list_screen.dart';
 import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/order_widget.dart';
 import 'dart:convert';
@@ -409,7 +410,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pushNamed(context, '/main');
+              Navigator.pushReplacementNamed(context, '/main');
             },
           ),
           actions: [

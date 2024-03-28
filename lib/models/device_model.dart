@@ -1,4 +1,4 @@
-import 'package:somoa/screens/device/device_list_screen.dart';
+import 'package:somoa/models/supply_model.dart';
 
 class Device {
   final String id;
