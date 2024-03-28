@@ -858,7 +858,7 @@ class SupplyWidget extends StatelessWidget {
                     context, int.parse(newValue), deviceId, supplyInfo.id);
 
                 if (supplyInfo.details['supplyAmount'] < int.parse(newValue)) {
-                  await setMaxAmount(supplyInfo.id, newValue as int);
+                  await setMaxAmount(supplyInfo.id, int.parse(newValue));
                 }
                 print('변경된 값: $newValue');
               },
