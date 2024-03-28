@@ -1,13 +1,24 @@
+import 'dart:convert';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:somoa/screens/device/device_detail_screen.dart';
 
 class SupplyWidget extends StatelessWidget {
-  final Map<String, Object> supplyInfo;
+  final String deviceId;
+  final dynamic supplyInfo;
 
-  const SupplyWidget({super.key, required this.supplyInfo});
+  const SupplyWidget({
+    super.key,
+    required this.deviceId,
+    required this.supplyInfo,
+  });
 
   Future<String?> getAccessToken() async {
     final storage = FlutterSecureStorage();
@@ -21,8 +32,7 @@ class SupplyWidget extends StatelessWidget {
       print(accessToken);
     }
 
-    fetchData();
-    switch (supplyInfo['type']) {
+    switch (supplyInfo.type) {
       case 'washerDetergent':
       case 'fabricSoftener':
       case 'dishDetergent':
@@ -50,11 +60,14 @@ class SupplyWidget extends StatelessWidget {
     }
   }
 
-  // shared preference 저장소에서 supplyId에 해당하는 maxAmount 값을 가져오는 함수
+  // shared preference 저장소에서 supplyId에 해당하는 maxAmount 값을 가져오는 함수 -> 저장된 값이 없으면 1000으로 저장 & 가져옴
   static Future<int> getMaxAmount(supplyId) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     final String key = "maxAmount_$supplyId";
     int? maxAmount = prefs.getInt(key);
+    if (maxAmount == null) {
+      setMaxAmount(supplyId, 1000);
+    }
     return maxAmount ?? 1000;
   }
 
@@ -66,17 +79,25 @@ class SupplyWidget extends StatelessWidget {
   }
 
   Future<Widget> _buildDetergentCard(BuildContext context) async {
-    // TODO: 기기 내부에 저장된 데이터에서 supplyId에 맞는 maxAmount를 가져오도록 작성해야함
-    int maxAmount = await getMaxAmount(supplyInfo['id']);
+    // 기기 내부에 저장된 데이터에서 supplyId에 맞는 maxAmount를 가져옴
+    int maxAmount = await getMaxAmount(supplyInfo.id);
 
-    bool isSupplyAmountTmp = supplyInfo['supplyAmountTmp'] != 0 ? true : false;
+    print(supplyInfo.supplyAmountTmp);
+    bool isSupplyAmountTmp =
+        supplyInfo.supplyAmountTmp != null && supplyInfo.supplyAmountTmp != 0
+            ? true
+            : false;
 
     if (isSupplyAmountTmp) {
-      maxAmount = maxAmount + (supplyInfo['supplyAmountTmp'] as int);
+      maxAmount = maxAmount + (supplyInfo.supplyAmountTmp as int);
     }
 
-    int supplyAmount = (supplyInfo['details'] as Map)['supplyAmount'];
-    int limitAmount = (supplyInfo['limit'] as Map)['supplyAmount'];
+    int supplyAmount = supplyInfo.details['supplyAmount'];
+    int limitAmount = supplyInfo.limit['supplyAmount'];
+    if (maxAmount < supplyAmount) {
+      setMaxAmount(supplyInfo.id, supplyAmount);
+      maxAmount = supplyAmount;
+    }
 
     double supplyPercentage = supplyAmount / maxAmount;
     double limitPercentage = limitAmount / maxAmount;
@@ -89,10 +110,9 @@ class SupplyWidget extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(supplyInfo['name'].toString()),
+                Text(supplyInfo.name),
                 isSupplyAmountTmp
-                    ? Text(
-                        '${supplyAmount}(+${supplyInfo['supplyAmountTmp']})ml')
+                    ? Text('${supplyAmount}(+${supplyInfo.supplyAmountTmp})ml')
                     : Text('${supplyAmount}ml'),
               ],
             ),
@@ -178,8 +198,7 @@ class SupplyWidget extends StatelessWidget {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // Add functionality to edit inventory button
-                        _showInventoryChangeDialog(context);
+                        _showSupplyAmountChangeDialog(context);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[300],
@@ -191,7 +210,7 @@ class SupplyWidget extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        // Add functionality to edit notification criteria button
+                        print('알림 기준 수정 기능 없음ㅎㅎ');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[300],
@@ -212,7 +231,7 @@ class SupplyWidget extends StatelessWidget {
                     minimumSize: const Size(260, 40),
                   ),
                   child: Text(
-                    '${supplyInfo['name']} 구매하러 가기',
+                    '${supplyInfo.name} 구매하러 가기',
                     style: const TextStyle(color: Colors.black),
                   ),
                 ),
@@ -226,9 +245,9 @@ class SupplyWidget extends StatelessWidget {
 
   Widget _buildFilterCard(BuildContext context) {
     final String supplyStatus =
-        (supplyInfo['details'] as Map)['supplyStatus'].toString().toLowerCase();
+        supplyInfo.details['supplyStatus'].toString().toLowerCase();
     final String limitStatus =
-        (supplyInfo['limit'] as Map)['supplyStatus'].toString().toLowerCase();
+        supplyInfo.limit['supplyStatus'].toString().toLowerCase();
 
     double maxAmount = 1.0;
 
@@ -252,7 +271,7 @@ class SupplyWidget extends StatelessWidget {
     double limitPercentage = limitAmount / maxAmount;
 
     DateTime? givenDateTime =
-        DateTime.parse((supplyInfo['details'] as Map)['supplyChangeDate']);
+        DateTime.parse(supplyInfo.details['supplyChangeDate']);
 
     // 'yyyy-MM-dd' 형식으로 날짜를 포맷
     String? formattedDate = DateFormat("yyyy-MM-dd").format(givenDateTime);
@@ -261,12 +280,12 @@ class SupplyWidget extends StatelessWidget {
     DateTime currentDate = DateTime.now();
     Duration? difference = currentDate.difference(givenDateTime);
 
-    String changedDateString = supplyInfo['type'] == 'cleanableFilter'
+    String changedDateString = supplyInfo.type == 'cleanableFilter'
         ? '최근 청소 날짜 : $formattedDate (${difference.inDays}일 경과)'
         : '최근 교체 날짜 : $formattedDate (${difference.inDays}일 경과)';
 
     bool isDurationOver =
-        difference.inDays >= (supplyInfo['limit'] as Map)['supplyChangeDate']
+        difference.inDays >= supplyInfo.limit['supplyChangeDate']
             ? true
             : false;
 
@@ -278,7 +297,7 @@ class SupplyWidget extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(supplyInfo['name'].toString()),
+                Text(supplyInfo.name),
                 Text(supplyStatus == 'bad'
                     ? '관리 필요'
                     : supplyStatus == 'normal'
@@ -399,7 +418,7 @@ class SupplyWidget extends StatelessWidget {
                     ),
                   ],
                 ),
-                supplyInfo['type'] == 'cleanableFilter'
+                supplyInfo.type == 'cleanableFilter'
                     ? const SizedBox()
                     : ElevatedButton(
                         onPressed: () {
@@ -410,7 +429,7 @@ class SupplyWidget extends StatelessWidget {
                           minimumSize: const Size(260, 40),
                         ),
                         child: Text(
-                          '${supplyInfo['name']} 구매하러 가기',
+                          '${supplyInfo.name} 구매하러 가기',
                           style: const TextStyle(color: Colors.black),
                         ),
                       ),
@@ -425,14 +444,14 @@ class SupplyWidget extends StatelessWidget {
   Widget _buildTankCard(BuildContext context) {
     int maxAmount = 100;
 
-    int supplyAmount = (supplyInfo['details'] as Map)['supplyLevel'];
-    int limitAmount = (supplyInfo['limit'] as Map)['supplyLevel'];
+    int supplyAmount = supplyInfo.details['supplyLevel'];
+    int limitAmount = supplyInfo.limit['supplyLevel'];
 
     double supplyPercentage = supplyAmount / maxAmount;
     double limitPercentage = limitAmount / maxAmount;
 
     DateTime? givenDateTime =
-        DateTime.parse((supplyInfo['details'] as Map)['supplyChangeDate']);
+        DateTime.parse(supplyInfo.details['supplyChangeDate']);
 
     // 'yyyy-MM-dd' 형식으로 날짜를 포맷
     String? formattedDate = DateFormat("yyyy-MM-dd").format(givenDateTime);
@@ -445,7 +464,7 @@ class SupplyWidget extends StatelessWidget {
         '최근 교체 날짜 : $formattedDate (${difference.inDays}일 경과)';
 
     bool isDurationOver =
-        difference.inDays >= (supplyInfo['limit'] as Map)['supplyChangeDate']
+        difference.inDays >= supplyInfo.limit['supplyChangeDate']
             ? true
             : false;
 
@@ -457,7 +476,7 @@ class SupplyWidget extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(supplyInfo['name'].toString()),
+                Text(supplyInfo.name),
                 Text('$supplyAmount%'),
               ],
             ),
@@ -488,7 +507,7 @@ class SupplyWidget extends StatelessWidget {
                             widthFactor: supplyPercentage,
                             child: Container(
                               decoration: BoxDecoration(
-                                color: supplyInfo['type'] == 'supplyTank'
+                                color: supplyInfo.type == 'supplyTank'
                                     ? (supplyAmount >= limitAmount
                                         ? Colors.blue[500]
                                         : Colors.red[400])
@@ -579,14 +598,14 @@ class SupplyWidget extends StatelessWidget {
   Widget _buildDustBinCard(BuildContext context) {
     int maxAmount = 10;
 
-    int supplyAmount = (supplyInfo['details'] as Map)['supplyStatus'];
-    int limitAmount = (supplyInfo['limit'] as Map)['supplyStatus'];
+    int supplyAmount = supplyInfo.details['supplyStatus'];
+    int limitAmount = supplyInfo.limit['supplyStatus'];
 
     double supplyPercentage = supplyAmount / maxAmount;
     double limitPercentage = limitAmount / maxAmount;
 
     DateTime? givenDateTime =
-        DateTime.parse((supplyInfo['details'] as Map)['supplyChangeDate']);
+        DateTime.parse(supplyInfo.details['supplyChangeDate']);
 
     // 'yyyy-MM-dd' 형식으로 날짜를 포맷
     String? formattedDate = DateFormat("yyyy-MM-dd").format(givenDateTime);
@@ -599,7 +618,7 @@ class SupplyWidget extends StatelessWidget {
         '최근 교체 날짜 : $formattedDate (${difference.inDays}일 경과)';
 
     bool isDurationOver =
-        difference.inDays >= (supplyInfo['limit'] as Map)['supplyChangeDate']
+        difference.inDays >= supplyInfo.limit['supplyChangeDate']
             ? true
             : false;
 
@@ -611,7 +630,7 @@ class SupplyWidget extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(supplyInfo['name'].toString()),
+                Text(supplyInfo.name),
                 Text('포화도: $supplyAmount/10'),
               ],
             ),
@@ -727,7 +746,7 @@ class SupplyWidget extends StatelessWidget {
                     minimumSize: const Size(260, 40),
                   ),
                   child: Text(
-                    '${supplyInfo['name']} 구매하러 가기',
+                    '${supplyInfo.name} 구매하러 가기',
                     style: const TextStyle(color: Colors.black),
                   ),
                 ),
@@ -739,17 +758,85 @@ class SupplyWidget extends StatelessWidget {
     );
   }
 
+  // 보유량 변경 api 요청 함수
+  Future<void> _changeSupplyAmount(BuildContext context, int amount,
+      String deviceId, String supplyId) async {
+    print("함수");
+    var bodyData = jsonEncode({
+      "supplyAmount": amount,
+    });
+
+    // .env 파일에서 서버 URL을 가져옵니다.
+    String serverUrl = dotenv.get("SERVER_URL");
+    String? accessToken = await getAccessToken();
+
+    // accessToken이 있는 경우에만 요청을 보냅니다.
+    if (accessToken != null) {
+      Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      http.Response response = await http.patch(
+        Uri.parse('${serverUrl}supplies/$supplyId'),
+        headers: headers,
+        body: bodyData,
+      );
+
+      if (response.statusCode == 200) {
+        // Map<String, dynamic> responseData =
+        //     jsonDecode(utf8.decode(response.bodyBytes));
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('보유량이 수정되었습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    // deviceDetailScreen으로 이동하는 코드
+                    Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        DeviceDetailScreen(deviceId: deviceId),
+                  ),
+                ),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+      } else {
+        print('Failed to fetch location data: ${response.statusCode}');
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('보유량 수정에 실패했습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      print('Access token is null');
+    }
+  }
+
   // 보유량 변경 다이얼로그
-  void _showInventoryChangeDialog(BuildContext context) {
+  void _showSupplyAmountChangeDialog(BuildContext context) {
     TextEditingController _controller = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text(
-            '${supplyInfo['name']} 보유량 변경',
+            '${supplyInfo.name} 보유량 변경',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 20),
+            style: const TextStyle(fontSize: 20),
           ),
           content: TextFormField(
             controller: _controller,
@@ -766,14 +853,14 @@ class SupplyWidget extends StatelessWidget {
             ElevatedButton(
               onPressed: () async {
                 String newValue = _controller.text;
-                // TODO: 보유량 변경 api 호출
-                if ((supplyInfo['details'] as Map)['supplyAmount'] <
-                    int.parse(newValue)) {
-                  await setMaxAmount(
-                      supplyInfo['id'] as String, newValue as int);
+                // 보유량 변경 api 호출
+                await _changeSupplyAmount(
+                    context, int.parse(newValue), deviceId, supplyInfo.id);
+
+                if (supplyInfo.details['supplyAmount'] < int.parse(newValue)) {
+                  await setMaxAmount(supplyInfo.id, newValue as int);
                 }
                 print('변경된 값: $newValue');
-                Navigator.of(context).pop();
               },
               child: const Text('변경'),
             ),
