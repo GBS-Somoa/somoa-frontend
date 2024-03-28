@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/models/device_model.dart';
@@ -126,7 +127,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       "productName": "다우니 세제 1L",
       "orderDate": "2024-03-25",
       "orderStatus": "배송완료",
-      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+      "productImg":
+          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
     },
     {
       "orderId": 1,
@@ -134,7 +136,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       "productName": "다우니 세제 1L",
       "orderDate": "2024-03-25",
       "orderStatus": "결제완료",
-      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+      "productImg":
+          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
     },
     {
       "orderId": 2,
@@ -142,7 +145,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       "productName": "어쩌구저쩌구 정품 필터",
       "orderDate": "2024-03-25",
       "orderStatus": "결제완료",
-      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+      "productImg":
+          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
     },
   ];
 
@@ -171,12 +175,12 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           limit.containsKey('supplyLevel')) {
         if (
             // 배수 탱크인 경우, 임계치 이상이면 관리 필요로 판단
-            supply['type'] == 'drainTank' &&
+            supply.type == 'drainTank' &&
                 details['supplyLevel'] >= limit['supplyLevel']) {
           statusSummary++;
         } else if (
             // 급수 탱크인 경우, 임계치 이하면 관리 필요로 판단
-            supply['type'] == 'supplyTank' &&
+            supply.type == 'supplyTank' &&
                 details['supplyLevel'] <= limit['supplyLevel']) {
           statusSummary++;
         }
@@ -193,11 +197,12 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
       if (details.containsKey('supplyStatus') &&
           limit.containsKey('supplyStatus')) {
-        if (supply['type'] == 'dustBin') {
+        if (supply.type == 'dustBin') {
           if (details['supplyStatus'] >= limit['supplyStatus']) {
             statusSummary++;
           }
         } else {
+          print('여기');
           List<String> statusOrder = ['good', 'normal', 'bad'];
           int detailIndex = statusOrder.indexOf(details['supplyStatus']);
           int limitIndex = statusOrder.indexOf(limit['supplyStatus']);
@@ -466,6 +471,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                         children: [
                           const Text(
                             '진행중인 배송',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.start,
                           ),
                           for (var order in orders)
@@ -478,6 +485,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                       children: [
                         const Text(
                           '소모품 목록',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.start,
                         ),
                         if (deviceInfo.supplies.isNotEmpty)

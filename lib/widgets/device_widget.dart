@@ -38,7 +38,7 @@ class DeviceWidget extends StatelessWidget {
                 IconButton(
                     onPressed: () {
                       // deviceDetailScreen으로 이동하는 코드
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
@@ -72,7 +72,8 @@ class DeviceWidget extends StatelessWidget {
       String supplyType = supply.type;
       Widget supplyInfoWidget;
 
-      if (supplyType == 'washerDetergent' || supplyType == 'fabricSoftener') {
+      if (['washerDetergent', 'fabricSoftener', 'dishDetergent', 'dishRinse']
+          .contains(supplyType)) {
         supplyInfoWidget = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -173,15 +174,15 @@ class DeviceWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              // Column(
-              //   crossAxisAlignment: CrossAxisAlignment.start,
-              //   children: [
-              //     const Text('최근 교체 날짜'),
-              //     Text(transformDate(supply.details['supplyChangeDate']),
-              //         style: const TextStyle(
-              //             fontSize: 18, fontWeight: FontWeight.bold)),
-              //   ],
-              // ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text('최근 교체 날짜'),
+                  Text(transformDate(supply.details['supplyChangeDate']),
+                      style: const TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold)),
+                ],
+              ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(
