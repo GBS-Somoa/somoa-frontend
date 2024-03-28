@@ -38,7 +38,7 @@ class DeviceWidget extends StatelessWidget {
                 IconButton(
                     onPressed: () {
                       // deviceDetailScreen으로 이동하는 코드
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
