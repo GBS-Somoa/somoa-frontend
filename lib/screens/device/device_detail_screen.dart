@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/models/order_model.dart';
 import 'package:somoa/screens/device/device_info_screen.dart';
+import 'package:somoa/screens/device/device_list_screen.dart';
 import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/order_widget.dart';
 import 'dart:convert';
@@ -489,64 +490,5 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               ),
             ),
     );
-  }
-}
-
-class Device {
-  final String id;
-  final String nickname;
-  final String type;
-  final String model;
-  final String manufacturer;
-  final List<Supply> supplies;
-
-  Device({
-    required this.id,
-    required this.nickname,
-    required this.type,
-    required this.model,
-    required this.manufacturer,
-    required this.supplies,
-  });
-
-  factory Device.fromJson(Map<String, dynamic> json) {
-    return Device(
-      id: json['id'],
-      nickname: json['nickname'],
-      type: json['type'],
-      model: json['model'],
-      manufacturer: json['manufacturer'],
-      supplies: (json['supplies'] as List<dynamic>)
-          .map((supplyJson) => Supply.fromJson(supplyJson))
-          .toList(),
-    );
-  }
-}
-
-class Supply {
-  final String id;
-  final String type;
-  final String name;
-  final Map<String, dynamic> details;
-  final Map<String, dynamic> limit;
-  final String? supplyAmountTmp;
-
-  Supply({
-    required this.id,
-    required this.type,
-    required this.name,
-    required this.details,
-    required this.limit,
-    this.supplyAmountTmp,
-  });
-
-  factory Supply.fromJson(Map<String, dynamic> json) {
-    return Supply(
-        id: json['id'],
-        type: json['type'],
-        name: json['name'],
-        details: json['details'],
-        limit: json['limit'],
-        supplyAmountTmp: json['supplyAmountTmp']);
   }
 }
