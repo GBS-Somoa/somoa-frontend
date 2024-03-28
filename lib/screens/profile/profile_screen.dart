@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
+import 'package:somoa/widgets/list_container_widget.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -24,7 +25,7 @@ class ProfileScreen extends StatelessWidget {
         ),
         body: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(5.0),
             child: Column(
               children: [
                 SizedBox(
@@ -42,42 +43,37 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                ListView(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    Card(
-                      child: ListTile(
+                ListContainerWidget(
+                    children: [
+                      ListTile(
                         title: Text('프로필 관리'),
                         onTap: () {
                           print('Item 1 tapped');
                         },
                       ),
-                    ),
-                    Card(
-                      child: ListTile(
+                      ListTile(
                         title: Text('장소 관리'),
                         onTap: () {
                           print('Item 2 tapped');
+                          Navigator.pushNamed(context, '/locationSetting');
                         },
                       ),
-                    ),
-                    Card(
-                      child: ListTile(
+
+                      ListTile(
                         title: Text('즐겨찾는 쇼핑몰 관리'),
                         onTap: () {
                           print('Item 3 tapped');
                         },
                       ),
-                    ),
-                  ],
+
+                    ]
                 ),
                 SizedBox(height: 20),
                 const Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       Text(
-                        '나의 주문 목록',
+                        '      진행중인 배송',
                         textAlign: TextAlign.start,
                         style: TextStyle(fontSize: 16),
                       )
