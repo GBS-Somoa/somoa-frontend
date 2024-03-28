@@ -52,7 +52,6 @@ class Order {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-
   static const storage = FlutterSecureStorage();
   List<Order> orders = [
     Order(
@@ -62,7 +61,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       productName: '다우니 세제 1L',
       orderStore: 'SSAPANG',
       orderStoreId: 0,
-      productImg: 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+      productImg:
+          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
       deviceName: '세탁기',
     ),
     Order(
@@ -72,7 +72,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       productName: '다우니 세제 1L',
       orderStore: 'SSAPANG',
       orderStoreId: 0,
-      productImg: 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+      productImg:
+          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
       deviceName: '세탁기',
     ),
     Order(
@@ -82,7 +83,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       productName: '어쩌구저쩌구 정품 필터 이름이 되게되게 길어서 ...으ㅕ로 나오는지 확인해보기 위한 테스트용 상품 이름',
       orderStore: '삼성몰',
       orderStoreId: 1,
-      productImg: 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+      productImg:
+          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
       deviceName: '공기청정기',
     ),
   ];
@@ -145,7 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
         appBar: AppBar(
-          title: const Text('Profile'),
+          title: const Text('내 정보'),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
@@ -176,29 +178,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-                ListContainerWidget(
-                    children: [
-                      ListTile(
-                        title: Text('프로필 관리'),
-                        onTap: () {
-                          print('Item 1 tapped');
-                        },
-                      ),
-                      ListTile(
-                        title: Text('장소 관리'),
-                        onTap: () {
-                          print('Item 2 tapped');
-                          Navigator.pushNamed(context, '/locationList');
-                        },
-                      ),
-                      ListTile(
-                        title: Text('즐겨찾는 쇼핑몰 관리'),
-                        onTap: () {
-                          print('Item 3 tapped');
-                        },
-                      ),
-                    ]
-                ),
+                ListContainerWidget(children: [
+                  ListTile(
+                    title: Text('프로필 관리'),
+                    onTap: () {
+                      print('Item 1 tapped');
+                    },
+                  ),
+                  ListTile(
+                    title: Text('장소 관리'),
+                    onTap: () {
+                      print('Item 2 tapped');
+                      Navigator.pushNamed(context, '/locationList');
+                    },
+                  ),
+                  ListTile(
+                    title: Text('즐겨찾는 쇼핑몰 관리'),
+                    onTap: () {
+                      print('Item 3 tapped');
+                    },
+                  ),
+                ]),
                 SizedBox(height: 20),
                 Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -206,7 +206,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         '      진행중인 배송',
                         textAlign: TextAlign.start,
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 15),
                       ListView.builder(
@@ -217,12 +218,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           final order = orders[index];
                           if (order.orderStatus != '주문취소') {
                             return Padding(
-                              padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
+                              padding: const EdgeInsets.fromLTRB(
+                                  10.0, 0.0, 10.0, 10.0),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(left: 20.0), // 왼쪽에 20 픽셀의 패딩 추가
+                                    padding: const EdgeInsets.only(
+                                        left: 20.0), // 왼쪽에 20 픽셀의 패딩 추가
                                     child: Text(
                                       '${order.groupName} > ${order.deviceName}',
                                       style: const TextStyle(
