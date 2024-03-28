@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:somoa/screens/device/device_qr_scan.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/services/api_services.dart';
@@ -111,11 +112,14 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
                         borderSide: BorderSide(color: Colors.black),
                       ),
                       suffixIcon: IconButton(
-                        icon: const Icon(Icons.qr_code),
-                        onPressed: () {
-                          // TODO: Implement QR code scanning functionality
-                        },
-                      ),
+                          icon: const Icon(Icons.qr_code),
+                          onPressed: () {
+                            // TODO: Implement QR code scanning functionality
+                            Navigator.push(context,
+                                MaterialPageRoute(builder: (context) {
+                              return const QrScan();
+                            }));
+                          }),
                     ),
                   ),
                   const SizedBox(height: 35.0),

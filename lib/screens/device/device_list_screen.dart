@@ -400,7 +400,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       value: '주문 목록',
                       child: const Text('주문 목록'),
                       onTap: () {
-                        Navigator.pushNamed(context, '/orderList');
+                        Navigator.pushNamed(context, '/orderList',
+                            arguments: _selectedLocation);
                       },
                     ),
                   ],

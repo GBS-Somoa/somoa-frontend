@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/location/location_detail_screen.dart';
+import 'package:somoa/screens/notification/notification_screen.dart';
 import 'package:somoa/screens/location/location_list_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';
 import 'package:somoa/screens/location/location_setting_screen.dart';
@@ -29,9 +30,12 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> saveNotification(
     String title, String body, Map<String, dynamic> data) async {
   final prefs = await SharedPreferences.getInstance();
+  await prefs.reload();
 
   // 알림 리스트를 가져옴. 없으면 빈 리스트를 사용
   final String storedNotifications = prefs.getString('notifications') ?? '[]';
@@ -45,6 +49,7 @@ Future<void> saveNotification(
   };
 
   print(notification['date']);
+  print(notification['data']);
   // 새 알림을 리스트에 추가
   notificationsList.add(notification);
 
@@ -88,14 +93,22 @@ void main() async {
       ?.createNotificationChannel(channel);
 
   await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-    ),
-  );
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
+      onDidReceiveNotificationResponse: (NotificationResponse details) async {
+    navigatorKey.currentState
+        ?.pushReplacementNamed('/mainScreen', arguments: 2);
+  });
 
   await flutterLocalNotificationsPlugin.cancelAll();
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    navigatorKey.currentState
+        ?.pushReplacementNamed('/mainScreen', arguments: 2);
+  });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
@@ -190,6 +203,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Somoa',
       theme: ThemeData(
@@ -236,13 +250,20 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
         ),
       ),
       home: FutureBuilder(
-        future: Provider.of<UserProvider>(context, listen: false).autoLogin(),
+        future: Provider.of<UserProvider>(context, listen: false)
+            .checkLoginAndInitialMessage(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.done) {
-            if (snapshot.data == true) {
-              return MainScreen();
+            // 로그인 성공하고 알림 클릭으로 앱 시작
+            if (snapshot.data?['isLoggedIn'] == true &&
+                snapshot.data?['hasInitialMessage'] == true) {
+              return MainScreen(index: 2); // 알림 탭으로 이동
+            }
+            // 로그인만 성공
+            else if (snapshot.data?['isLoggedIn'] == true) {
+              return MainScreen(); // 기본 탭으로 이동
             } else {
-              return const LoginScreen();
+              return const LoginScreen(); // 로그인 실패시 로그인 화면으로 이동
             }
           }
           return const SplashScreen(); // 로딩 중에는 스플래시 화면을 보여줍니다.
@@ -256,6 +277,15 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
         '/locationSetting': (context) => LocationSettingScreen(),
         '/locationList': (context) => LocationListScreen(),
         '/locationDetail': (context) => LocationDetailScreen(),
+        '/notification': (context) => const NotificationScreen(),
+      },
+      onGenerateRoute: (settings) {
+        if (settings.name == '/mainScreen') {
+          final args = settings.arguments as int?;
+          return MaterialPageRoute(builder: (context) {
+            return MainScreen(index: args ?? 0);
+          });
+        }
       },
     );
   }

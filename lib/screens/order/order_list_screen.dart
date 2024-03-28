@@ -9,8 +9,9 @@ import 'package:somoa/widgets/menu_bar_widget.dart';
 import 'package:somoa/widgets/order_widget.dart';
 
 class OrderListScreen extends StatefulWidget {
+  final int? groupId;
 
-  OrderListScreen({super.key});
+  OrderListScreen({super.key, this.groupId});
 
   @override
   _OrderListScreenState createState() => _OrderListScreenState();
@@ -26,12 +27,17 @@ class _OrderListScreenState extends State<OrderListScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final args = ModalRoute.of(context)?.settings.arguments;
-      if (args is int) {
-        groupId = args;
-      }
-    });
+
+    if (widget.groupId != null) {
+      groupId = widget.groupId!;
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final args = ModalRoute.of(context)?.settings.arguments;
+        if (args is int) {
+          groupId = args;
+        }
+      });
+    }
     fetchData();
   }
 
@@ -49,7 +55,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
 
   Future<void> fetchOrders() async {
     final accessToken = await storage.read(key: 'accessToken');
-
+    print('accessToken: $accessToken');
+    print('groupId: $groupId');
     String serverUrl = dotenv.get("SERVER_URL");
     final url = Uri.parse('$serverUrl' 'groups/${groupId}/orders');
 
@@ -72,7 +79,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
           });
         }
       } else {
-        print(response.body);
+        print(json.decode(utf8.decode(response.bodyBytes)));
         print(response.statusCode);
         print('내가 주문한 주문목록 조회 실패');
       }
@@ -107,7 +114,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(left: 20.0), // 왼쪽에 20 픽셀의 패딩 추가
+                    padding:
+                        const EdgeInsets.only(left: 20.0), // 왼쪽에 20 픽셀의 패딩 추가
                     child: Text(
                       order.createdAt.toString().substring(0, 10),
                       style: const TextStyle(

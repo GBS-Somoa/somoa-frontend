@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -853,8 +852,8 @@ class SupplyWidget extends StatelessWidget {
               onPressed: () async {
                 String newValue = _controller.text;
                 // 보유량 변경 api 호출
-                await _changeSupplyAmount(
-                    context, int.parse(newValue), deviceId, supplyInfo.username);
+                await _changeSupplyAmount(context, int.parse(newValue),
+                    deviceId, supplyInfo.username);
 
                 if (supplyInfo.details['supplyAmount'] < int.parse(newValue)) {
                   await setMaxAmount(supplyInfo.id, int.parse(newValue));
