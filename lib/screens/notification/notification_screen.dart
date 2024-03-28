@@ -1,7 +1,11 @@
 import 'dart:convert';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intl/intl.dart';
+import 'package:somoa/screens/device/device_detail_screen.dart';
+import 'package:somoa/screens/device/device_list_screen.dart';
+import 'package:somoa/screens/order/order_list_screen.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -11,17 +15,39 @@ class NotificationScreen extends StatefulWidget {
   _NotificationScreenState createState() => _NotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _NotificationScreenState extends State<NotificationScreen>
+    with WidgetsBindingObserver {
   List<Map<String, dynamic>> notifications = [];
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      if (mounted) {
+        _loadNotifications();
+      }
+    });
     _loadNotifications();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      _loadNotifications();
+    }
   }
 
   Future<void> _loadNotifications() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     final String storedNotifications = prefs.getString('notifications') ?? '[]';
     final List<dynamic> notificationsList = json.decode(storedNotifications);
 
@@ -72,6 +98,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   Future<void> _deleteAllNotifications() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     await prefs.setString('notifications', '[]');
     setState(() {
       notifications = [];
@@ -186,6 +213,10 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                 horizontal: 8.0, vertical: 4.0),
                             child: Column(
                               children: entry.value.map((notification) {
+                                // 알림에서 data 객체
+                                final Map<String, dynamic> data =
+                                    json.decode(notification['data']);
+                                final String? path = data['path'];
                                 return Column(
                                   children: [
                                     Container(
@@ -197,6 +228,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                           notifications.remove(notification);
                                           final prefs = await SharedPreferences
                                               .getInstance();
+                                          await prefs.reload();
                                           String encodedData =
                                               json.encode(notifications);
                                           setState(() {
@@ -205,8 +237,44 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                           });
                                         },
                                         child: ListTile(
-                                          leading: getIconFromData(json.decode(
-                                              notification['data'])['Icon']),
+                                          leading:
+                                              getIconFromData(data['icon']),
+                                          onTap: () {
+                                            if (path != null) {
+                                              if (path ==
+                                                  'DeviceDetailScreen') {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            DeviceDetailScreen(
+                                                                deviceId: data[
+                                                                        'pathData']
+                                                                    as String)));
+                                              } else if (path ==
+                                                  'OrderListScreen') {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            OrderListScreen(
+                                                                groupId: data[
+                                                                        'pathData']
+                                                                    as String)));
+                                              } else if (path ==
+                                                  'DeviceListScreen') {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const DeviceScreen()));
+                                              } else {
+                                                print('Unknown path: $path');
+                                              }
+                                            } else {
+                                              print('path is null');
+                                            }
+                                          },
                                           title: Padding(
                                             padding: const EdgeInsets.only(
                                                 bottom: 5.0),

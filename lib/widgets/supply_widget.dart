@@ -767,7 +767,8 @@ class SupplyWidget extends StatelessWidget {
               onPressed: () async {
                 String newValue = _controller.text;
                 // TODO: 보유량 변경 api 호출
-                if ((supplyInfo['details'] as Map)['supplyAmount'] < newValue) {
+                if ((supplyInfo['details'] as Map)['supplyAmount'] <
+                    int.parse(newValue)) {
                   await setMaxAmount(
                       supplyInfo['id'] as String, newValue as int);
                 }

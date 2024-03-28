@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/screens/location/location_detail_screen.dart';
+import 'package:somoa/screens/notification/notification_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';
 import 'package:somoa/screens/profile/location_setting_screen.dart';
 import 'screens/auth/registration_screen.dart';
@@ -29,6 +30,8 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 Future<void> saveNotification(
     String title, String body, Map<String, dynamic> data) async {
   final prefs = await SharedPreferences.getInstance();
@@ -45,6 +48,7 @@ Future<void> saveNotification(
   };
 
   print(notification['date']);
+  print(notification['data']);
   // 새 알림을 리스트에 추가
   notificationsList.add(notification);
 
@@ -88,14 +92,37 @@ void main() async {
       ?.createNotificationChannel(channel);
 
   await flutterLocalNotificationsPlugin.initialize(
-    const InitializationSettings(
-      android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-    ),
-  );
+      const InitializationSettings(
+        android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+      ),
+      onDidReceiveNotificationResponse: (NotificationResponse details) async {
+    Navigator.of(navigatorKey.currentContext!).push(
+        MaterialPageRoute(builder: (context) => const NotificationScreen()));
+    print('알림 클릭 성공 ㅋ');
+  });
 
   await flutterLocalNotificationsPlugin.cancelAll();
 
   FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    Navigator.of(navigatorKey.currentContext!).push(
+        MaterialPageRoute(builder: (context) => const NotificationScreen()));
+    print('알림 클릭 성공 ㅋ');
+  });
+
+  RemoteMessage? initialMessage =
+      await FirebaseMessaging.instance.getInitialMessage();
+  if (initialMessage != null) {
+    navigatorKey.currentState?.pushNamed('/notification');
+    print('알림 클릭 성공 ㅋ');
+  }
+
+  // messaging.getInitialMessage().then((RemoteMessage? message) {
+  //   if (message != null) {
+  //     print('알림 클릭 성공 ㅋ');
+  //   }
+  // });
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print('Got a message whilst in the foreground!');
@@ -190,6 +217,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      navigatorKey: navigatorKey,
       debugShowCheckedModeBanner: false,
       title: 'Somoa',
       theme: ThemeData(
@@ -258,6 +286,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
               groupId: '',
             ),
         '/locationDetail': (context) => LocationDetailScreen(),
+        '/notification': (context) => const NotificationScreen(),
       },
     );
   }
