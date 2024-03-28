@@ -147,6 +147,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('내 정보'),
           actions: [
             IconButton(

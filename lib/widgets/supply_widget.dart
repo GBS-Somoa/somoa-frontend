@@ -761,7 +761,6 @@ class SupplyWidget extends StatelessWidget {
   // 보유량 변경 api 요청 함수
   Future<void> _changeSupplyAmount(BuildContext context, int amount,
       String deviceId, String supplyId) async {
-    print("함수");
     var bodyData = jsonEncode({
       "supplyAmount": amount,
     });
