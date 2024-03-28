@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:somoa/models/device_model.dart';
+import 'package:somoa/models/supply_model.dart';
+import 'package:somoa/models/order_model.dart';
 import 'package:somoa/screens/device/device_info_screen.dart';
+import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/order_widget.dart';
 import 'dart:convert';
 
@@ -17,100 +22,101 @@ class DeviceDetailScreen extends StatefulWidget {
 
 class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   bool isLoading = true;
+  late Device deviceInfo;
+  List orderList = [];
 
-  Map<String, Object> data = {};
-
-  Map<String, Object> dummyData = {
-    "id": "06b76c4725ddc59b",
-    "nickname": "dd",
-    "model": "가나다라",
-    "type": "washer",
-    "manufacturer": "LG",
-    "supplies": [
-      {
-        "id": "6601bb29c4ec1e75ed8670bb",
-        "type": "fabricSoftener",
-        "name": "섬유유연제",
-        "details": {"supplyAmount": 1000},
-        "limit": {"supplyAmount": 100},
-        'supplyAmountTmp': 0,
-      },
-      {
-        "id": "6601bb29c4ec1e75ed8670ba",
-        "type": "replaceableFilter",
-        "name": "교체형 필터",
-        "details": {
-          "supplyChangeDate": "2024-03-25T17:58:01.580+00:00",
-          "supplyStatus": "normal"
-        },
-        "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
-      },
-      {
-        "id": "6601bb29c4ec1e75ed8670be",
-        "type": "washerDetergent",
-        "name": "세탁세제",
-        "details": {"supplyAmount": 100},
-        "limit": {"supplyAmount": 300},
-        'supplyAmountTmp': 0,
-      },
-      {
-        "id": "6601bb29c4ec1e75ed8670bf",
-        "type": "dishRinse",
-        "name": "식기세척기 린스",
-        "details": {"supplyAmount": 100},
-        "limit": {"supplyAmount": 0},
-        'supplyAmountTmp': 500,
-      },
-      {
-        "id": "6601bb29c4ec1e75ed8670bd",
-        "type": "dishDetergent",
-        "name": "세제",
-        "details": {"supplyAmount": 0},
-        "limit": {"supplyAmount": 0},
-        'supplyAmountTmp': 2000,
-      },
-      {
-        "id": "6601bb29c4ec1e75ed8670bc",
-        "type": "cleanableFilter",
-        "name": "청소형 필터",
-        "details": {
-          "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-          "supplyStatus": "good"
-        },
-        "limit": {"supplyChangeDate": 365, "supplyStatus": "null"}
-      },
-      {
-        "id": "6601bb29c4ec1e75ed8670sd",
-        "type": "supplyTank",
-        "name": "급수 탱크",
-        "details": {
-          "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-          "supplyLevel": 50
-        },
-        "limit": {"supplyChangeDate": 0, "supplyLevel": 10}
-      },
-      {
-        "id": "6601bb29c4ec1e75ed8645sd",
-        "type": "drainTank",
-        "name": "배수 탱크",
-        "details": {
-          "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-          "supplyLevel": 95
-        },
-        "limit": {"supplyChangeDate": 0, "supplyLevel": 90}
-      },
-      {
-        "id": "6601bb29c4ec1ewerd8645sd",
-        "type": "dustBin",
-        "name": "먼지봉투",
-        "details": {
-          "supplyChangeDate": "2023-03-25T17:58:01.584+00:00",
-          "supplyStatus": 7
-        },
-        "limit": {"supplyChangeDate": 0, "supplyStatus": 9}
-      }
-    ]
-  };
+  // 더미 기기 데이터
+  // Map<String, Object> dummyData = {
+  //   "id": "06b76c4725ddc59b",
+  //   "nickname": "dd",
+  //   "model": "가나다라",
+  //   "type": "washer",
+  //   "manufacturer": "LG",
+  //   "supplies": [
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8670bb",
+  //       "type": "fabricSoftener",
+  //       "name": "섬유유연제",
+  //       "details": {"supplyAmount": 1000},
+  //       "limit": {"supplyAmount": 100},
+  //       'supplyAmountTmp': 0,
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8670ba",
+  //       "type": "replaceableFilter",
+  //       "name": "교체형 필터",
+  //       "details": {
+  //         "supplyChangeDate": "2024-03-25T17:58:01.580+00:00",
+  //         "supplyStatus": "normal"
+  //       },
+  //       "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8670be",
+  //       "type": "washerDetergent",
+  //       "name": "세탁세제",
+  //       "details": {"supplyAmount": 100},
+  //       "limit": {"supplyAmount": 300},
+  //       'supplyAmountTmp': 0,
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8670bf",
+  //       "type": "dishRinse",
+  //       "name": "식기세척기 린스",
+  //       "details": {"supplyAmount": 100},
+  //       "limit": {"supplyAmount": 0},
+  //       'supplyAmountTmp': 500,
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8670bd",
+  //       "type": "dishDetergent",
+  //       "name": "세제",
+  //       "details": {"supplyAmount": 0},
+  //       "limit": {"supplyAmount": 0},
+  //       'supplyAmountTmp': 2000,
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8670bc",
+  //       "type": "cleanableFilter",
+  //       "name": "청소형 필터",
+  //       "details": {
+  //         "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+  //         "supplyStatus": "good"
+  //       },
+  //       "limit": {"supplyChangeDate": 365, "supplyStatus": "null"}
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8670sd",
+  //       "type": "supplyTank",
+  //       "name": "급수 탱크",
+  //       "details": {
+  //         "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+  //         "supplyLevel": 50
+  //       },
+  //       "limit": {"supplyChangeDate": 0, "supplyLevel": 10}
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1e75ed8645sd",
+  //       "type": "drainTank",
+  //       "name": "배수 탱크",
+  //       "details": {
+  //         "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
+  //         "supplyLevel": 95
+  //       },
+  //       "limit": {"supplyChangeDate": 0, "supplyLevel": 90}
+  //     },
+  //     {
+  //       "id": "6601bb29c4ec1ewerd8645sd",
+  //       "type": "dustBin",
+  //       "name": "먼지봉투",
+  //       "details": {
+  //         "supplyChangeDate": "2023-03-25T17:58:01.584+00:00",
+  //         "supplyStatus": 7
+  //       },
+  //       "limit": {"supplyChangeDate": 0, "supplyStatus": 9}
+  //     }
+  //   ]
+  // };
 
   // 임시 기기와 연관된 소모품 주문 데이터
   List<Map<String, Object>> orders = [
@@ -142,15 +148,15 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
   int statusSummary = 0;
 
-  int calculateStatusSummary(Map<String, Object> data) {
+  int calculateStatusSummary(dynamic deviceInfo) {
     int statusSummary = 0;
 
-    List supplies = data['supplies'] as List;
+    List supplies = deviceInfo.supplies;
     DateTime today = DateTime.now();
 
     supplies.forEach((supply) {
-      Map<String, dynamic> details = supply['details'];
-      Map<String, dynamic> limit = supply['limit'];
+      Map<String, dynamic> details = supply.details;
+      Map<String, dynamic> limit = supply.limit;
 
       if (details.containsKey('supplyAmount') &&
           limit.containsKey('supplyAmount')) {
@@ -208,37 +214,151 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   @override
   void initState() {
     super.initState();
-    fetchDeviceInfo();
+    fetchDeviceData(widget.deviceId);
   }
 
-  Future<void> fetchDeviceInfo() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
+  // device 상세 정보 가져오기
+  Future<void> fetchDeviceData(String deviceId) async {
+    String serverUrl = dotenv.get("SERVER_URL");
+    String? accessToken = await getAccessToken();
+    String url = '${serverUrl}devices/$deviceId';
 
-      // Send device lookup request to the server
-      final response = await http
-          .get(Uri.parse('YOUR_DEVICE_LOOKUP_API_URL/${widget.deviceId}'));
+    // accessToken이 있는 경우에만 요청을 보냅니다.
+    if (accessToken != null) {
+      Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      http.Response response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      );
 
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
+        Map<String, dynamic> responseData =
+            jsonDecode(utf8.decode(response.bodyBytes))['data'];
 
+        Device _deviceInfo = Device.fromJson(responseData);
+        print(_deviceInfo.nickname);
         setState(() {
-          data = responseData;
-          isLoading = false;
-          statusSummary = calculateStatusSummary(responseData);
+          deviceInfo = _deviceInfo;
+          statusSummary = calculateStatusSummary(deviceInfo);
+          fetchOrderData(deviceInfo);
         });
       } else {
-        throw Exception('Failed to fetch device info');
+        print(response.body);
+        print('Failed to fetch location data: ${response.statusCode}');
+      }
+    } else {
+      print('Access token is null');
+    }
+  }
+
+  // 소모품 별 주문 데이터 가져오기
+  Future<void> fetchOrderData(Device deviceInfo) async {
+    // deviceInfo에 포함된 supplyid 순회하면서 url로 요청을 보내고 결과를 orderList로 합치기
+    print("주문 조회 요청");
+    for (Supply supply in deviceInfo.supplies) {
+      String supplyId = supply.id;
+      String serverUrl = dotenv.get("SERVER_URL");
+      String? accessToken = await getAccessToken();
+
+      String url =
+          '${serverUrl}api/orders?supply_id=$supplyId&order_status=Delivering';
+
+      try {
+        http.Response response = await http.get(Uri.parse(url),
+            headers: {"Authentication": "Bearer $accessToken"});
+
+        if (response.statusCode == 200) {
+          List<dynamic> data = jsonDecode(response.body);
+          List<Order> orders =
+              data.map((json) => Order.fromJson(json)).toList();
+
+          orderList.addAll(orders);
+        } else {
+          // Handle the error scenario
+          print(
+              'Failed to fetch order data for supply ID $supplyId: ${response.statusCode}');
+        }
+      } catch (e) {
+        // Handle any exceptions
+        print('Error fetching order data for supply ID $supplyId: $e');
+      }
+    }
+    setState(
+      () {
+        orderList = orderList;
+        isLoading = false;
+      },
+    );
+  }
+
+  void deleteDevice(BuildContext context, String deviceId) async {
+    String serverUrl = dotenv.get("SERVER_URL");
+    String? accessToken = await getAccessToken();
+    String url = '${serverUrl}devices/$deviceId';
+
+    try {
+      final response = await http.delete(Uri.parse(url),
+          headers: {"Authorization": "Bearer $accessToken"});
+
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('삭제 성공'),
+              content: const Text('기기가 삭제되었습니다.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/main');
+                  },
+                  child: const Text('확인'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('에러'),
+              content: Text('기기 삭제에 문제 실패: $response.body.data'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('확인'),
+                ),
+              ],
+            );
+          },
+        );
       }
     } catch (error) {
-      print(error);
-      setState(() {
-        data = dummyData;
-        isLoading = false;
-        statusSummary = calculateStatusSummary(dummyData);
-      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('에러'),
+            content: Text('기기 삭제에 문제 실패: $error'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -283,38 +403,50 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        // toolbarHeight: 100,
-        // elevation: 10,
-        title: Text('${data['nickname'] ?? '이름 없는 기기'}',
-            style: const TextStyle(fontSize: 30)),
-        centerTitle: true,
-        actions: [
-          PopupMenuButton<String>(
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                child: const Text('기기 정보'),
-                onTap: () {
-                  // deviceDetailScreen으로 이동하는 코드
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DeviceInfoScreen(
-                        deviceInfo: data,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const PopupMenuItem<String>(
-                child: Text('이름 변경'),
-              ),
-              const PopupMenuItem<String>(
-                child: Text('기기 삭제', style: TextStyle(color: Colors.red)),
-              ),
-            ],
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: AppBar(
+          title: isLoading
+              ? const Text('Loading...', style: const TextStyle(fontSize: 28))
+              : Text(deviceInfo.nickname, style: const TextStyle(fontSize: 28)),
+          centerTitle: true,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushReplacementNamed(context, '/main');
+            },
           ),
-        ],
+          actions: [
+            PopupMenuButton<String>(
+              itemBuilder: (BuildContext context) => [
+                PopupMenuItem<String>(
+                  child: const Text('기기 정보'),
+                  onTap: () {
+                    // deviceInfoScreen으로 이동하는 코드
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => DeviceInfoScreen(
+                          deviceInfo: deviceInfo,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const PopupMenuItem<String>(
+                  child: Text('이름 변경'),
+                ),
+                PopupMenuItem<String>(
+                  child:
+                      const Text('기기 삭제', style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    deleteDevice(context, deviceInfo.id);
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       body: isLoading
           ? const Center(
@@ -348,8 +480,13 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                           '소모품 목록',
                           textAlign: TextAlign.start,
                         ),
-                        for (var supply in data['supplies'] as List)
-                          SupplyWidget(supplyInfo: supply),
+                        if (deviceInfo.supplies.isNotEmpty)
+                          ...deviceInfo.supplies.map((supply) => SupplyWidget(
+                              deviceId: deviceInfo.id, supplyInfo: supply))
+                        else
+                          const SizedBox(
+                              height: 50,
+                              child: Center(child: Text('소모품 정보 없음'))),
                       ],
                     ),
                   ],
