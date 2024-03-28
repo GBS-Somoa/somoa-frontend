@@ -22,26 +22,61 @@ class OrderWidget extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(orderInfo['orderStore'] as String,
-                    textAlign: TextAlign.start,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    )),
-                Text(orderInfo['productName'] as String),
+                Row(
+                  children: [
+                    // 텍스트를 먼저 배치
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            orderInfo['orderStore'] as String,
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            orderInfo['productName'] as String,
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Colors.grey,
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                    // 이미지를 오른쪽에 배치
+                    Container(
+                      width: 70, // 이미지의 너비
+                      height: 70, // 이미지의 높이
+                      child: Image.network(
+                        orderInfo['productImg'] as String,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ],
+                ),
+                // 배송 상태 표시하는 위젯은 이전과 같이 배치
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: Image.asset(
                     orderInfo['orderStatus'] == '결제완료'
                         ? 'assets/images/deliveryStatus=onlyPurchase.png'
                         : orderInfo['orderStatus'] == '배송시작'
-                            ? 'assets/images/deliveryStatus=deliveryStart.png'
-                            : orderInfo['orderStatus'] == '배송중'
-                                ? 'assets/images/deliveryStatus=deliveryIng.png'
-                                : 'assets/images/deliveryStatus=deliveryStart.png',
+                        ? 'assets/images/deliveryStatus=deliveryStart.png'
+                        : orderInfo['orderStatus'] == '배송중'
+                        ? 'assets/images/deliveryStatus=deliveryIng.png'
+                        : 'assets/images/deliveryStatus=deliveryStart.png',
                     width: 150,
                   ),
                 ),
+                // 쇼핑몰로 이동하는 버튼은 이전과 같이 배치
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [

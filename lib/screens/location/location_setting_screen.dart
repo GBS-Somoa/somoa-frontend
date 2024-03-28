@@ -3,11 +3,15 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:provider/provider.dart';
+import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/widgets/list_container_widget.dart';
 import 'package:somoa/widgets/menu_bar_widget.dart';
 import 'package:http/http.dart' as http;
 
 class LocationSettingScreen extends StatefulWidget {
+  const LocationSettingScreen({super.key});
+
   @override
   _LocationSettingScreenState createState() => _LocationSettingScreenState();
 }
@@ -53,29 +57,44 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
   static const List roles = [ADMIN, ALL_GRANTED, ONLY_SUPPLY];
   static const storage = FlutterSecureStorage();
 
-  Group _group = Group(id: 1, name: '우리집', myRole: ONLY_SUPPLY, alarm: true);
-  Member _admin = Member(name: '경부선', id: 'hspear', role: ADMIN);
+  Group _group = Group(id: 0, name: '', myRole: '', alarm: false);
+  Member _admin = Member(name: '', id: '', role: '');
 
-  List<Member> _groupMembers = [
-    Member(name: '경부선', id: 'alice01', role: ONLY_SUPPLY),
-  ];
+  List<Member> _groupMembers = [];
+
+  int groupId = 0;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is int) {
+        groupId = args;
+      }
+    });
     fetchData();
   }
 
   Future<void> fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     await fetchGroup();
     await fetchGroupMembers();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> fetchGroup() async {
     final accessToken = await storage.read(key: 'accessToken');
 
     String serverUrl = dotenv.get("SERVER_URL");
-    final url = Uri.parse('$serverUrl' 'groups/1');
+    final url = Uri.parse('$serverUrl' 'groups/$groupId');
 
     try {
       final response = await http.get(
@@ -108,7 +127,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
     final accessToken = await storage.read(key: 'accessToken');
 
     String serverUrl = dotenv.get("SERVER_URL");
-    final url = Uri.parse('$serverUrl' 'groups/1');
+    final url = Uri.parse('$serverUrl' 'groups/$groupId');
 
     try {
       final response = await http.patch(
@@ -135,7 +154,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
     final accessToken = await storage.read(key: 'accessToken');
 
     String serverUrl = dotenv.get("SERVER_URL");
-    final url = Uri.parse('$serverUrl' 'groups/1/users');
+    final url = Uri.parse('$serverUrl' 'groups/$groupId/users');
 
     try {
       final response = await http.get(
@@ -217,79 +236,85 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: MenuBarWidget(titleText: '${_group.name} 설정'),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ListContainerWidget(
-                children: [
-                  ListTile(
-                    title: Text('장소 이름'),
-                    subtitle: Text(_group.name, style: TextStyle(color: Colors.indigo),
-                    ),
-                    onTap: () {
-                      _showEditDialog(context, _group.name);
-                    },
-                  ),
-                ]
-            ),
-            ListContainerWidget(
-                children: [
-                  SwitchListTile(
-                    title: Text('알림'),
-                    subtitle: Text('장소에 대한 알림을 받습니다.', style: TextStyle(color: Colors.indigo)),
-                    value: _group.alarm,
-                    onChanged: (value) {
-                      setState(() {
-                        _group.alarm = value;
-                      });
-                    },
-                  ),
-                ]
-            ),
-            const ListContainerWidget(
-                children: [
-                  ListTile(
-                    title: Text('소모품 주문 내역'),
-                  ),
-                ]
-            ),
-            ListContainerWidget(
-                title: ADMIN,
-                children: [
-                  Align(
-                      child: ListTile(
-                          title: Text(_admin.name),
-                          subtitle: Text(_admin.id, style: TextStyle(color: Colors.grey),)
-                      )
-                  ),
-                ]
-            ),
-            ListContainerWidget(
-              title: '멤버',
-              children: _groupMembers.map((member) {
-                return ListTile(
-                  title: Text(member.name),
-                  subtitle: Text(member.role, style: TextStyle(color: Colors.indigo)),
-                  trailing: SizedBox(
-                    width: 48,
-                    height: 48,
-                    child: GestureDetector(
+    return Consumer<UserProvider>(builder: (context, userProvider, child) {
+      return Scaffold(
+        appBar: _isLoading ? MenuBarWidget(titleText: '') :
+        MenuBarWidget(titleText: '${_group.name} 설정'),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator()) :
+        SingleChildScrollView(
+          child: Column(
+            children: [
+              ListContainerWidget(
+                  children: [
+                    ListTile(
+                      title: Text('장소 이름'),
+                      subtitle: Text(_group.name, style: TextStyle(color: Colors.indigo),
+                      ),
                       onTap: () {
-                        print("hehe");
+                        _showEditDialog(context, _group.name);
                       },
-                      child: _group.myRole == ADMIN || member.role == ADMIN
-                          ? Icon(Icons.remove_circle_outline, color: Colors.red)
-                          : null,
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
-          ],
+                  ]
+              ),
+              ListContainerWidget(
+                  children: [
+                    SwitchListTile(
+                      title: Text('알림'),
+                      subtitle: Text('장소에 대한 알림을 받습니다.', style: TextStyle(color: Colors.indigo)),
+                      value: _group.alarm,
+                      onChanged: (value) {
+                        setState(() {
+                          _group.alarm = value;
+                        });
+                      },
+                    ),
+                  ]
+              ),
+              const ListContainerWidget(
+                  children: [
+                    ListTile(
+                      title: Text('소모품 주문 내역'),
+                    ),
+                  ]
+              ),
+              ListContainerWidget(
+                  title: ADMIN,
+                  children: [
+                    Align(
+                        child: ListTile(
+                            title: Text(_admin.name),
+                            subtitle: Text(_admin.id, style: TextStyle(color: Colors.grey),)
+                        )
+                    ),
+                  ]
+              ),
+              _groupMembers.length > 0 ?
+              ListContainerWidget(
+                title: '멤버',
+                children: _groupMembers.map((member) {
+                  return ListTile(
+                    title: Text(member.name),
+                    subtitle: Text(member.role, style: TextStyle(color: Colors.indigo)),
+                    trailing: SizedBox(
+                      width: 48,
+                      height: 48,
+                      child: GestureDetector(
+                        onTap: () {
+                          print("hehe");
+                        },
+                        child: member.id != userProvider.username && (_group.myRole == ADMIN || _group.myRole == ALL_GRANTED)
+                            ? Icon(Icons.remove_circle_outline, color: Colors.red)
+                            : null,
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ) : const SizedBox(),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
