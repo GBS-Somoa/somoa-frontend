@@ -5,8 +5,9 @@ import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_create_screen.dart';
 import 'package:somoa/screens/location/location_detail_screen.dart';
+import 'package:somoa/screens/location/location_list_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';
-import 'package:somoa/screens/profile/location_setting_screen.dart';
+import 'package:somoa/screens/location/location_setting_screen.dart';
 import 'screens/auth/registration_screen.dart';
 import 'screens/auth/login_screen.dart';
 import 'screens/main_screen.dart';
@@ -253,10 +254,11 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
         '/login': (context) => const LoginScreen(),
         '/main': (context) => MainScreen(),
         '/addDevice': (context) => DeviceCreateScreen(),
-        '/locationSetting': (context) => LocationSettingScreen(),
         '/orderList': (context) => OrderListScreen(
               groupId: '',
             ),
+        '/locationSetting': (context) => LocationSettingScreen(),
+        '/locationList': (context) => LocationListScreen(),
         '/locationDetail': (context) => LocationDetailScreen(),
       },
     );
@@ -270,7 +272,7 @@ class SplashScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Scaffold(
       body: Center(
-        child: CircularProgressIndicator(), // 로딩 인디케이터
+        child: CircularProgressIndicator(),
       ),
     );
   }
