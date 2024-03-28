@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:somoa/models/member_model.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/widgets/list_container_widget.dart';
 import 'package:somoa/widgets/menu_bar_widget.dart';
@@ -16,36 +17,20 @@ class LocationSettingScreen extends StatefulWidget {
   _LocationSettingScreenState createState() => _LocationSettingScreenState();
 }
 
-class Group {
+class MyGroup {
   int id;
   String name;
   String myRole;
   bool alarm;
 
-  Group({required this.id, required this.name, required this.myRole, required this.alarm});
+  MyGroup({required this.id, required this.name, required this.myRole, required this.alarm});
 
-  factory Group.fromJson(Map<String, dynamic> json) {
-    return Group(
+  factory MyGroup.fromJson(Map<String, dynamic> json) {
+    return MyGroup(
       id: json['groupId'] as int,
       name: json['groupName'] as String,
       myRole: json['role'] as String,
       alarm: json['alarm'] as bool,
-    );
-  }
-}
-
-class Member {
-  String name;
-  String id;
-  String role;
-
-  Member({required this.name, required this.id, required this.role});
-
-  factory Member.fromJson(Map<String, dynamic> json) {
-    return Member(
-      name: json['userNickname'] as String,
-      id: json['userUsername'] as String,
-      role: json['role'] as String,
     );
   }
 }
@@ -57,7 +42,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
   static const List roles = [ADMIN, ALL_GRANTED, ONLY_SUPPLY];
   static const storage = FlutterSecureStorage();
 
-  Group _group = Group(id: 0, name: '', myRole: '', alarm: false);
+  MyGroup _group = MyGroup(id: 0, name: '', myRole: '', alarm: false);
   Member _admin = Member(name: '', id: '', role: '');
 
   List<Member> _groupMembers = [];
@@ -112,7 +97,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
           print(data['data']);
           final groupJson = data['data'];
           setState(() {
-            _group = Group.fromJson(groupJson);
+            _group = MyGroup.fromJson(groupJson);
           });
         }
       } else {
@@ -271,12 +256,15 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                     ),
                   ]
               ),
-              const ListContainerWidget(
+              ListContainerWidget(
                   children: [
                     ListTile(
                       title: Text('소모품 주문 내역'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/orderList', arguments: _group.id);
+                      },
                     ),
-                  ]
+                  ],
               ),
               ListContainerWidget(
                   title: ADMIN,
