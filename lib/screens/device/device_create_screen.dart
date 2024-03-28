@@ -53,7 +53,10 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('기기 등록 되었습니다.'),
-            content: Text(responseData['data']['deviceId']),
+            content: Text(
+              '${responseData['data']['deviceId']} \n $nickname',
+              textAlign: TextAlign.center,
+            ),
             actions: [
               TextButton(
                 onPressed: () =>

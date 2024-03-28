@@ -173,15 +173,15 @@ class DeviceWidget extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text('최근 교체 날짜'),
-                  Text(transformDate(supply.details['supplyChangeDate']),
-                      style: const TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                ],
-              ),
+              // Column(
+              //   crossAxisAlignment: CrossAxisAlignment.start,
+              //   children: [
+              //     const Text('최근 교체 날짜'),
+              //     Text(transformDate(supply.details['supplyChangeDate']),
+              //         style: const TextStyle(
+              //             fontSize: 18, fontWeight: FontWeight.bold)),
+              //   ],
+              // ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Column(

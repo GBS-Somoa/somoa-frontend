@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/screens/device/device_info_screen.dart';
+import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/order_widget.dart';
 import 'dart:convert';
 
@@ -17,6 +19,7 @@ class DeviceDetailScreen extends StatefulWidget {
 
 class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   bool isLoading = true;
+  late Device deviceInfo;
 
   Map<String, Object> data = {};
 
@@ -205,37 +208,109 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   @override
   void initState() {
     super.initState();
-    fetchDeviceInfo();
+    fetchDeviceData(widget.deviceId);
   }
 
-  Future<void> fetchDeviceInfo() async {
-    try {
-      setState(() {
-        isLoading = true;
-      });
+  Future<void> fetchDeviceData(String deviceId) async {
+    String serverUrl = dotenv.get("SERVER_URL");
+    String? accessToken = await getAccessToken();
+    String url = '${serverUrl}devices/$deviceId';
 
-      // Send device lookup request to the server
-      final response = await http
-          .get(Uri.parse('YOUR_DEVICE_LOOKUP_API_URL/${widget.deviceId}'));
+    // accessToken이 있는 경우에만 요청을 보냅니다.
+    if (accessToken != null) {
+      Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      http.Response response = await http.get(
+        Uri.parse(url),
+        headers: headers,
+      );
 
       if (response.statusCode == 200) {
-        final responseData = json.decode(response.body);
+        Map<String, dynamic> responseData =
+            jsonDecode(utf8.decode(response.bodyBytes))['data'];
 
+        Device _deviceInfo = Device.fromJson(responseData);
+        print(_deviceInfo.nickname);
         setState(() {
-          data = responseData;
+          deviceInfo = _deviceInfo;
           isLoading = false;
-          statusSummary = calculateStatusSummary(responseData);
         });
       } else {
-        throw Exception('Failed to fetch device info');
+        print(response.body);
+        print('Failed to fetch location data: ${response.statusCode}');
+      }
+    } else {
+      print('Access token is null');
+    }
+  }
+
+  void deleteDevice(BuildContext context, String deviceId) async {
+    String serverUrl = dotenv.get("SERVER_URL");
+    String? accessToken = await getAccessToken();
+    String url = '${serverUrl}devices/$deviceId';
+
+    try {
+      final response = await http.delete(Uri.parse(url),
+          headers: {"Authorization": "Bearer $accessToken"});
+
+      if (response.statusCode == 200) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('삭제 성공'),
+              content: const Text('기기가 삭제되었습니다.'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, '/main');
+                  },
+                  child: const Text('확인'),
+                ),
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('에러'),
+              content: Text('기기 삭제에 문제 실패: $response.body.data'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                  child: const Text('확인'),
+                ),
+              ],
+            );
+          },
+        );
       }
     } catch (error) {
-      print(error);
-      setState(() {
-        data = dummyData;
-        isLoading = false;
-        statusSummary = calculateStatusSummary(dummyData);
-      });
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('에러'),
+            content: Text('기기 삭제에 문제 실패: $error'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('확인'),
+              ),
+            ],
+          );
+        },
+      );
     }
   }
 
@@ -283,8 +358,9 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       appBar: AppBar(
         // toolbarHeight: 100,
         // elevation: 10,
-        title: Text('${data['nickname'] ?? '이름 없는 기기'}',
-            style: const TextStyle(fontSize: 30)),
+        title: isLoading
+            ? Text('Loading...', style: const TextStyle(fontSize: 28))
+            : Text(deviceInfo.nickname, style: const TextStyle(fontSize: 28)),
         centerTitle: true,
         actions: [
           PopupMenuButton<String>(
@@ -292,12 +368,12 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               PopupMenuItem<String>(
                 child: const Text('기기 정보'),
                 onTap: () {
-                  // deviceDetailScreen으로 이동하는 코드
+                  // deviceInfoScreen으로 이동하는 코드
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => DeviceInfoScreen(
-                        deviceInfo: data,
+                        deviceInfo: deviceInfo,
                       ),
                     ),
                   );
@@ -306,9 +382,12 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               const PopupMenuItem<String>(
                 child: Text('이름 변경'),
               ),
-              const PopupMenuItem<String>(
-                child: Text('기기 삭제', style: TextStyle(color: Colors.red)),
-              ),
+              PopupMenuItem<String>(
+                  child:
+                      const Text('기기 삭제', style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    deleteDevice(context, deviceInfo.id);
+                  }),
             ],
           ),
         ],
@@ -345,8 +424,13 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                           '소모품 목록',
                           textAlign: TextAlign.start,
                         ),
-                        for (var supply in data['supplies'] as List)
-                          SupplyWidget(supplyInfo: supply),
+                        if (deviceInfo.supplies.isNotEmpty)
+                          ...deviceInfo.supplies.map((supply) => SupplyWidget(
+                              deviceId: deviceInfo.id, supplyInfo: supply))
+                        else
+                          const SizedBox(
+                              height: 50,
+                              child: Center(child: Text('소모품 정보 없음'))),
                       ],
                     ),
                   ],
@@ -354,5 +438,64 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               ),
             ),
     );
+  }
+}
+
+class Device {
+  final String id;
+  final String nickname;
+  final String type;
+  final String model;
+  final String manufacturer;
+  final List<Supply> supplies;
+
+  Device({
+    required this.id,
+    required this.nickname,
+    required this.type,
+    required this.model,
+    required this.manufacturer,
+    required this.supplies,
+  });
+
+  factory Device.fromJson(Map<String, dynamic> json) {
+    return Device(
+      id: json['id'],
+      nickname: json['nickname'],
+      type: json['type'],
+      model: json['model'],
+      manufacturer: json['manufacturer'],
+      supplies: (json['supplies'] as List<dynamic>)
+          .map((supplyJson) => Supply.fromJson(supplyJson))
+          .toList(),
+    );
+  }
+}
+
+class Supply {
+  final String id;
+  final String type;
+  final String name;
+  final Map<String, dynamic> details;
+  final Map<String, dynamic> limit;
+  final String? supplyAmountTmp;
+
+  Supply({
+    required this.id,
+    required this.type,
+    required this.name,
+    required this.details,
+    required this.limit,
+    this.supplyAmountTmp,
+  });
+
+  factory Supply.fromJson(Map<String, dynamic> json) {
+    return Supply(
+        id: json['id'],
+        type: json['type'],
+        name: json['name'],
+        details: json['details'],
+        limit: json['limit'],
+        supplyAmountTmp: json['supplyAmountTmp']);
   }
 }
