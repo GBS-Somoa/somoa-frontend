@@ -377,7 +377,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                   return ListTile(
                     title: Text(member.name),
                     subtitle: Text(member.role, style: TextStyle(color: Colors.indigo)),
-                    onTap: member.role != ONLY_SUPPLY && userProvider.username != member.username ? () {
+                    onTap: _group.myRole != ONLY_SUPPLY && userProvider.username != member.username ? () {
                       showModalBottomSheet(
                         context: context,
                         isScrollControlled: true,
