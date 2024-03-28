@@ -16,17 +16,17 @@ class ProfileScreen extends StatefulWidget {
   _ProfileScreenState createState() => _ProfileScreenState();
 }
 
-class Order {
+class _Order {
   final int orderId;
   final String groupName;
   final String orderStatus;
   final String productName;
   final String orderStore;
-  final int orderStoreId;
+  final String orderStoreId;
   final String productImg;
   final String deviceName;
 
-  Order({
+  _Order({
     required this.orderId,
     required this.groupName,
     required this.orderStatus,
@@ -37,16 +37,19 @@ class Order {
     required this.deviceName,
   });
 
-  factory Order.fromJson(Map<String, dynamic> json) {
-    return Order(
-      orderId: json['orderId'] as int,
-      groupName: json['groupName'] as String,
-      orderStatus: json['orderStatus'] as String,
-      productName: json['productName'] as String,
-      orderStore: json['orderStore'] as String,
-      orderStoreId: json['orderStoreId'] as int,
-      productImg: json['productImg'] as String,
-      deviceName: json['deviceName'] as String,
+  factory _Order.fromJson(Map<String, dynamic> json) {
+    print('json: $json');
+    return _Order(
+      orderId: json['orderId'],
+      orderStatus: json['orderStatus'] ?? '',
+      orderStore: json['orderStore'] ?? '',
+      orderStoreId: json['orderStoreId'] ?? '',
+      productName: json['productName'] ?? '',
+      productImg: json['productImg'] != null && json['productImg'].startsWith('http')
+          ? json['productImg']
+          : 'https://i.ibb.co/K9B80fg/no-image.jpg',
+      groupName: json['groupName'] ?? '우리집',
+      deviceName: json['deviceName'] ?? '세탁기',
     );
   }
 }
@@ -54,43 +57,12 @@ class Order {
 class _ProfileScreenState extends State<ProfileScreen> {
 
   static const storage = FlutterSecureStorage();
-  List<Order> orders = [
-    Order(
-      orderId: 0,
-      groupName: '우리집',
-      orderStatus: '배송완료',
-      productName: '다우니 세제 1L',
-      orderStore: 'SSAPANG',
-      orderStoreId: 0,
-      productImg: 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-      deviceName: '세탁기',
-    ),
-    Order(
-      orderId: 1,
-      groupName: '너네집',
-      orderStatus: '결제완료',
-      productName: '다우니 세제 1L',
-      orderStore: 'SSAPANG',
-      orderStoreId: 0,
-      productImg: 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-      deviceName: '세탁기',
-    ),
-    Order(
-      orderId: 2,
-      groupName: '내집',
-      orderStatus: '결제완료',
-      productName: '어쩌구저쩌구 정품 필터 이름이 되게되게 길어서 ...으ㅕ로 나오는지 확인해보기 위한 테스트용 상품 이름',
-      orderStore: '삼성몰',
-      orderStoreId: 1,
-      productImg: 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-      deviceName: '공기청정기',
-    ),
-  ];
+  List<_Order> orders = [];
 
   @override
   void initState() {
     super.initState();
-    // fetchData();
+    fetchData();
   }
 
   Future<void> fetchData() async {
@@ -118,7 +90,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         if (data['data'] != null) {
           final List<dynamic> ordersJson = data['data'];
           setState(() {
-            orders = ordersJson.map((order) => Order.fromJson(order)).toList();
+            orders = ordersJson.map((order) => _Order.fromJson(order)).toList();
           });
         }
       } else {
@@ -131,7 +103,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  Map<String, Object> makeOrderInfo(Order order) {
+  Map<String, Object> makeOrderInfo(_Order order) {
     return {
       'orderStore': order.orderStore,
       'productName': order.productName,

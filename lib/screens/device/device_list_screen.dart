@@ -394,7 +394,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           value: '장소 관리',
                           child: const Text('장소 관리'),
                           onTap: () {
-                            Navigator.pushNamed(context, '/locationDetail');
+                            Navigator.pushNamed(context, '/locationSetting', arguments: _selectedLocation);
                           },
                         ),
                         PopupMenuItem(
