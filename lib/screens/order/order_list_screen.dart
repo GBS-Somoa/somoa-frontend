@@ -1,99 +1,123 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
+import 'package:somoa/models/order_model.dart';
+import 'package:somoa/widgets/menu_bar_widget.dart';
 import 'package:somoa/widgets/order_widget.dart';
 
 class OrderListScreen extends StatefulWidget {
-  final String groupId;
 
-  OrderListScreen({required this.groupId});
+  OrderListScreen({super.key});
 
   @override
   _OrderListScreenState createState() => _OrderListScreenState();
 }
 
 class _OrderListScreenState extends State<OrderListScreen> {
-  List<Map<String, Object>> orders = [
-    {
-      "orderId": 0,
-      "orderStore": "SSAPANG",
-      "productName": "다우니 세제 1L",
-      "orderDate": "2024-03-25",
-      "orderStatus": "배송완료",
-      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-    },
-    {
-      "orderId": 1,
-      "orderStore": "SSAPANG",
-      "productName": "다우니 세제 1L",
-      "orderDate": "2024-03-25",
-      "orderStatus": "결제완료",
-      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-    },
-    {
-      "orderId": 2,
-      "orderStore": "삼성몰",
-      "productName": "어쩌구저쩌구 정품 필터",
-      "orderDate": "2024-03-25",
-      "orderStatus": "결제완료",
-      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-    },
-  ];
+  static const storage = FlutterSecureStorage();
+  int groupId = 0;
+  bool _isLoading = true;
+
+  List<Order> orders = [];
 
   @override
   void initState() {
     super.initState();
-    // fetchOrders();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)?.settings.arguments;
+      if (args is int) {
+        groupId = args;
+      }
+    });
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    await fetchOrders();
+
+    setState(() {
+      _isLoading = false;
+    });
   }
 
   Future<void> fetchOrders() async {
+    final accessToken = await storage.read(key: 'accessToken');
+
+    String serverUrl = dotenv.get("SERVER_URL");
+    final url = Uri.parse('$serverUrl' 'groups/${groupId}/orders');
+
     try {
-      // Send request to server with group ID
       final response = await http.get(
-          Uri.parse('https://example.com/orders?groupId=${widget.groupId}'));
+        url,
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      );
 
       if (response.statusCode == 200) {
-        // Parse the response body and update the orders list
-        final List<Map<String, Object>> data = jsonDecode(response.body);
-        setState(() {
-          orders = data;
-        });
+        final String decodedBody = utf8.decode(response.bodyBytes);
+        final data = json.decode(decodedBody);
+
+        if (data['data'] != null) {
+          final List<dynamic> ordersJson = data['data'];
+          setState(() {
+            orders = ordersJson.map((order) => Order.fromJson(order)).toList();
+          });
+        }
       } else {
-        // Handle error response
-        print('Failed to fetch orders: ${response.statusCode}');
+        print(response.body);
+        print(response.statusCode);
+        print('내가 주문한 주문목록 조회 실패');
       }
     } catch (e) {
-      // Handle network or server errors
-      print('Failed to fetch orders: $e');
+      print(e.toString());
     }
+  }
+
+  Map<String, Object> makeOrderInfo(Order order) {
+    print('order.productImg: ${order.productImg}');
+    return {
+      'orderStore': order.orderStore,
+      'productName': order.productName,
+      'productImg': order.productImg,
+      'orderStatus': order.orderStatus,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('주문 목록'),
-      ),
+      appBar: const MenuBarWidget(titleText: '주문 목록'),
       body: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, index) {
           final order = orders[index];
-          if (order['orderStatus'] != '주문취소') {
+          // TODO : 주문 취소도 보여주기
+          if (order.orderStatus != '주문취소') {
             return Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Text(
-                    order['orderDate'] as String,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.black87,
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0), // 왼쪽에 20 픽셀의 패딩 추가
+                    child: Text(
+                      order.createdAt.toString().substring(0, 10),
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.black87,
+                      ),
+                      textAlign: TextAlign.start,
                     ),
-                    textAlign: TextAlign.start,
                   ),
-                  OrderWidget(orderInfo: order),
+                  OrderWidget(orderInfo: makeOrderInfo(order)),
                 ],
               ),
             );

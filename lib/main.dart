@@ -253,10 +253,7 @@ class MyAppState extends State<MyApp> with WidgetsBindingObserver {
         '/registration': (context) => const RegistrationScreen(),
         '/login': (context) => const LoginScreen(),
         '/main': (context) => MainScreen(),
-        '/locationSetting': (context) => LocationSettingScreen(),
-        '/orderList': (context) => OrderListScreen(
-              groupId: '',
-            ),
+        '/orderList': (context) => OrderListScreen(),
         '/locationSetting': (context) => LocationSettingScreen(),
         '/locationList': (context) => LocationListScreen(),
         '/locationDetail': (context) => LocationDetailScreen(),
