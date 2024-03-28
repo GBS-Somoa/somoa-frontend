@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -147,6 +148,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   // 사용자가 포함된 그룹 리스트 가져오는 코드
   Future<void> fetchLocationData() async {
+    // .env 파일에서 서버 URL을 가져옵니다.
+    String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
 
     // accessToken이 있는 경우에만 요청을 보냅니다.
@@ -157,7 +160,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
       };
 
       http.Response response = await http.get(
-        Uri.parse('${await getServerUrl()}groups'),
+        Uri.parse(serverUrl + 'groups'),
         headers: headers,
       );
 
