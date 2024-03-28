@@ -20,21 +20,24 @@ class _OrderListScreenState extends State<OrderListScreen> {
       "orderStore": "SSAPANG",
       "productName": "다우니 세제 1L",
       "orderDate": "2024-03-25",
-      "orderStatus": "배송완료"
+      "orderStatus": "배송완료",
+      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
     },
     {
       "orderId": 1,
       "orderStore": "SSAPANG",
       "productName": "다우니 세제 1L",
       "orderDate": "2024-03-25",
-      "orderStatus": "결제완료"
+      "orderStatus": "결제완료",
+      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
     },
     {
       "orderId": 2,
       "orderStore": "삼성몰",
       "productName": "어쩌구저쩌구 정품 필터",
       "orderDate": "2024-03-25",
-      "orderStatus": "결제완료"
+      "orderStatus": "결제완료",
+      "productImg": 'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
     },
   ];
 
