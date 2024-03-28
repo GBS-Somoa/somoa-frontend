@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/models/device_model.dart';
@@ -470,6 +471,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                         children: [
                           const Text(
                             '진행중인 배송',
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.start,
                           ),
                           for (var order in orders)
@@ -482,6 +485,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                       children: [
                         const Text(
                           '소모품 목록',
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold),
                           textAlign: TextAlign.start,
                         ),
                         if (deviceInfo.supplies.isNotEmpty)

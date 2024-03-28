@@ -335,99 +335,98 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           builder: (BuildContext context) {
                             String placeName = '';
 
-                                return AlertDialog(
-                                  title: const Text(
-                                    '장소 추가',
-                                    textAlign: TextAlign.center,
-                                  ),
-                                  content: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      TextField(
-                                        onChanged: (value) {
-                                          placeName = value;
-                                        },
-                                        decoration: const InputDecoration(
-                                            hintText: "장소 이름을 입력하세요",
-                                            border: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.black))),
-                                      ),
-                                    ],
-                                  ),
-                                  actions: [
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        if (placeName.isNotEmpty) {
-                                          // 장소 이름이 입력되었을 경우에만 처리합니다.
-                                          _registerLoctaion(placeName);
-                                        }
-                                      },
-                                      child: const Text(
-                                        '확인',
-                                        style: TextStyle(fontSize: 15),
-                                      ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            );
-                          },
-                        ),
-                        PopupMenuItem(
-                          value: '장소 관리',
-                          child: const Text('장소 관리'),
-                          onTap: () {
-                            Navigator.pushNamed(context, '/locationSetting', arguments: _selectedLocation);
-                          },
-                        ),
-                        PopupMenuItem(
-                          value: '기기 추가',
-                          child: const Text('기기 추가'),
-                          onTap: () {
-                            // deviceCreateScreen으로 이동하는 코드
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => DeviceCreateScreen(
-                                    groupId: _selectedLocation.toString()),
+                            return AlertDialog(
+                              title: const Text(
+                                '장소 추가',
+                                textAlign: TextAlign.center,
                               ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
+                                    onChanged: (value) {
+                                      placeName = value;
+                                    },
+                                    decoration: const InputDecoration(
+                                        hintText: "장소 이름을 입력하세요",
+                                        border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.black))),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (placeName.isNotEmpty) {
+                                      // 장소 이름이 입력되었을 경우에만 처리합니다.
+                                      _registerLoctaion(placeName);
+                                    }
+                                  },
+                                  child: const Text(
+                                    '확인',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ),
+                              ],
                             );
                           },
-                        ),
-                        PopupMenuItem(
-                          value: '주문 목록',
-                          child: const Text('주문 목록'),
-                          onTap: () {
-                            Navigator.pushNamed(context, '/orderList');
-                          },
-                        ),
-                      ],
-                      elevation: 8.0,
-                    ).then((value) {
-                      if (value != null) {
-                        // Handle menu item selection here
-                        print('Selected: $value');
-                      }
-                    });
-                  },
-                ),
-              ],
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: '장소 관리',
+                      child: const Text('장소 관리'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/locationSetting',
+                            arguments: _selectedLocation);
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: '기기 추가',
+                      child: const Text('기기 추가'),
+                      onTap: () {
+                        // deviceCreateScreen으로 이동하는 코드
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DeviceCreateScreen(
+                                groupId: _selectedLocation.toString()),
+                          ),
+                        );
+                      },
+                    ),
+                    PopupMenuItem(
+                      value: '주문 목록',
+                      child: const Text('주문 목록'),
+                      onTap: () {
+                        Navigator.pushNamed(context, '/orderList');
+                      },
+                    ),
+                  ],
+                  elevation: 8.0,
+                ).then((value) {
+                  if (value != null) {
+                    // Handle menu item selection here
+                    print('Selected: $value');
+                  }
+                });
+              },
             ),
-          ),
-          body: Center(
-            child: SingleChildScrollView(
-              child: deviceList.isNotEmpty
-                  ? Column(
-                      children: deviceList
-                          .map((device) => DeviceWidget(deviceInfo: device))
-                          .toList(),
-                    )
-                  : const Center(child: Text('등록된 기기가 없습니다.')),
-            ),
-          ),
-        );
-      },
+          ],
+        ),
+      ),
+      body: Center(
+        child: SingleChildScrollView(
+          child: deviceList.isNotEmpty
+              ? Column(
+                  children: deviceList
+                      .map((device) => DeviceWidget(deviceInfo: device))
+                      .toList(),
+                )
+              : const Center(child: Text('등록된 기기가 없습니다.')),
+        ),
+      ),
     );
   }
 }

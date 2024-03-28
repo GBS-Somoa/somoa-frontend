@@ -45,9 +45,10 @@ class _Order {
       orderStore: json['orderStore'] ?? '',
       orderStoreId: json['orderStoreId'] ?? '',
       productName: json['productName'] ?? '',
-      productImg: json['productImg'] != null && json['productImg'].startsWith('http')
-          ? json['productImg']
-          : 'https://i.ibb.co/K9B80fg/no-image.jpg',
+      productImg:
+          json['productImg'] != null && json['productImg'].startsWith('http')
+              ? json['productImg']
+              : 'https://i.ibb.co/K9B80fg/no-image.jpg',
       groupName: json['groupName'] ?? '우리집',
       deviceName: json['deviceName'] ?? '세탁기',
     );
@@ -56,41 +57,7 @@ class _Order {
 
 class _ProfileScreenState extends State<ProfileScreen> {
   static const storage = FlutterSecureStorage();
-  List<Order> orders = [
-    Order(
-      orderId: 0,
-      groupName: '우리집',
-      orderStatus: '배송완료',
-      productName: '다우니 세제 1L',
-      orderStore: 'SSAPANG',
-      orderStoreId: 0,
-      productImg:
-          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-      deviceName: '세탁기',
-    ),
-    Order(
-      orderId: 1,
-      groupName: '너네집',
-      orderStatus: '결제완료',
-      productName: '다우니 세제 1L',
-      orderStore: 'SSAPANG',
-      orderStoreId: 0,
-      productImg:
-          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-      deviceName: '세탁기',
-    ),
-    Order(
-      orderId: 2,
-      groupName: '내집',
-      orderStatus: '결제완료',
-      productName: '어쩌구저쩌구 정품 필터 이름이 되게되게 길어서 ...으ㅕ로 나오는지 확인해보기 위한 테스트용 상품 이름',
-      orderStore: '삼성몰',
-      orderStoreId: 1,
-      productImg:
-          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-      deviceName: '공기청정기',
-    ),
-  ];
+  List<_Order> orders = [];
 
   @override
   void initState() {
@@ -150,7 +117,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
         appBar: AppBar(
-          automaticallyImplyLeading: false,
           title: const Text('내 정보'),
           actions: [
             IconButton(
