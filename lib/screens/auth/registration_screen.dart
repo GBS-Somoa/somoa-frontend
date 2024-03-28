@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:somoa/providers/user_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:somoa/screens/main_screen.dart';
 
 class RegistrationScreen extends StatefulWidget {
   const RegistrationScreen({super.key});
@@ -112,10 +113,6 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   actions: [
                     TextButton(
                       onPressed: () async {
-                        if (isKeepLoggedIn) {
-                          // TODO: keep login 로직 작성
-                          print("로그인 유지");
-                        }
                         await _saveKeepLoggedIn(isKeepLoggedIn);
                         final loginResult = await Provider.of<UserProvider>(
                                 context,
@@ -125,7 +122,13 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                                 username: idController.text,
                                 password: passwordController.text);
                         if (loginResult == "success") {
-                          Navigator.pushReplacementNamed(context, '/main');
+                          if (context.mounted) {
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => MainScreen()),
+                                (route) => false);
+                          }
                         } else {
                           showDialog(
                             context: context,

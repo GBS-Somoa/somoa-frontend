@@ -43,31 +43,27 @@ class ProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-                ListContainerWidget(
-                    children: [
-                      ListTile(
-                        title: Text('프로필 관리'),
-                        onTap: () {
-                          print('Item 1 tapped');
-                        },
-                      ),
-                      ListTile(
-                        title: Text('장소 관리'),
-                        onTap: () {
-                          print('Item 2 tapped');
-                          Navigator.pushNamed(context, '/locationSetting');
-                        },
-                      ),
-
-                      ListTile(
-                        title: Text('즐겨찾는 쇼핑몰 관리'),
-                        onTap: () {
-                          print('Item 3 tapped');
-                        },
-                      ),
-
-                    ]
-                ),
+                ListContainerWidget(children: [
+                  ListTile(
+                    title: Text('프로필 관리'),
+                    onTap: () {
+                      print('Item 1 tapped');
+                    },
+                  ),
+                  ListTile(
+                    title: Text('장소 관리'),
+                    onTap: () {
+                      print('Item 2 tapped');
+                      Navigator.pushNamed(context, '/locationSetting');
+                    },
+                  ),
+                  ListTile(
+                    title: Text('즐겨찾는 쇼핑몰 관리'),
+                    onTap: () {
+                      print('Item 3 tapped');
+                    },
+                  ),
+                ]),
                 SizedBox(height: 20),
                 const Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,

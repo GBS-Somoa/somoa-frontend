@@ -35,6 +35,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 Future<void> saveNotification(
     String title, String body, Map<String, dynamic> data) async {
   final prefs = await SharedPreferences.getInstance();
+  await prefs.reload();
 
   // 알림 리스트를 가져옴. 없으면 빈 리스트를 사용
   final String storedNotifications = prefs.getString('notifications') ?? '[]';
