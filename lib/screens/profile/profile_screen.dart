@@ -206,9 +206,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         '      진행중인 배송',
                         textAlign: TextAlign.start,
-                        style: TextStyle(fontSize: 16),
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 15),
                       ListView.builder(
                         shrinkWrap: true,
                         physics: NeverScrollableScrollPhysics(),
