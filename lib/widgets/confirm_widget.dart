@@ -5,15 +5,17 @@ class ConfirmWidget extends StatelessWidget {
   final String title;
   final String text;
   final VoidCallback onYes;
-  final String yesText;
-  final String noText;
+  final Text yesText;
+  final Text noText;
+  final double height;
 
   ConfirmWidget({
     required this.title,
     required this.text,
     required this.onYes,
-    this.yesText = '확인',
-    this.noText = '취소',
+    required this.height,
+    this.yesText = const Text('확인', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+    this.noText = const Text('취소', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
   });
 
   @override
@@ -22,7 +24,7 @@ class ConfirmWidget extends StatelessWidget {
       padding: EdgeInsets.all(10),
       child: Container(
         padding: EdgeInsets.fromLTRB(25, 20, 25, 0),
-        height: 170,
+        height: height,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
@@ -43,7 +45,7 @@ class ConfirmWidget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 TextButton(
-                  child: Text(noText, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: noText,
                   onPressed: () => Navigator.pop(context),
                 ),
                 Container(
@@ -51,7 +53,7 @@ class ConfirmWidget extends StatelessWidget {
                   child: VerticalDivider(color: Colors.black54),
                 ),
                 TextButton(
-                  child: Text(yesText, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  child: yesText,
                   onPressed: () {
                     onYes();
                     Navigator.pop(context);

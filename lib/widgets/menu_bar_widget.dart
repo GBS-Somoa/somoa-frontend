@@ -5,6 +5,8 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final double appBarHeight;
   final double topPadding;
   final String? title;
+  final bool showExtraMenu;
+  final PopupMenuButton Function()? buildPopupMenuButton;
 
   const MenuBarWidget({
     super.key,
@@ -12,6 +14,8 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.appBarHeight = 85.0,
     this.topPadding = 25.0,
     this.title,
+    this.showExtraMenu = false,
+    this.buildPopupMenuButton,
   });
 
   @override
@@ -28,6 +32,9 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
             backgroundColor: Colors.transparent,
             elevation: 0,
             iconTheme: IconThemeData(color: Colors.black),
+            actions: showExtraMenu && buildPopupMenuButton != null ? [
+              buildPopupMenuButton!(),
+            ] : [],
           ),
         ),
       ],
