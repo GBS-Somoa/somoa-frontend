@@ -356,7 +356,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         'Content-Type': 'application/json',
       };
 
-      http.Response response = await http.post(
+      http.Response response = await http.patch(
         Uri.parse('${serverUrl}devices/${deviceInfo.id}'),
         headers: headers,
         body: bodyData,
