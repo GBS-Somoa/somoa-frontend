@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
 
 class OrderWidget extends StatelessWidget {
@@ -7,6 +9,13 @@ class OrderWidget extends StatelessWidget {
     super.key,
     required this.orderInfo,
   });
+
+  Map orderStatusMap = {
+    "주문 완료": "onlyPurchase",
+    "배송 시작": "deliveryStart",
+    "배송 중": "deliveryIng",
+    "배송 완료": "deliveryFinish"
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -66,13 +75,7 @@ class OrderWidget extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.symmetric(vertical: 20.0),
                   child: Image.asset(
-                    orderInfo['orderStatus'] == '결제완료'
-                        ? 'assets/images/deliveryStatus=onlyPurchase.png'
-                        : orderInfo['orderStatus'] == '배송시작'
-                        ? 'assets/images/deliveryStatus=deliveryStart.png'
-                        : orderInfo['orderStatus'] == '배송중'
-                        ? 'assets/images/deliveryStatus=deliveryIng.png'
-                        : 'assets/images/deliveryStatus=deliveryStart.png',
+                    'assets/images/deliveryStatus=${orderStatusMap[orderInfo['orderStatus']]}.png',
                     width: 150,
                   ),
                 ),

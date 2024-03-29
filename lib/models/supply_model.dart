@@ -4,7 +4,7 @@ class Supply {
   final String name;
   final Map<String, dynamic> details;
   final Map<String, dynamic> limit;
-  final String? supplyAmountTmp;
+  final int? supplyAmountTmp;
 
   Supply({
     required this.id,

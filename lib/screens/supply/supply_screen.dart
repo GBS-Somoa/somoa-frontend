@@ -15,10 +15,14 @@ class SupplyScreen extends StatefulWidget {
 
 class _SupplyScreenState extends State<SupplyScreen> {
   bool isLoading = true;
+  Map<String, List> careNeedSupply = {};
+  Map<String, List> careNotNeedSupply = {};
+  late int totalCount;
+
   // 임시 데이터
-  Map<String, dynamic> data = {
+  Map<String, dynamic> dummyData = {
     "isCareNeeded": {
-      "charge": [
+      "add": [
         {
           "supplyLimit": {"supplyAmount": 0},
           "supplyName": "세제",
@@ -80,7 +84,7 @@ class _SupplyScreenState extends State<SupplyScreen> {
           "deviceNickname": "세탁기"
         }
       ],
-      "replace": [
+      "change": [
         {
           "supplyLimit": {"supplyChangeDate": 365, "supplyStatus": "bad"},
           "supplyName": "교체형 필터",
@@ -140,7 +144,7 @@ class _SupplyScreenState extends State<SupplyScreen> {
     },
     "totalCount": 13,
     "isCareNotNeeded": {
-      "charge": [
+      "add": [
         {
           "supplyLimit": {"supplyLevel": 10},
           "supplyName": "물탱크",
@@ -164,7 +168,7 @@ class _SupplyScreenState extends State<SupplyScreen> {
           "deviceNickname": "가습기"
         }
       ],
-      "replace": [],
+      "change": [],
       "clean": [
         {
           "supplyLimit": {"supplyLevel": 90},
@@ -214,19 +218,26 @@ class _SupplyScreenState extends State<SupplyScreen> {
             jsonDecode(utf8.decode(response.bodyBytes))['data'];
 
         setState(() {
-          data = responseData;
+          careNeedSupply = Map<String, List>.from(responseData['isCareNeeded']);
+          careNotNeedSupply =
+              Map<String, List>.from(responseData['isCareNotNeeded']);
+          totalCount = responseData['totalCount'] as int;
+          isLoading = false;
         });
       } else {
         print(response.body);
         print('Failed to fetch location data: ${response.statusCode}');
+        setState() {
+          isLoading = false;
+          careNeedSupply = Map<String, List>.from(dummyData['isCareNeeded']);
+          careNotNeedSupply =
+              Map<String, List>.from(dummyData['isCareNotNeeded']);
+          totalCount = dummyData['totalCount'];
+        }
       }
     } else {
       print('Access token is null');
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
@@ -237,10 +248,6 @@ class _SupplyScreenState extends State<SupplyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, List> careNeedSupply = data['isCareNeeded'];
-    Map<String, List> careNotNeedSupply = data['isCareNotNeeded'];
-    int totalCount = data['totalCount'];
-
     Map careNeedCount = {};
     Map careNotNeedCount = {};
     int careNeedTotal = 0;
@@ -255,9 +262,6 @@ class _SupplyScreenState extends State<SupplyScreen> {
       careNotNeedCount[key] = value.length;
       careNotNeedTotal += value.length;
     });
-
-    // print(careNeedCount);
-    // print(careNotNeedCount);
 
     return Scaffold(
       appBar: AppBar(
@@ -320,18 +324,18 @@ class _SupplyScreenState extends State<SupplyScreen> {
                                 ],
                               ),
                               Text(
-                                '${careNeedCount['replace']} / ${careNeedCount['replace'] + careNotNeedCount['replace']}',
+                                '${careNeedCount['change']} / ${careNeedCount['change'] + careNotNeedCount['change']}',
                               ),
                             ],
                           ),
                           for (int i = 0;
-                              i < careNeedSupply['replace']!.length;
+                              i < careNeedSupply['change']!.length;
                               i++)
                             Column(
                               children: [
                                 ListTile(
                                   title: Text(
-                                      '${careNeedSupply['replace']![i]['groupName']} > ${careNeedSupply['replace']![i]['deviceNickname']} > ${careNeedSupply['replace']![i]['supplyName']}'),
+                                      '${careNeedSupply['change']![i]['groupName']} > ${careNeedSupply['change']![i]['deviceNickname']} > ${careNeedSupply['change']![i]['supplyName']}'),
                                   trailing: const SizedBox(
                                     width: 5,
                                     child: Icon(Icons.arrow_forward_ios,
@@ -344,13 +348,14 @@ class _SupplyScreenState extends State<SupplyScreen> {
                                       MaterialPageRoute(
                                         builder: (context) =>
                                             DeviceDetailScreen(
-                                                deviceId: careNeedSupply[
-                                                    'replace']![i]['deviceId']),
+                                                deviceId:
+                                                    careNeedSupply['change']![i]
+                                                        ['deviceId']),
                                       ),
                                     );
                                   },
                                 ),
-                                if (i != careNeedSupply['replace']!.length - 1)
+                                if (i != careNeedSupply['change']!.length - 1)
                                   Divider(
                                       color: Colors.grey[
                                           400]), // 마지막 아이템이 아닐 때만 Divider 추가
@@ -378,18 +383,18 @@ class _SupplyScreenState extends State<SupplyScreen> {
                                 ],
                               ),
                               Text(
-                                '${careNeedCount['charge']} / ${careNeedCount['charge'] + careNotNeedCount['charge']}',
+                                '${careNeedCount['add']} / ${careNeedCount['add'] + careNotNeedCount['add']}',
                               ),
                             ],
                           ),
                           for (int i = 0;
-                              i < careNeedSupply['charge']!.length;
+                              i < careNeedSupply['add']!.length;
                               i++)
                             Column(
                               children: [
                                 ListTile(
                                   title: Text(
-                                      '${careNeedSupply['charge']![i]['groupName']} > ${careNeedSupply['charge']![i]['deviceNickname']} > ${careNeedSupply['charge']![i]['supplyName']}'),
+                                      '${careNeedSupply['add']![i]['groupName']} > ${careNeedSupply['add']![i]['deviceNickname']} > ${careNeedSupply['add']![i]['supplyName']}'),
                                   trailing: const SizedBox(
                                     width: 5,
                                     child: Icon(Icons.arrow_forward_ios,
@@ -403,13 +408,13 @@ class _SupplyScreenState extends State<SupplyScreen> {
                                         builder: (context) =>
                                             DeviceDetailScreen(
                                                 deviceId:
-                                                    careNeedSupply['charge']![i]
+                                                    careNeedSupply['add']![i]
                                                         ['deviceId']),
                                       ),
                                     );
                                   },
                                 ),
-                                if (i != careNeedSupply['charge']!.length - 1)
+                                if (i != careNeedSupply['add']!.length - 1)
                                   Divider(
                                       color: Colors.grey[
                                           400]), // 마지막 아이템이 아닐 때만 Divider 추가

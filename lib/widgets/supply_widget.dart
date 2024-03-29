@@ -26,11 +26,6 @@ class SupplyWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    void fetchData() async {
-      String? accessToken = await getAccessToken();
-      print(accessToken);
-    }
-
     switch (supplyInfo.type) {
       case 'washerDetergent':
       case 'fabricSoftener':
@@ -81,7 +76,6 @@ class SupplyWidget extends StatelessWidget {
     // 기기 내부에 저장된 데이터에서 supplyId에 맞는 maxAmount를 가져옴
     int maxAmount = await getMaxAmount(supplyInfo.id);
 
-    print(supplyInfo.supplyAmountTmp);
     bool isSupplyAmountTmp =
         supplyInfo.supplyAmountTmp != null && supplyInfo.supplyAmountTmp != 0
             ? true
@@ -209,7 +203,7 @@ class SupplyWidget extends StatelessWidget {
                     ),
                     ElevatedButton(
                       onPressed: () {
-                        print('알림 기준 수정 기능 없음ㅎㅎ');
+                        print('알림 기준 수정 추가 필요');
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.grey[300],
@@ -764,11 +758,9 @@ class SupplyWidget extends StatelessWidget {
       "supplyAmount": amount,
     });
 
-    // .env 파일에서 서버 URL을 가져옵니다.
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
 
-    // accessToken이 있는 경우에만 요청을 보냅니다.
     if (accessToken != null) {
       Map<String, String> headers = {
         'Authorization': 'Bearer $accessToken',
@@ -798,6 +790,7 @@ class SupplyWidget extends StatelessWidget {
                     builder: (context) =>
                         DeviceDetailScreen(deviceId: deviceId),
                   ),
+                  // Todo:deviceData 갱신(fetchData) & Navigator.pop(context)
                 ),
                 child: const Text('확인'),
               ),
@@ -805,7 +798,6 @@ class SupplyWidget extends StatelessWidget {
           ),
         );
       } else {
-        print('Failed to fetch location data: ${response.statusCode}');
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -852,8 +844,8 @@ class SupplyWidget extends StatelessWidget {
               onPressed: () async {
                 String newValue = _controller.text;
                 // 보유량 변경 api 호출
-                await _changeSupplyAmount(context, int.parse(newValue),
-                    deviceId, supplyInfo.id);
+                await _changeSupplyAmount(
+                    context, int.parse(newValue), deviceId, supplyInfo.id);
 
                 if (supplyInfo.details['supplyAmount'] < int.parse(newValue)) {
                   await setMaxAmount(supplyInfo.id, int.parse(newValue));
