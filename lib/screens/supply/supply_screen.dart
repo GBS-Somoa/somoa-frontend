@@ -263,9 +263,6 @@ class _SupplyScreenState extends State<SupplyScreen> {
       careNotNeedTotal += value.length;
     });
 
-    // print(careNeedCount);
-    // print(careNotNeedCount);
-
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,

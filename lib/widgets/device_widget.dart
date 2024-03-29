@@ -114,8 +114,7 @@ class DeviceWidget extends StatelessWidget {
                           fontSize: 18, fontWeight: FontWeight.bold)),
                 ],
               ),
-              if (supply.details['supplyLevel']
-                  is int) // Check if supplyAmount is an integer
+              if (supply.details['supplyLevel'] is int)
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: WaterSaturationWidget(
@@ -164,7 +163,6 @@ class DeviceWidget extends StatelessWidget {
           ],
         );
       } else if (supplyType == 'dustBin') {
-        // Handle other supply types here
         supplyInfoWidget = Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [

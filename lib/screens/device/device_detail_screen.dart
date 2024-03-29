@@ -122,7 +122,6 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
             statusSummary++;
           }
         } else {
-          print('여기');
           List<String> statusOrder = ['good', 'normal', 'bad'];
           int detailIndex = statusOrder.indexOf(details['supplyStatus']);
           int limitIndex = statusOrder.indexOf(limit['supplyStatus']);
@@ -165,7 +164,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
             jsonDecode(utf8.decode(response.bodyBytes))['data'];
 
         Device _deviceInfo = Device.fromJson(responseData);
-        print(_deviceInfo.nickname);
+
         setState(() {
           deviceInfo = _deviceInfo;
           statusSummary = calculateStatusSummary(deviceInfo);
@@ -182,8 +181,6 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
   // 소모품 별 주문 데이터 가져오기
   Future<void> fetchOrderData(Device deviceInfo) async {
-    // deviceInfo에 포함된 supplyid 순회하면서 url로 요청을 보내고 결과를 orderList로 합치기
-    print("주문 조회 요청");
     for (Supply supply in deviceInfo.supplies) {
       String supplyId = supply.id;
       String serverUrl = dotenv.get("SERVER_URL");
@@ -212,7 +209,6 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
             });
           }
         } else {
-          // Handle the error scenario
           print(response.body);
           print('Supply ID $supplyId에 대한 주문내역 조회 실패: ${response.statusCode}');
           setState(() {
@@ -220,7 +216,6 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           });
         }
       } catch (e) {
-        // Handle any exceptions
         print('Supply ID $supplyId에 대한 주문내역 조회 실패: $e');
       }
     }
@@ -352,11 +347,9 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       "deviceName": deviceName,
     });
 
-    // .env 파일에서 서버 URL을 가져옵니다.
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
 
-    // accessToken이 있는 경우에만 요청을 보냅니다.
     if (accessToken != null) {
       Map<String, String> headers = {
         'Authorization': 'Bearer $accessToken',
@@ -370,8 +363,6 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       );
 
       if (response.statusCode == 200) {
-        Map<String, dynamic> responseData =
-            jsonDecode(utf8.decode(response.bodyBytes));
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -384,7 +375,6 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
             ],
           ),
         );
-        print(responseData);
       } else {
         print(response.body);
         print('기기 이름 변경 실패: ${response.statusCode}');
@@ -442,7 +432,6 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                 PopupMenuItem<String>(
                   child: const Text('이름 변경'),
                   onTap: () {
-                    print("이름 변경");
                     showDialog(
                       context: context,
                       builder: (BuildContext context) {
@@ -460,7 +449,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                                   deviceName = value;
                                 },
                                 decoration: const InputDecoration(
-                                    hintText: "변경할 기기 이름 입력",
+                                    hintText: "변경할 이름 입력",
                                     border: OutlineInputBorder(
                                         borderSide:
                                             BorderSide(color: Colors.black))),

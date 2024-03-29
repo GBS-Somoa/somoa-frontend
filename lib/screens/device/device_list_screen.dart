@@ -19,126 +19,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
   late int _selectedLocation;
   List<Device> deviceList = [];
 
-  // 임시 기기-소모품 데이터
-  // List<Map<String, Object>> deviceList = [
-  //   {
-  //     "deviceId": "asdf1",
-  //     "deviceNickname": "세탁기",
-  //     "deviceType": "Washer",
-  //     "deviceModel": "최신형 세탁기",
-  //     "manufacturer": "LG",
-  //     "supplies": [
-  //       {
-  //         "id": "6601bb29c4ec1e75ed8670be",
-  //         "type": "washerDetergent",
-  //         "name": "세탁세제",
-  //         "details": {"supplyAmount": 100},
-  //         "limit": {"supplyAmount": 300}
-  //       },
-  //       {
-  //         "id": "6601bb29c4ec1e75ed8670bb",
-  //         "type": "fabricSoftener",
-  //         "name": "섬유유연제",
-  //         "details": {"supplyAmount": 1000},
-  //         "limit": {"supplyAmount": 100}
-  //       },
-  //     ]
-  //   },
-  //   {
-  //     "deviceId": "asdf12",
-  //     "deviceNickname": "가습기",
-  //     "deviceType": "Humidifier",
-  //     "deviceModel": "최신 가습기",
-  //     "manufacturer": "삼성",
-  //     "supplies": [
-  //       {
-  //         "id": "6601bb29c4ec1e75ed8670sd",
-  //         "type": "supplyTank",
-  //         "name": "급수 탱크",
-  //         "details": {
-  //           "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-  //           "supplyLevel": 50
-  //         },
-  //         "limit": {"supplyChangeDate": 0, "supplyLevel": 10}
-  //       },
-  //     ]
-  //   },
-  //   {
-  //     "deviceId": "asdf123",
-  //     "deviceNickname": "제습기",
-  //     "deviceType": "Dehumidifier",
-  //     "deviceModel": "최신 제습기",
-  //     "manufacturer": "삼성",
-  //     "supplies": [
-  //       {
-  //         "id": "6601bb29c4ec1e75ed8645sd",
-  //         "type": "drainTank",
-  //         "name": "배수 탱크",
-  //         "details": {
-  //           "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-  //           "supplyLevel": 91
-  //         },
-  //         "limit": {"supplyChangeDate": 0, "supplyLevel": 90}
-  //       },
-  //     ]
-  //   },
-  //   {
-  //     "deviceId": "asdf1234",
-  //     "deviceNickname": "공기청정기",
-  //     "deviceType": "airPurifier",
-  //     "deviceModel": "최신 공기청정기",
-  //     "supplies": [
-  //       {
-  //         "id": "6601bb29c4ec1e75ed8670ba",
-  //         "type": "replaceableFilter",
-  //         "name": "교체형 필터",
-  //         "details": {
-  //           "supplyChangeDate": "2024-03-25T17:58:01.580+00:00",
-  //           "supplyStatus": "normal"
-  //         },
-  //         "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
-  //       },
-  //     ]
-  //   },
-  //   {
-  //     "deviceId": "asdf12345",
-  //     "deviceNickname": "에어컨",
-  //     "deviceType": "airConditioner",
-  //     "deviceModel": "최신 에어컨",
-  //     "manufacturer": "삼성",
-  //     "supplies": [
-  //       {
-  //         "id": "6601bb29c4ec1e75ed8670bc",
-  //         "type": "cleanableFilter",
-  //         "name": "청소형 필터",
-  //         "details": {
-  //           "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-  //           "supplyStatus": "good"
-  //         },
-  //         "limit": {"supplyChangeDate": 365, "supplyStatus": "null"}
-  //       },
-  //     ]
-  //   },
-  //   {
-  //     "deviceId": "asdf123456",
-  //     "deviceNickname": "청소기",
-  //     "deviceType": "vacuumCleaner",
-  //     "deviceModel": "최신 청소기",
-  //     "supplies": [
-  //       {
-  //         "id": "6601bb29c4ec1ewerd8645sd",
-  //         "type": "dustBin",
-  //         "name": "먼지봉투",
-  //         "details": {
-  //           "supplyChangeDate": "2023-03-25T17:58:01.584+00:00",
-  //           "supplyStatus": 7
-  //         },
-  //         "limit": {"supplyChangeDate": 0, "supplyStatus": 9}
-  //       }
-  //     ]
-  //   },
-  // ];
-
   @override
   void initState() {
     super.initState();
@@ -149,12 +29,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
 
   // 사용자가 포함된 그룹 리스트 가져오는 코드
   Future<void> fetchLocationData() async {
-    // .env 파일에서 서버 URL을 가져옵니다.
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
-    print(accessToken);
 
-    // accessToken이 있는 경우에만 요청을 보냅니다.
     if (accessToken != null) {
       Map<String, String> headers = {
         'Authorization': 'Bearer $accessToken',
@@ -173,10 +50,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
           locationList = responseData['data'];
           _selectedLocation = locationList[0]['groupId'];
           fetchDeviceData(_selectedLocation.toString());
-          // print(locationList);
-          // print(_selectedLocation);
         });
-        // print(responseData);
       } else {
         print(response.body);
         print('Failed to fetch location data: ${response.statusCode}');
@@ -191,11 +65,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
       "groupName": groupName,
     });
 
-    // .env 파일에서 서버 URL을 가져옵니다.
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
 
-    // accessToken이 있는 경우에만 요청을 보냅니다.
     if (accessToken != null) {
       Map<String, String> headers = {
         'Authorization': 'Bearer $accessToken',
@@ -209,8 +81,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
       );
 
       if (response.statusCode == 200) {
-        Map<String, dynamic> responseData =
-            jsonDecode(utf8.decode(response.bodyBytes));
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -224,7 +94,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
             ],
           ),
         );
-        print(responseData);
       } else {
         print(response.body);
         print('Failed to fetch location data: ${response.statusCode}');
@@ -250,7 +119,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
     String url = '${serverUrl}groups/$groupId/devices';
-    // accessToken이 있는 경우에만 요청을 보냅니다.
+
     if (accessToken != null) {
       Map<String, String> headers = {
         'Authorization': 'Bearer $accessToken',
@@ -267,11 +136,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
             jsonDecode(utf8.decode(response.bodyBytes));
 
         List<dynamic> tmpDeviceList = responseData['data'];
-        print(tmpDeviceList);
         List<Device> devices = tmpDeviceList
             .map((deviceJson) => Device.fromJson(deviceJson))
             .toList();
-        // print(tmpDeviceList);
+
         setState(() {
           deviceList = devices;
         });
@@ -405,12 +273,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                     ),
                   ],
                   elevation: 8.0,
-                ).then((value) {
-                  if (value != null) {
-                    // Handle menu item selection here
-                    print('Selected: $value');
-                  }
-                });
+                );
               },
             ),
           ],
