@@ -250,7 +250,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
     String url = '${serverUrl}groups/$groupId/devices';
-
     // accessToken이 있는 경우에만 요청을 보냅니다.
     if (accessToken != null) {
       Map<String, String> headers = {
@@ -268,6 +267,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
             jsonDecode(utf8.decode(response.bodyBytes));
 
         List<dynamic> tmpDeviceList = responseData['data'];
+        print(tmpDeviceList);
         List<Device> devices = tmpDeviceList
             .map((deviceJson) => Device.fromJson(deviceJson))
             .toList();

@@ -11,7 +11,7 @@ class OrderWidget extends StatelessWidget {
   });
 
   Map orderStatusMap = {
-    "결제 완료": "onlyPurchase",
+    "주문 완료": "onlyPurchase",
     "배송 시작": "deliveryStart",
     "배송 중": "deliveryIng",
     "배송 완료": "deliveryFinish"

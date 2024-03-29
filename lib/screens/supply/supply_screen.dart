@@ -15,8 +15,12 @@ class SupplyScreen extends StatefulWidget {
 
 class _SupplyScreenState extends State<SupplyScreen> {
   bool isLoading = true;
+  Map<String, List> careNeedSupply = {};
+  Map<String, List> careNotNeedSupply = {};
+  late int totalCount;
+
   // 임시 데이터
-  Map<String, dynamic> data = {
+  Map<String, dynamic> dummyData = {
     "isCareNeeded": {
       "add": [
         {
@@ -214,19 +218,26 @@ class _SupplyScreenState extends State<SupplyScreen> {
             jsonDecode(utf8.decode(response.bodyBytes))['data'];
 
         setState(() {
-          data = responseData;
+          careNeedSupply = Map<String, List>.from(responseData['isCareNeeded']);
+          careNotNeedSupply =
+              Map<String, List>.from(responseData['isCareNotNeeded']);
+          totalCount = responseData['totalCount'] as int;
+          isLoading = false;
         });
       } else {
         print(response.body);
         print('Failed to fetch location data: ${response.statusCode}');
+        setState() {
+          isLoading = false;
+          careNeedSupply = Map<String, List>.from(dummyData['isCareNeeded']);
+          careNotNeedSupply =
+              Map<String, List>.from(dummyData['isCareNotNeeded']);
+          totalCount = dummyData['totalCount'];
+        }
       }
     } else {
       print('Access token is null');
     }
-
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
@@ -237,10 +248,6 @@ class _SupplyScreenState extends State<SupplyScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, List> careNeedSupply = data['isCareNeeded'];
-    Map<String, List> careNotNeedSupply = data['isCareNotNeeded'];
-    int totalCount = data['totalCount'];
-
     Map careNeedCount = {};
     Map careNotNeedCount = {};
     int careNeedTotal = 0;

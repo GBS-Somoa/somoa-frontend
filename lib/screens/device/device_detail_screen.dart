@@ -22,132 +22,52 @@ class DeviceDetailScreen extends StatefulWidget {
 }
 
 class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
+  // TEST: 더미 주문 데이터 사용 여부
+  bool testmode = false;
+
   bool isLoading = true;
   late Device deviceInfo;
-  List orderList = [];
 
-  // 더미 기기 데이터
-  // Map<String, Object> dummyData = {
-  //   "id": "06b76c4725ddc59b",
-  //   "nickname": "dd",
-  //   "model": "가나다라",
-  //   "type": "washer",
-  //   "manufacturer": "LG",
-  //   "supplies": [
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8670bb",
-  //       "type": "fabricSoftener",
-  //       "name": "섬유유연제",
-  //       "details": {"supplyAmount": 1000},
-  //       "limit": {"supplyAmount": 100},
-  //       'supplyAmountTmp': 0,
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8670ba",
-  //       "type": "replaceableFilter",
-  //       "name": "교체형 필터",
-  //       "details": {
-  //         "supplyChangeDate": "2024-03-25T17:58:01.580+00:00",
-  //         "supplyStatus": "normal"
-  //       },
-  //       "limit": {"supplyChangeDate": 365, "supplyStatus": "bad"}
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8670be",
-  //       "type": "washerDetergent",
-  //       "name": "세탁세제",
-  //       "details": {"supplyAmount": 100},
-  //       "limit": {"supplyAmount": 300},
-  //       'supplyAmountTmp': 0,
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8670bf",
-  //       "type": "dishRinse",
-  //       "name": "식기세척기 린스",
-  //       "details": {"supplyAmount": 100},
-  //       "limit": {"supplyAmount": 0},
-  //       'supplyAmountTmp': 500,
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8670bd",
-  //       "type": "dishDetergent",
-  //       "name": "세제",
-  //       "details": {"supplyAmount": 0},
-  //       "limit": {"supplyAmount": 0},
-  //       'supplyAmountTmp': 2000,
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8670bc",
-  //       "type": "cleanableFilter",
-  //       "name": "청소형 필터",
-  //       "details": {
-  //         "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-  //         "supplyStatus": "good"
-  //       },
-  //       "limit": {"supplyChangeDate": 365, "supplyStatus": "null"}
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8670sd",
-  //       "type": "supplyTank",
-  //       "name": "급수 탱크",
-  //       "details": {
-  //         "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-  //         "supplyLevel": 50
-  //       },
-  //       "limit": {"supplyChangeDate": 0, "supplyLevel": 10}
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1e75ed8645sd",
-  //       "type": "drainTank",
-  //       "name": "배수 탱크",
-  //       "details": {
-  //         "supplyChangeDate": "2024-03-25T17:58:01.584+00:00",
-  //         "supplyLevel": 95
-  //       },
-  //       "limit": {"supplyChangeDate": 0, "supplyLevel": 90}
-  //     },
-  //     {
-  //       "id": "6601bb29c4ec1ewerd8645sd",
-  //       "type": "dustBin",
-  //       "name": "먼지봉투",
-  //       "details": {
-  //         "supplyChangeDate": "2023-03-25T17:58:01.584+00:00",
-  //         "supplyStatus": 7
-  //       },
-  //       "limit": {"supplyChangeDate": 0, "supplyStatus": 9}
-  //     }
-  //   ]
-  // };
+  List<Order> orders = [];
 
   // 임시 기기와 연관된 소모품 주문 데이터
-  List<Map<String, Object>> orders = [
-    {
-      "orderId": 0,
-      "orderStore": "SSAPANG",
-      "productName": "다우니 세제 1L",
-      "orderDate": "2024-03-25",
-      "orderStatus": "배송완료",
-      "productImg":
-          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-    },
-    {
-      "orderId": 1,
-      "orderStore": "SSAPANG",
-      "productName": "다우니 세제 1L",
-      "orderDate": "2024-03-25",
-      "orderStatus": "결제완료",
-      "productImg":
-          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-    },
-    {
-      "orderId": 2,
-      "orderStore": "삼성몰",
-      "productName": "어쩌구저쩌구 정품 필터",
-      "orderDate": "2024-03-25",
-      "orderStatus": "결제완료",
-      "productImg":
-          'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-    },
+  List<Order> dummyOrders = [
+    Order(
+        orderId: 0,
+        supplyId: "12314kjslajtw",
+        orderStore: "SSAPANG",
+        orderStoreId: "ddfs",
+        productName: "다우니 세제 1L",
+        orderStatus: "배송 완료",
+        productImg:
+            'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+        orderCount: 1,
+        orderAmount: "1L",
+        createdAt: DateTime.parse("2024-01-24T01:30:44")),
+    Order(
+        orderId: 1,
+        supplyId: "12314kjslajtw",
+        orderStore: "SSAPANG",
+        orderStoreId: "ddfs",
+        productName: "다우니 세제 1L",
+        orderStatus: "배송 완료",
+        productImg:
+            'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+        orderCount: 1,
+        orderAmount: "1L",
+        createdAt: DateTime.parse("2024-01-24T01:30:44")),
+    Order(
+        orderId: 2,
+        supplyId: "12314kjslajtw",
+        orderStore: "SSAPANG",
+        orderStoreId: "ddfs",
+        productName: "다우니 세제 1L",
+        orderStatus: "배송 완료",
+        productImg:
+            'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
+        orderCount: 1,
+        orderAmount: "1L",
+        createdAt: DateTime.parse("2024-01-24T01:30:44")),
   ];
 
   int statusSummary = 0;
@@ -253,7 +173,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         });
       } else {
         print(response.body);
-        print('Failed to fetch location data: ${response.statusCode}');
+        print('기기 상세 조회 실패: ${response.statusCode}');
       }
     } else {
       print('Access token is null');
@@ -268,36 +188,58 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       String supplyId = supply.id;
       String serverUrl = dotenv.get("SERVER_URL");
       String? accessToken = await getAccessToken();
-
       String url =
-          '${serverUrl}api/orders?supply_id=$supplyId&order_status=Delivering';
+          '${serverUrl}orders?supply_id=$supplyId&order_status=Delivering';
 
       try {
-        http.Response response = await http.get(Uri.parse(url),
-            headers: {"Authentication": "Bearer $accessToken"});
+        http.Response response = await http.get(
+          Uri.parse(url),
+          headers: {
+            'Authorization': 'Bearer $accessToken',
+          },
+        );
 
         if (response.statusCode == 200) {
-          List<dynamic> data = jsonDecode(response.body);
-          List<Order> orders =
-              data.map((json) => Order.fromJson(json)).toList();
+          final String decodedBody = utf8.decode(response.bodyBytes);
+          final data = json.decode(decodedBody);
 
-          orderList.addAll(orders);
+          if (data['data'] != null) {
+            final List<dynamic> ordersJson = data['data'];
+            setState(() {
+              orders =
+                  ordersJson.map((order) => Order.fromJson(order)).toList();
+              isLoading = false;
+            });
+          }
         } else {
           // Handle the error scenario
-          print(
-              'Failed to fetch order data for supply ID $supplyId: ${response.statusCode}');
+          print(response.body);
+          print('Supply ID $supplyId에 대한 주문내역 조회 실패: ${response.statusCode}');
+          setState(() {
+            isLoading = false;
+          });
         }
       } catch (e) {
         // Handle any exceptions
-        print('Error fetching order data for supply ID $supplyId: $e');
+        print('Supply ID $supplyId에 대한 주문내역 조회 실패: $e');
       }
     }
-    setState(
-      () {
-        orderList = orderList;
+
+    if (testmode) {
+      setState(() {
+        orders = dummyOrders;
         isLoading = false;
-      },
-    );
+      });
+    }
+  }
+
+  Map<String, Object> makeOrderInfo(Order order) {
+    return {
+      'orderStore': order.orderStore,
+      'productName': order.productName,
+      'productImg': order.productImg,
+      'orderStatus': order.orderStatus,
+    };
   }
 
   void deleteDevice(BuildContext context, String deviceId) async {
@@ -422,7 +364,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       };
 
       http.Response response = await http.post(
-        Uri.parse(serverUrl + 'devices/${deviceInfo.id}'),
+        Uri.parse('${serverUrl}devices/${deviceInfo.id}'),
         headers: headers,
         body: bodyData,
       );
@@ -445,7 +387,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         print(responseData);
       } else {
         print(response.body);
-        print('Failed to fetch location data: ${response.statusCode}');
+        print('기기 이름 변경 실패: ${response.statusCode}');
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -518,7 +460,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                                   deviceName = value;
                                 },
                                 decoration: const InputDecoration(
-                                    hintText: deviceInfo.nickname,
+                                    hintText: "변경할 기기 이름 입력",
                                     border: OutlineInputBorder(
                                         borderSide:
                                             BorderSide(color: Colors.black))),
@@ -578,7 +520,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                             textAlign: TextAlign.start,
                           ),
                           for (var order in orders)
-                            OrderWidget(orderInfo: order),
+                            OrderWidget(orderInfo: makeOrderInfo(order)),
                         ],
                       ),
                     const SizedBox(height: 10),
