@@ -79,7 +79,7 @@ class SupplyWidget extends StatelessWidget {
 
   Future<Widget> _buildDetergentCard(BuildContext context) async {
     // 기기 내부에 저장된 데이터에서 supplyId에 맞는 maxAmount를 가져옴
-    int maxAmount = await getMaxAmount(supplyInfo.username);
+    int maxAmount = await getMaxAmount(supplyInfo.id);
 
     print(supplyInfo.supplyAmountTmp);
     bool isSupplyAmountTmp =
@@ -94,7 +94,7 @@ class SupplyWidget extends StatelessWidget {
     int supplyAmount = supplyInfo.details['supplyAmount'];
     int limitAmount = supplyInfo.limit['supplyAmount'];
     if (maxAmount < supplyAmount) {
-      setMaxAmount(supplyInfo.username, supplyAmount);
+      setMaxAmount(supplyInfo.id, supplyAmount);
       maxAmount = supplyAmount;
     }
 
@@ -853,7 +853,7 @@ class SupplyWidget extends StatelessWidget {
                 String newValue = _controller.text;
                 // 보유량 변경 api 호출
                 await _changeSupplyAmount(context, int.parse(newValue),
-                    deviceId, supplyInfo.username);
+                    deviceId, supplyInfo.id);
 
                 if (supplyInfo.details['supplyAmount'] < int.parse(newValue)) {
                   await setMaxAmount(supplyInfo.id, int.parse(newValue));
