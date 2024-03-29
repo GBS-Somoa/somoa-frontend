@@ -186,7 +186,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
     }
   }
 
-  void _registerLoctaion(String groupName) async {
+  void _registerLocation(String groupName) async {
     var bodyData = jsonEncode({
       "groupName": groupName,
     });
@@ -359,8 +359,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                 ElevatedButton(
                                   onPressed: () {
                                     if (placeName.isNotEmpty) {
-                                      // 장소 이름이 입력되었을 경우에만 처리합니다.
-                                      _registerLoctaion(placeName);
+                                      _registerLocation(placeName);
                                     }
                                   },
                                   child: const Text(

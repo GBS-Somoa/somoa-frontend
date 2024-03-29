@@ -798,6 +798,7 @@ class SupplyWidget extends StatelessWidget {
                     builder: (context) =>
                         DeviceDetailScreen(deviceId: deviceId),
                   ),
+                  // Todo:deviceData 갱신(fetchData) & Navigator.pop(context)
                 ),
                 child: const Text('확인'),
               ),

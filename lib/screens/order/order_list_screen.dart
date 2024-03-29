@@ -107,7 +107,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
         itemBuilder: (context, index) {
           final order = orders[index];
           // TODO : 주문 취소도 보여주기
-          if (order.orderStatus != '주문취소') {
+          if (order.orderStatus != '주문 취소') {
             return Padding(
               padding: const EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 10.0),
               child: Column(

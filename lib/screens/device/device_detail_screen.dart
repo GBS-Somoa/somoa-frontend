@@ -405,6 +405,65 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
           );
   }
 
+  void _changeDeviceName(String deviceName) async {
+    var bodyData = jsonEncode({
+      "deviceName": deviceName,
+    });
+
+    // .env 파일에서 서버 URL을 가져옵니다.
+    String serverUrl = dotenv.get("SERVER_URL");
+    String? accessToken = await getAccessToken();
+
+    // accessToken이 있는 경우에만 요청을 보냅니다.
+    if (accessToken != null) {
+      Map<String, String> headers = {
+        'Authorization': 'Bearer $accessToken',
+        'Content-Type': 'application/json',
+      };
+
+      http.Response response = await http.post(
+        Uri.parse(serverUrl + 'devices/${deviceInfo.id}'),
+        headers: headers,
+        body: bodyData,
+      );
+
+      if (response.statusCode == 200) {
+        Map<String, dynamic> responseData =
+            jsonDecode(utf8.decode(response.bodyBytes));
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('$deviceName로 변경 되었습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+        print(responseData);
+      } else {
+        print(response.body);
+        print('Failed to fetch location data: ${response.statusCode}');
+        showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('기기 이름 변경에 실패했습니다.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('확인'),
+              ),
+            ],
+          ),
+        );
+      }
+    } else {
+      print('Access token is null');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -412,7 +471,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: AppBar(
           title: isLoading
-              ? const Text('Loading...', style: const TextStyle(fontSize: 28))
+              ? const Text('Loading...', style: TextStyle(fontSize: 28))
               : Text(deviceInfo.nickname, style: const TextStyle(fontSize: 28)),
           centerTitle: true,
           leading: IconButton(
@@ -438,8 +497,51 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                     );
                   },
                 ),
-                const PopupMenuItem<String>(
-                  child: Text('이름 변경'),
+                PopupMenuItem<String>(
+                  child: const Text('이름 변경'),
+                  onTap: () {
+                    print("이름 변경");
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        String deviceName = '';
+                        return AlertDialog(
+                          title: const Text(
+                            '기기 이름 변경',
+                            textAlign: TextAlign.center,
+                          ),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              TextField(
+                                onChanged: (value) {
+                                  deviceName = value;
+                                },
+                                decoration: const InputDecoration(
+                                    hintText: deviceInfo.nickname,
+                                    border: OutlineInputBorder(
+                                        borderSide:
+                                            BorderSide(color: Colors.black))),
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                if (deviceName.isNotEmpty) {
+                                  _changeDeviceName(deviceName);
+                                }
+                              },
+                              child: const Text(
+                                '확인',
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
                 PopupMenuItem<String>(
                   child:
