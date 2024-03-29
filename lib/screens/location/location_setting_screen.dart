@@ -491,10 +491,10 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                     ),
                   ]
               ),
-              _groupMembers.length > 0 ?
               ListContainerWidget(
-                  title: '멤버',
-                  children: _groupMembers.map((member) {
+                title: '멤버',
+                children: [
+                  ..._groupMembers.map((member) {
                     return ListTile(
                       title: Text(member.name),
                       subtitle: Text(member.role, style: TextStyle(color: Colors.indigo)),
@@ -549,8 +549,25 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                         ),
                       ),
                     );
-                  }).toList()
-              ) : const SizedBox(),
+                  }).toList(),
+
+                  if (_group.myRole != ONLY_SUPPLY)
+                    ListTile(
+                      leading: const CircleAvatar(
+                        backgroundColor: Colors.transparent,
+                        child: Icon(
+                          Icons.add_circle_outline,
+                          color: Colors.indigo,
+                          size: 40,
+                        ),
+                      ),
+                      title: const Text('멤버 초대'),
+                      onTap: () {
+                        print('멤버 초대 clicked!');
+                      },
+                    ),
+                ],
+              ),
             ],
           ),
         ),
