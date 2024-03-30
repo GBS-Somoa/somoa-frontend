@@ -126,7 +126,10 @@ class _LocationListScreenState extends State<LocationListScreen> {
                     ),
                     onTap: () {
                       Navigator.pushNamed(context, '/locationSetting',
-                          arguments: groups[index].id);
+                              arguments: groups[index].id)
+                          .then((_) {
+                        fetchData();
+                      });
                     },
                     trailing: ReorderableDragStartListener(
                       index: index,

@@ -593,8 +593,8 @@ class SupplyWidget extends StatelessWidget {
   Widget _buildDustBinCard(BuildContext context) {
     int maxAmount = 10;
 
-    int supplyAmount = supplyInfo.details['supplyStatus'];
-    int limitAmount = supplyInfo.limit['supplyStatus'];
+    int supplyAmount = int.parse(supplyInfo.details['supplyStatus']);
+    int limitAmount = int.parse(supplyInfo.limit['supplyStatus']);
 
     double supplyPercentage = supplyAmount / maxAmount;
     double limitPercentage = limitAmount / maxAmount;

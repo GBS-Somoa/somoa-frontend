@@ -454,9 +454,9 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                           _group.name,
                           style: TextStyle(color: Colors.indigo),
                         ),
-                        onTap: () {
-                          _showEditDialog(context, _group.name);
-                        },
+                        onTap: _group.myRole == ADMIN
+                            ? () => _showEditDialog(context, _group.name)
+                            : null,
                       ),
                     ]),
                     ListContainerWidget(children: [
@@ -500,7 +500,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                             title: Text(member.name),
                             subtitle: Text(member.role,
                                 style: TextStyle(color: Colors.indigo)),
-                            onTap: _group.myRole != ONLY_SUPPLY &&
+                            onTap: _group.myRole == ADMIN &&
                                     userProvider.username != member.username
                                 ? () {
                                     showModalBottomSheet(
@@ -559,8 +559,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                                 },
                                 child:
                                     member.username != userProvider.username &&
-                                            (_group.myRole == ADMIN ||
-                                                _group.myRole == ALL_GRANTED)
+                                            (_group.myRole == ADMIN)
                                         ? Icon(Icons.remove_circle_outline,
                                             color: Colors.red)
                                         : null,
@@ -568,7 +567,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
                             ),
                           );
                         }).toList(),
-                        if (_group.myRole != ONLY_SUPPLY)
+                        if (_group.myRole == ADMIN)
                           ListTile(
                             leading: const CircleAvatar(
                               backgroundColor: Colors.transparent,

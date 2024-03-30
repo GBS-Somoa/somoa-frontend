@@ -59,7 +59,6 @@ class _DeviceScreenState extends State<DeviceScreen> {
           locationList = responseData['data'];
           _selectedLocation = locationList[0]['groupId'];
           fetchDeviceData(_selectedLocation.toString());
-          isLoading = false;
         });
       } else {
         print(response.body);
@@ -266,7 +265,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
                             child: const Text('장소 관리'),
                             onTap: () {
                               Navigator.pushNamed(context, '/locationSetting',
-                                  arguments: _selectedLocation);
+                                      arguments: _selectedLocation)
+                                  .then((_) {
+                                fetchLocationData();
+                              });
                             },
                           ),
                           PopupMenuItem(

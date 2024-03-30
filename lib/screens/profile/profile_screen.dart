@@ -124,7 +124,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               icon: const Icon(Icons.logout),
               onPressed: () {
                 userProvider.logout();
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/login', (route) => false);
               },
             )
           ],
