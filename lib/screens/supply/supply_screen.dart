@@ -216,24 +216,30 @@ class _SupplyScreenState extends State<SupplyScreen> {
       if (response.statusCode == 200) {
         Map<String, dynamic> responseData =
             jsonDecode(utf8.decode(response.bodyBytes))['data'];
-
-        setState(() {
-          careNeedSupply = Map<String, List>.from(responseData['isCareNeeded']);
-          careNotNeedSupply =
-              Map<String, List>.from(responseData['isCareNotNeeded']);
-          totalCount = responseData['totalCount'] as int;
-          isLoading = false;
-        });
+        int tempTotalCount = responseData['totalCount'] as int;
+        if (tempTotalCount > 0) {
+          setState(() {
+            careNeedSupply =
+                Map<String, List>.from(responseData['isCareNeeded']);
+            careNotNeedSupply =
+                Map<String, List>.from(responseData['isCareNotNeeded']);
+            isLoading = false;
+            totalCount = tempTotalCount;
+          });
+        } else {
+          setState(() => isLoading = false);
+          totalCount = 0;
+        }
       } else {
         print(response.body);
         print('Failed to fetch location data: ${response.statusCode}');
-        setState() {
+        setState(() {
           isLoading = false;
           careNeedSupply = Map<String, List>.from(dummyData['isCareNeeded']);
           careNotNeedSupply =
               Map<String, List>.from(dummyData['isCareNotNeeded']);
           totalCount = dummyData['totalCount'];
-        }
+        });
       }
     } else {
       print('Access token is null');
@@ -276,216 +282,232 @@ class _SupplyScreenState extends State<SupplyScreen> {
           ? const Center(
               child: CircularProgressIndicator(),
             )
-          : SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(15.0),
-                child: Column(children: [
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Center(
-                      child: Column(
-                        children: [
-                          Image.asset(
-                              'assets/images/face=${careNeedTotal == 0 ? "good" : careNeedTotal < careNotNeedTotal ? "normal" : "bad"}.png',
-                              height: 120),
-                          Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(
-                              careNeedTotal == 0
-                                  ? "모든 소모품이 \n잘 관리되고 있어요!"
-                                  : "관리가 필요한 \n소모품이 있어요.",
-                              style: const TextStyle(fontSize: 22),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                          Text(
-                            "$totalCount개의 소모품 중\n $careNeedTotal개가 관리가 필요합니다.",
-                            style: const TextStyle(fontSize: 15),
-                            textAlign: TextAlign.center,
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                  // 교체가 필요한 소모품
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          : totalCount == 0
+              ? Center(child: Text('등록된 소모품이 없습니다.'))
+              : SingleChildScrollView(
+                  child: Padding(
+                    padding: const EdgeInsets.all(15.0),
+                    child: Column(children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Center(
+                          child: Column(
                             children: [
-                              const Row(
-                                children: [
-                                  SizedBox(
-                                      width: 30, child: Icon(Icons.cached)),
-                                  Text('교체', style: TextStyle(fontSize: 16)),
-                                ],
+                              Image.asset(
+                                  'assets/images/face=${careNeedTotal == 0 ? "good" : careNeedTotal < careNotNeedTotal ? "normal" : "bad"}.png',
+                                  height: 120),
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  careNeedTotal == 0
+                                      ? "모든 소모품이 \n잘 관리되고 있어요!"
+                                      : "관리가 필요한 \n소모품이 있어요.",
+                                  style: const TextStyle(fontSize: 22),
+                                  textAlign: TextAlign.center,
+                                ),
                               ),
                               Text(
-                                '${careNeedCount['change']} / ${careNeedCount['change'] + careNotNeedCount['change']}',
-                              ),
+                                "$totalCount개의 소모품 중\n $careNeedTotal개가 관리가 필요합니다.",
+                                style: const TextStyle(fontSize: 15),
+                                textAlign: TextAlign.center,
+                              )
                             ],
                           ),
-                          for (int i = 0;
-                              i < careNeedSupply['change']!.length;
-                              i++)
-                            Column(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                      '${careNeedSupply['change']![i]['groupName']} > ${careNeedSupply['change']![i]['deviceNickname']} > ${careNeedSupply['change']![i]['supplyName']}'),
-                                  trailing: const SizedBox(
-                                    width: 5,
-                                    child: Icon(Icons.arrow_forward_ios,
-                                        color: Colors.black54),
-                                  ),
-                                  onTap: () {
-                                    // 해당 기기 상세페이지로 이동
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DeviceDetailScreen(
-                                                deviceId:
-                                                    careNeedSupply['change']![i]
-                                                        ['deviceId']),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                if (i != careNeedSupply['change']!.length - 1)
-                                  Divider(
-                                      color: Colors.grey[
-                                          400]), // 마지막 아이템이 아닐 때만 Divider 추가
-                              ],
-                            ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  // 충전이 필요한 소모품
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // 교체가 필요한 소모품
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Column(
                             children: [
-                              const Row(
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  SizedBox(
-                                      width: 30,
-                                      child: Icon(Icons.add_circle_outline)),
-                                  Text('충전', style: TextStyle(fontSize: 16)),
+                                  const Row(
+                                    children: [
+                                      SizedBox(
+                                          width: 30, child: Icon(Icons.cached)),
+                                      Text('교체',
+                                          style: TextStyle(fontSize: 16)),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${careNeedCount['change']} / ${careNeedCount['change'] + careNotNeedCount['change']}',
+                                  ),
                                 ],
                               ),
-                              Text(
-                                '${careNeedCount['add']} / ${careNeedCount['add'] + careNotNeedCount['add']}',
-                              ),
+                              for (int i = 0;
+                                  i < careNeedSupply['change']!.length;
+                                  i++)
+                                Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                          '${careNeedSupply['change']![i]['groupName']} > ${careNeedSupply['change']![i]['deviceNickname']} > ${careNeedSupply['change']![i]['supplyName']}'),
+                                      trailing: const SizedBox(
+                                        width: 5,
+                                        child: Icon(Icons.arrow_forward_ios,
+                                            color: Colors.black54),
+                                      ),
+                                      onTap: () {
+                                        // 해당 기기 상세페이지로 이동
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DeviceDetailScreen(
+                                                    deviceId: careNeedSupply[
+                                                            'change']![i]
+                                                        ['deviceId']),
+                                          ),
+                                        ).then((_) {
+                                          fetchData();
+                                        });
+                                      },
+                                    ),
+                                    if (i !=
+                                        careNeedSupply['change']!.length - 1)
+                                      Divider(
+                                          color: Colors.grey[
+                                              400]), // 마지막 아이템이 아닐 때만 Divider 추가
+                                  ],
+                                ),
                             ],
                           ),
-                          for (int i = 0;
-                              i < careNeedSupply['add']!.length;
-                              i++)
-                            Column(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                      '${careNeedSupply['add']![i]['groupName']} > ${careNeedSupply['add']![i]['deviceNickname']} > ${careNeedSupply['add']![i]['supplyName']}'),
-                                  trailing: const SizedBox(
-                                    width: 5,
-                                    child: Icon(Icons.arrow_forward_ios,
-                                        color: Colors.black54),
-                                  ),
-                                  onTap: () {
-                                    // 해당 기기 상세페이지로 이동
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DeviceDetailScreen(
-                                                deviceId:
-                                                    careNeedSupply['add']![i]
-                                                        ['deviceId']),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                if (i != careNeedSupply['add']!.length - 1)
-                                  Divider(
-                                      color: Colors.grey[
-                                          400]), // 마지막 아이템이 아닐 때만 Divider 추가
-                              ],
-                            ),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
-                  // 청소가 필요한 소모품
-                  Card(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      // 충전이 필요한 소모품
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Column(
                             children: [
-                              const Row(
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  SizedBox(
-                                      width: 30,
-                                      child: Icon(Icons.cleaning_services)),
-                                  Text('청소', style: TextStyle(fontSize: 16)),
+                                  const Row(
+                                    children: [
+                                      SizedBox(
+                                          width: 30,
+                                          child:
+                                              Icon(Icons.add_circle_outline)),
+                                      Text('충전',
+                                          style: TextStyle(fontSize: 16)),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${careNeedCount['add']} / ${careNeedCount['add'] + careNotNeedCount['add']}',
+                                  ),
                                 ],
                               ),
-                              Text(
-                                '${careNeedCount['clean']} / ${careNeedCount['clean'] + careNotNeedCount['clean']}',
-                              ),
+                              for (int i = 0;
+                                  i < careNeedSupply['add']!.length;
+                                  i++)
+                                Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                          '${careNeedSupply['add']![i]['groupName']} > ${careNeedSupply['add']![i]['deviceNickname']} > ${careNeedSupply['add']![i]['supplyName']}'),
+                                      trailing: const SizedBox(
+                                        width: 5,
+                                        child: Icon(Icons.arrow_forward_ios,
+                                            color: Colors.black54),
+                                      ),
+                                      onTap: () {
+                                        // 해당 기기 상세페이지로 이동
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DeviceDetailScreen(
+                                                    deviceId: careNeedSupply[
+                                                        'add']![i]['deviceId']),
+                                          ),
+                                        ).then((_) {
+                                          fetchData();
+                                        });
+                                      },
+                                    ),
+                                    if (i != careNeedSupply['add']!.length - 1)
+                                      Divider(
+                                          color: Colors.grey[
+                                              400]), // 마지막 아이템이 아닐 때만 Divider 추가
+                                  ],
+                                ),
                             ],
                           ),
-                          for (int i = 0;
-                              i < careNeedSupply['clean']!.length;
-                              i++)
-                            Column(
-                              children: [
-                                ListTile(
-                                  title: Text(
-                                      '${careNeedSupply['clean']![i]['groupName']} > ${careNeedSupply['clean']![i]['deviceNickname']} > ${careNeedSupply['clean']![i]['supplyName']}'),
-                                  trailing: const SizedBox(
-                                    width: 5,
-                                    child: Icon(Icons.arrow_forward_ios,
-                                        color: Colors.black54),
-                                  ),
-                                  onTap: () {
-                                    // 해당 기기 상세페이지로 이동
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) =>
-                                            DeviceDetailScreen(
-                                                deviceId:
-                                                    careNeedSupply['clean']![i]
-                                                        ['deviceId']),
-                                      ),
-                                    );
-                                  },
-                                ),
-                                if (i != careNeedSupply['clean']!.length - 1)
-                                  Divider(
-                                      color: Colors.grey[
-                                          400]), // 마지막 아이템이 아닐 때만 Divider 추가
-                              ],
-                            ),
-                        ],
+                        ),
                       ),
-                    ),
+                      // 청소가 필요한 소모품
+                      Card(
+                        child: Padding(
+                          padding: const EdgeInsets.all(15.0),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Row(
+                                    children: [
+                                      SizedBox(
+                                          width: 30,
+                                          child: Icon(Icons.cleaning_services)),
+                                      Text('청소',
+                                          style: TextStyle(fontSize: 16)),
+                                    ],
+                                  ),
+                                  Text(
+                                    '${careNeedCount['clean']} / ${careNeedCount['clean'] + careNotNeedCount['clean']}',
+                                  ),
+                                ],
+                              ),
+                              for (int i = 0;
+                                  i < careNeedSupply['clean']!.length;
+                                  i++)
+                                Column(
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                          '${careNeedSupply['clean']![i]['groupName']} > ${careNeedSupply['clean']![i]['deviceNickname']} > ${careNeedSupply['clean']![i]['supplyName']}'),
+                                      trailing: const SizedBox(
+                                        width: 5,
+                                        child: Icon(Icons.arrow_forward_ios,
+                                            color: Colors.black54),
+                                      ),
+                                      onTap: () {
+                                        // 해당 기기 상세페이지로 이동
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                DeviceDetailScreen(
+                                                    deviceId: careNeedSupply[
+                                                            'clean']![i]
+                                                        ['deviceId']),
+                                          ),
+                                        ).then((_) {
+                                          fetchData();
+                                        });
+                                      },
+                                    ),
+                                    if (i !=
+                                        careNeedSupply['clean']!.length - 1)
+                                      Divider(
+                                          color: Colors.grey[
+                                              400]), // 마지막 아이템이 아닐 때만 Divider 추가
+                                  ],
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ]),
                   ),
-                ]),
-              ),
-            ),
+                ),
     );
   }
 }

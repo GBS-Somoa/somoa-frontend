@@ -11,8 +11,7 @@ class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
 
   @override
-  // ignore: library_private_types_in_public_api
-  _NotificationScreenState createState() => _NotificationScreenState();
+  State<NotificationScreen> createState() => _NotificationScreenState();
 }
 
 class _NotificationScreenState extends State<NotificationScreen>
@@ -254,7 +253,20 @@ class _NotificationScreenState extends State<NotificationScreen>
                                               child: ListTile(
                                                 leading: getIconFromData(
                                                     data['icon']),
-                                                onTap: () {
+                                                onTap: () async {
+                                                  notifications
+                                                      .remove(notification);
+                                                  final prefs =
+                                                      await SharedPreferences
+                                                          .getInstance();
+                                                  await prefs.reload();
+                                                  String encodedData = json
+                                                      .encode(notifications);
+                                                  setState(() {
+                                                    prefs.setString(
+                                                        'notifications',
+                                                        encodedData);
+                                                  });
                                                   if (path != null) {
                                                     if (path ==
                                                         'DeviceDetailScreen') {

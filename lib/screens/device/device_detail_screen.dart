@@ -22,6 +22,10 @@ class DeviceDetailScreen extends StatefulWidget {
 }
 
 class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
+  void refresh() {
+    fetchDeviceData(widget.deviceId);
+  }
+
   // TEST: 더미 주문 데이터 사용 여부
   bool testmode = false;
 
@@ -181,6 +185,9 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
   // 소모품 별 주문 데이터 가져오기
   Future<void> fetchOrderData(Device deviceInfo) async {
+    setState(() {
+      isLoading = true;
+    });
     for (Supply supply in deviceInfo.supplies) {
       String supplyId = supply.id;
       String serverUrl = dotenv.get("SERVER_URL");
@@ -249,6 +256,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       if (response.statusCode == 200) {
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('삭제 성공'),
@@ -363,6 +371,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       );
 
       if (response.statusCode == 200) {
+        await fetchDeviceData(widget.deviceId);
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -403,13 +412,13 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: AppBar(
           title: isLoading
-              ? const Text('Loading...', style: TextStyle(fontSize: 28))
+              ? const Text('', style: TextStyle(fontSize: 28))
               : Text(deviceInfo.nickname, style: const TextStyle(fontSize: 28)),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/main');
+              Navigator.pop(context);
             },
           ),
           actions: [
@@ -461,6 +470,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                               onPressed: () {
                                 if (deviceName.isNotEmpty) {
                                   _changeDeviceName(deviceName);
+                                  Navigator.of(context).pop();
                                 }
                               },
                               child: const Text(
@@ -524,7 +534,10 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                         ),
                         if (deviceInfo.supplies.isNotEmpty)
                           ...deviceInfo.supplies.map((supply) => SupplyWidget(
-                              deviceId: deviceInfo.id, supplyInfo: supply))
+                                deviceId: deviceInfo.id,
+                                supplyInfo: supply,
+                                onRefresh: refresh,
+                              ))
                         else
                           const SizedBox(
                               height: 50,
