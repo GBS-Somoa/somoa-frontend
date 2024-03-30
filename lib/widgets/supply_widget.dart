@@ -12,11 +12,13 @@ import 'package:somoa/screens/device/device_detail_screen.dart';
 class SupplyWidget extends StatelessWidget {
   final String deviceId;
   final dynamic supplyInfo;
+  final VoidCallback onRefresh;
 
   const SupplyWidget({
     super.key,
     required this.deviceId,
     required this.supplyInfo,
+    required this.onRefresh,
   });
 
   Future<String?> getAccessToken() async {
@@ -591,8 +593,8 @@ class SupplyWidget extends StatelessWidget {
   Widget _buildDustBinCard(BuildContext context) {
     int maxAmount = 10;
 
-    int supplyAmount = supplyInfo.details['supplyStatus'];
-    int limitAmount = supplyInfo.limit['supplyStatus'];
+    int supplyAmount = int.parse(supplyInfo.details['supplyStatus']);
+    int limitAmount = int.parse(supplyInfo.limit['supplyStatus']);
 
     double supplyPercentage = supplyAmount / maxAmount;
     double limitPercentage = limitAmount / maxAmount;
@@ -752,8 +754,8 @@ class SupplyWidget extends StatelessWidget {
   }
 
   // 보유량 변경 api 요청 함수
-  Future<void> _changeSupplyAmount(BuildContext context, int amount,
-      String deviceId, String supplyId) async {
+  void _changeSupplyAmount(BuildContext context, int amount, String deviceId,
+      String supplyId) async {
     var bodyData = jsonEncode({
       "supplyAmount": amount,
     });
@@ -774,24 +776,18 @@ class SupplyWidget extends StatelessWidget {
       );
 
       if (response.statusCode == 200) {
-        // Map<String, dynamic> responseData =
-        //     jsonDecode(utf8.decode(response.bodyBytes));
+        onRefresh();
+
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('보유량이 수정되었습니다.'),
             actions: [
               TextButton(
-                onPressed: () =>
-                    // deviceDetailScreen으로 이동하는 코드
-                    Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        DeviceDetailScreen(deviceId: deviceId),
-                  ),
-                  // Todo:deviceData 갱신(fetchData) & Navigator.pop(context)
-                ),
+                onPressed: () {
+                  Navigator.pop(context);
+                  // onRefresh();
+                },
                 child: const Text('확인'),
               ),
             ],
@@ -841,16 +837,17 @@ class SupplyWidget extends StatelessWidget {
           ),
           actions: <Widget>[
             ElevatedButton(
-              onPressed: () async {
+              onPressed: () {
                 String newValue = _controller.text;
                 // 보유량 변경 api 호출
-                await _changeSupplyAmount(
+                _changeSupplyAmount(
                     context, int.parse(newValue), deviceId, supplyInfo.id);
 
                 if (supplyInfo.details['supplyAmount'] < int.parse(newValue)) {
-                  await setMaxAmount(supplyInfo.id, int.parse(newValue));
+                  setMaxAmount(supplyInfo.id, int.parse(newValue));
                 }
                 print('변경된 값: $newValue');
+                Navigator.of(context).pop();
               },
               child: const Text('변경'),
             ),

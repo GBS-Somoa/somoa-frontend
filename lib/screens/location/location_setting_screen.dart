@@ -25,7 +25,11 @@ class MyGroup {
   String myRole;
   bool alarm;
 
-  MyGroup({required this.id, required this.name, required this.myRole, required this.alarm});
+  MyGroup(
+      {required this.id,
+      required this.name,
+      required this.myRole,
+      required this.alarm});
 
   factory MyGroup.fromJson(Map<String, dynamic> json) {
     return MyGroup(
@@ -127,7 +131,6 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
       if (response.statusCode != 200) {
         print("장소 이름 바꾸기 실패");
       }
-
     } catch (e) {
       print(e.toString());
     }
@@ -154,7 +157,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
 
           setState(() {
             final adminJson = membersJson.firstWhere(
-                  (member) => member['role'] == ADMIN,
+              (member) => member['role'] == ADMIN,
               orElse: () => null,
             );
             if (adminJson != null) {
@@ -201,7 +204,6 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
           _group.alarm = value;
         });
       }
-
     } catch (e) {
       print(e.toString());
     }
@@ -233,7 +235,6 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
           member.role = role;
         });
       }
-
     } catch (e) {
       print(e.toString());
     }
@@ -250,9 +251,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
           'Content-Type': 'application/json',
           'Authorization': 'Bearer $accessToken',
         },
-        body: jsonEncode({
-          'userId': id
-        }),
+        body: jsonEncode({'userId': id}),
       );
 
       if (response.statusCode != 200) {
@@ -263,7 +262,6 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
           _groupMembers.removeWhere((member) => member.id == id);
         });
       }
-
     } catch (e) {
       print(e.toString());
     }
@@ -290,8 +288,7 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
         print(data);
         print("장소 삭제 실패");
       } else {
-        Navigator.pop(context, '/locationList');
-        Navigator.pushReplacementNamed(context, '/locationList');
+        Navigator.pushReplacementNamed(context, '/main');
       }
     } catch (e) {
       print(e.toString());
@@ -327,17 +324,16 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
     }
   }
 
-  Future<void> _showEditDialog(BuildContext context, String currentLocationName) async {
-    TextEditingController _textEditingController = TextEditingController(text: currentLocationName);
+  Future<void> _showEditDialog(
+      BuildContext context, String currentLocationName) async {
+    TextEditingController _textEditingController =
+        TextEditingController(text: currentLocationName);
 
     return showDialog<void>(
       context: context,
       builder: (BuildContext dialogContext) {
         return AlertDialog(
-          title: const Text(
-              '장소 이름 편집',
-              style: TextStyle(fontSize: 18)
-          ),
+          title: const Text('장소 이름 편집', style: TextStyle(fontSize: 18)),
           content: TextField(
             controller: _textEditingController,
             decoration: const InputDecoration(hintText: '장소 이름을 입력하세요'),
@@ -374,203 +370,223 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
-        appBar: _isLoading ? MenuBarWidget(titleText: '') :
-        MenuBarWidget(
-          titleText: '${_group.name} 설정',
-          showExtraMenu: true,
-          buildPopupMenuButton: () => PopupMenuButton<String>(
-            onSelected: (String result) {
-              if (_group.myRole == ADMIN) {
-                if (result == 'delete') {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                    ),
-                    builder: (BuildContext context) {
-                      return ConfirmWidget(
-                        title: '${_group.name} 을(를) 삭제할까요?',
-                        text: '이 장소의 기기와 소모품을 모두 삭제합니다. \n기기를 새 장소에 등록하지 않으면 소모품 관리를 할 수 없습니다.',
-                        height: 200,
-                        onYes: () {
-                          deleteGroup(groupId);
+        appBar: AppBar(
+          title: Text(_isLoading ? '' : '${_group.name} 설정'),
+          actions: <Widget>[
+            if (!_isLoading)
+              PopupMenuButton<String>(
+                onSelected: (String result) {
+                  if (_group.myRole == ADMIN) {
+                    if (result == 'delete') {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(30)),
+                        ),
+                        builder: (BuildContext context) {
+                          return ConfirmWidget(
+                            title: '${_group.name} 을(를) 삭제할까요?',
+                            text:
+                                '이 장소의 기기와 소모품을 모두 삭제합니다. \n기기를 새 장소에 등록하지 않으면 소모품 관리를 할 수 없습니다.',
+                            height: 200,
+                            onYes: () {
+                              deleteGroup(groupId);
+                            },
+                            yesText: Text('삭제',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red)),
+                          );
                         },
-                        yesText: Text('삭제', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
                       );
-                    },
-                  );
-                }
-              } else {
-                if (result == 'leave') {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                    ),
-                    builder: (BuildContext context) {
-                      return ConfirmWidget(
-                        title: '${_group.name}에서 나가시겠어요?',
-                        text: '이 장소에 다시 접근하려면 장소 멤버의 초대가 필요합니다.',
-                        height: 180,
-                        onYes: () {
-                          leaveGroup(groupId);
+                    }
+                  } else {
+                    if (result == 'leave') {
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: Colors.transparent,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(30)),
+                        ),
+                        builder: (BuildContext context) {
+                          return ConfirmWidget(
+                            title: '${_group.name}에서 나가시겠어요?',
+                            text: '이 장소에 다시 접근하려면 장소 멤버의 초대가 필요합니다.',
+                            height: 180,
+                            onYes: () {
+                              leaveGroup(groupId);
+                            },
+                            yesText: Text('나가기',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red)),
+                          );
                         },
-                        yesText: Text('나가기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
                       );
-                    },
-                  );
-                }
-              }
-            },
-            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              _group.myRole == ADMIN ?
-              const PopupMenuItem<String>(
-                value: 'delete',
-                child: Text('장소 삭제'),
-              ) :
-              const PopupMenuItem<String>(
-                value: 'leave',
-                child: Text('장소 나가기'),
-              ),
-            ],
-          ),
-        ),
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator()) :
-        SingleChildScrollView(
-          child: Column(
-            children: [
-              ListContainerWidget(
-                  children: [
-                    ListTile(
-                      title: Text('장소 이름'),
-                      subtitle: Text(_group.name, style: TextStyle(color: Colors.indigo),
-                      ),
-                      onTap: () {
-                        _showEditDialog(context, _group.name);
-                      },
-                    ),
-                  ]
-              ),
-              ListContainerWidget(
-                  children: [
-                    SwitchListTile(
-                      title: Text('알림'),
-                      subtitle: Text('장소에 대한 알림을 받습니다.', style: TextStyle(color: Colors.indigo)),
-                      value: _group.alarm,
-                      onChanged: (value) {
-                        setState(() {
-                          toggleAlarm(value);
-                        });
-                      },
-                    ),
-                  ]
-              ),
-              ListContainerWidget(
-                children: [
-                  ListTile(
-                    title: Text('소모품 주문 내역'),
-                    onTap: () {
-                      Navigator.pushNamed(context, '/orderList', arguments: _group.id);
-                    },
+                    }
+                  }
+                },
+                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+                  PopupMenuItem<String>(
+                    value: _group.myRole == ADMIN ? 'delete' : 'leave',
+                    child: Text(_group.myRole == ADMIN ? '장소 삭제' : '장소 나가기'),
                   ),
                 ],
-              ),
-              ListContainerWidget(
-                  title: ADMIN,
-                  children: [
-                    Align(
-                        child: ListTile(
-                            title: Text(_admin.name),
-                            subtitle: Text(_admin.username, style: TextStyle(color: Colors.grey),)
-                        )
-                    ),
-                  ]
-              ),
-              ListContainerWidget(
-                title: '멤버',
-                children: [
-                  ..._groupMembers.map((member) {
-                    return ListTile(
-                      title: Text(member.name),
-                      subtitle: Text(member.role, style: TextStyle(color: Colors.indigo)),
-                      onTap: _group.myRole != ONLY_SUPPLY && userProvider.username != member.username ? () {
-                        showModalBottomSheet(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: Colors.transparent,
-                          shape: const RoundedRectangleBorder(
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                          ),
-                          builder: (BuildContext context) {
-                            return RadioWidget(
-                              title: '${member.name} 님에게 허용할 기능을 선택하세요.',
-                              choices: roles,
-                              selectedValue: member.role,
-                              onChanged: (String selectedValue) {
-                                changeMemberRole(member, selectedValue);
-                              },
-                            );
-                          },
-                        );
-                      } : null,
-                      trailing: SizedBox(
-                        width: 48,
-                        height: 48,
-                        child: GestureDetector(
-                          onTap: () {
-                            showModalBottomSheet(
-                              context: context,
-                              isScrollControlled: true,
-                              backgroundColor: Colors.transparent,
-                              shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-                              ),
-                              builder: (BuildContext context) {
-                                return ConfirmWidget(
-                                  title: '${member.name} 님을 삭제할까요?',
-                                  text: '삭제한 멤버는 ${_group.name} 기기의 소모품을 관리할 수 없게 됩니다.',
-                                  height: 170,
-                                  onYes: () {
-                                    deleteMember(member.id);
-                                  },
-                                  yesText: Text('삭제', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
-                                );
-                              },
-                            );
-                          },
-                          child: member.username != userProvider.username && (_group.myRole == ADMIN || _group.myRole == ALL_GRANTED)
-                              ? Icon(Icons.remove_circle_outline, color: Colors.red)
-                              : null,
-                        ),
-                      ),
-                    );
-                  }).toList(),
-
-                  if (_group.myRole != ONLY_SUPPLY)
-                    ListTile(
-                      leading: const CircleAvatar(
-                        backgroundColor: Colors.transparent,
-                        child: Icon(
-                          Icons.add_circle_outline,
-                          color: Colors.indigo,
-                          size: 40,
-                        ),
-                      ),
-                      title: const Text('멤버 초대'),
-                      onTap: () {
-                        print('멤버 초대 clicked!');
-                      },
-                    ),
-                ],
-              ),
-            ],
-          ),
+              )
+          ],
         ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                child: Column(
+                  children: [
+                    ListContainerWidget(children: [
+                      ListTile(
+                        title: Text('장소 이름'),
+                        subtitle: Text(
+                          _group.name,
+                          style: TextStyle(color: Colors.indigo),
+                        ),
+                        onTap: _group.myRole == ADMIN
+                            ? () => _showEditDialog(context, _group.name)
+                            : null,
+                      ),
+                    ]),
+                    ListContainerWidget(children: [
+                      SwitchListTile(
+                        title: Text('알림'),
+                        subtitle: Text('장소에 대한 알림을 받습니다.',
+                            style: TextStyle(color: Colors.indigo)),
+                        value: _group.alarm,
+                        onChanged: (value) {
+                          setState(() {
+                            toggleAlarm(value);
+                          });
+                        },
+                      ),
+                    ]),
+                    ListContainerWidget(
+                      children: [
+                        ListTile(
+                          title: Text('소모품 주문 내역'),
+                          onTap: () {
+                            Navigator.pushNamed(context, '/orderList',
+                                arguments: _group.id);
+                          },
+                        ),
+                      ],
+                    ),
+                    ListContainerWidget(title: ADMIN, children: [
+                      Align(
+                          child: ListTile(
+                              title: Text(_admin.name),
+                              subtitle: Text(
+                                _admin.username,
+                                style: TextStyle(color: Colors.grey),
+                              ))),
+                    ]),
+                    ListContainerWidget(
+                      title: '멤버',
+                      children: [
+                        ..._groupMembers.map((member) {
+                          return ListTile(
+                            title: Text(member.name),
+                            subtitle: Text(member.role,
+                                style: TextStyle(color: Colors.indigo)),
+                            onTap: _group.myRole == ADMIN &&
+                                    userProvider.username != member.username
+                                ? () {
+                                    showModalBottomSheet(
+                                      context: context,
+                                      isScrollControlled: true,
+                                      backgroundColor: Colors.transparent,
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(30)),
+                                      ),
+                                      builder: (BuildContext context) {
+                                        return RadioWidget(
+                                          title:
+                                              '${member.name} 님에게 허용할 기능을 선택하세요.',
+                                          choices: roles,
+                                          selectedValue: member.role,
+                                          onChanged: (String selectedValue) {
+                                            changeMemberRole(
+                                                member, selectedValue);
+                                          },
+                                        );
+                                      },
+                                    );
+                                  }
+                                : null,
+                            trailing: SizedBox(
+                              width: 48,
+                              height: 48,
+                              child: GestureDetector(
+                                onTap: () {
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    backgroundColor: Colors.transparent,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(30)),
+                                    ),
+                                    builder: (BuildContext context) {
+                                      return ConfirmWidget(
+                                        title: '${member.name} 님을 삭제할까요?',
+                                        text:
+                                            '삭제한 멤버는 ${_group.name} 기기의 소모품을 관리할 수 없게 됩니다.',
+                                        height: 170,
+                                        onYes: () {
+                                          deleteMember(member.id);
+                                        },
+                                        yesText: Text('삭제',
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.red)),
+                                      );
+                                    },
+                                  );
+                                },
+                                child:
+                                    member.username != userProvider.username &&
+                                            (_group.myRole == ADMIN)
+                                        ? Icon(Icons.remove_circle_outline,
+                                            color: Colors.red)
+                                        : null,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        if (_group.myRole == ADMIN)
+                          ListTile(
+                            leading: const CircleAvatar(
+                              backgroundColor: Colors.transparent,
+                              child: Icon(
+                                Icons.add_circle_outline,
+                                color: Colors.indigo,
+                                size: 40,
+                              ),
+                            ),
+                            title: const Text('멤버 초대'),
+                            onTap: () {
+                              print('멤버 초대 clicked!');
+                            },
+                          ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
       );
     });
   }

@@ -117,13 +117,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           title: const Text('내 정보'),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
                 userProvider.logout();
-                Navigator.pushReplacementNamed(context, '/login');
+                Navigator.pushNamedAndRemoveUntil(
+                    context, '/login', (route) => false);
               },
             )
           ],

@@ -101,7 +101,10 @@ class _OrderListScreenState extends State<OrderListScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const MenuBarWidget(titleText: '주문 목록'),
+      appBar: AppBar(
+        title: const Text('주문 목록'),
+        centerTitle: true,
+      ),
       body: ListView.builder(
         itemCount: orders.length,
         itemBuilder: (context, index) {

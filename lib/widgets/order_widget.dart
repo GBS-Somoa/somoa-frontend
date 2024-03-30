@@ -52,7 +52,7 @@ class OrderWidget extends StatelessWidget {
                             orderInfo['productName'] as String,
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey,
+                              color: Colors.black,
                             ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,

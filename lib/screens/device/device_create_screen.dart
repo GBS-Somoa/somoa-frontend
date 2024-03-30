@@ -19,7 +19,9 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
   TextEditingController _deviceCodeController = TextEditingController();
   TextEditingController _nicknameController = TextEditingController();
 
-  void _registerDevice() async {
+  var isChanged = false;
+
+  Future<void> _registerDevice() async {
     String deviceCode = _deviceCodeController.text;
     String nickname = _nicknameController.text;
 
@@ -48,25 +50,27 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
       );
 
       if (response.statusCode == 200) {
+        setState(() {
+          isChanged = true;
+        });
         Map<String, dynamic> responseData =
             jsonDecode(utf8.decode(response.bodyBytes));
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: const Text('기기 등록 되었습니다.'),
-            content: Text(
-              '${responseData['data']['deviceId']} \n $nickname',
-              textAlign: TextAlign.center,
-            ),
-            actions: [
-              TextButton(
-                onPressed: () =>
-                    Navigator.pushReplacementNamed(context, '/main'),
-                child: const Text('확인'),
+        Future.microtask(() => showDialog(
+              context: context,
+              builder: (context) => AlertDialog(
+                title: const Text('기기 등록 되었습니다.'),
+                content: Text(
+                  '${responseData['data']['deviceId']} \n $nickname',
+                  textAlign: TextAlign.center,
+                ),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: const Text('확인'),
+                  ),
+                ],
               ),
-            ],
-          ),
-        );
+            ));
         print(responseData);
       } else {
         print(response.body);
@@ -136,7 +140,13 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
                   FractionallySizedBox(
                     widthFactor: 0.8, // Set width to 70% of the screen width
                     child: ElevatedButton(
-                      onPressed: _registerDevice,
+                      onPressed: () async {
+                        await _registerDevice();
+                        print(isChanged);
+                        if (isChanged == true) {
+                          Navigator.pop(context, 'isChanged');
+                        }
+                      },
                       child: const Padding(
                         padding: EdgeInsets.all(10.0),
                         child: Text(

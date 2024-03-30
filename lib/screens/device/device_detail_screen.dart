@@ -22,53 +22,14 @@ class DeviceDetailScreen extends StatefulWidget {
 }
 
 class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
-  // TEST: 더미 주문 데이터 사용 여부
-  bool testmode = false;
+  void refresh() {
+    fetchDeviceData(widget.deviceId);
+  }
 
   bool isLoading = true;
   late Device deviceInfo;
 
   List<Order> orders = [];
-
-  // 임시 기기와 연관된 소모품 주문 데이터
-  List<Order> dummyOrders = [
-    Order(
-        orderId: 0,
-        supplyId: "12314kjslajtw",
-        orderStore: "SSAPANG",
-        orderStoreId: "ddfs",
-        productName: "다우니 세제 1L",
-        orderStatus: "배송 완료",
-        productImg:
-            'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-        orderCount: 1,
-        orderAmount: "1L",
-        createdAt: DateTime.parse("2024-01-24T01:30:44")),
-    Order(
-        orderId: 1,
-        supplyId: "12314kjslajtw",
-        orderStore: "SSAPANG",
-        orderStoreId: "ddfs",
-        productName: "다우니 세제 1L",
-        orderStatus: "배송 완료",
-        productImg:
-            'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-        orderCount: 1,
-        orderAmount: "1L",
-        createdAt: DateTime.parse("2024-01-24T01:30:44")),
-    Order(
-        orderId: 2,
-        supplyId: "12314kjslajtw",
-        orderStore: "SSAPANG",
-        orderStoreId: "ddfs",
-        productName: "다우니 세제 1L",
-        orderStatus: "배송 완료",
-        productImg:
-            'https://img.danawa.com/prod_img/500000/437/683/img/13683437_1.jpg?_v=20210323145912',
-        orderCount: 1,
-        orderAmount: "1L",
-        createdAt: DateTime.parse("2024-01-24T01:30:44")),
-  ];
 
   int statusSummary = 0;
 
@@ -118,14 +79,15 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       if (details.containsKey('supplyStatus') &&
           limit.containsKey('supplyStatus')) {
         if (supply.type == 'dustBin') {
-          if (details['supplyStatus'] >= limit['supplyStatus']) {
+          if (int.parse(details['supplyStatus']) >=
+              int.parse(limit['supplyStatus'])) {
             statusSummary++;
           }
         } else {
           List<String> statusOrder = ['good', 'normal', 'bad'];
           int detailIndex = statusOrder.indexOf(details['supplyStatus']);
           int limitIndex = statusOrder.indexOf(limit['supplyStatus']);
-          if (detailIndex <= limitIndex) {
+          if (detailIndex >= limitIndex) {
             statusSummary++;
           }
         }
@@ -143,6 +105,9 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
   // device 상세 정보 가져오기
   Future<void> fetchDeviceData(String deviceId) async {
+    setState(() {
+      isLoading = true;
+    });
     String serverUrl = dotenv.get("SERVER_URL");
     String? accessToken = await getAccessToken();
     String url = '${serverUrl}devices/$deviceId';
@@ -181,51 +146,49 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
   // 소모품 별 주문 데이터 가져오기
   Future<void> fetchOrderData(Device deviceInfo) async {
+    List<Future> fetchTasks = [];
+
     for (Supply supply in deviceInfo.supplies) {
       String supplyId = supply.id;
       String serverUrl = dotenv.get("SERVER_URL");
       String? accessToken = await getAccessToken();
-      String url =
-          '${serverUrl}orders?supply_id=$supplyId&order_status=Delivering';
+      String url = '${serverUrl}orders?supply_id=$supplyId&order_status=배송 중';
 
-      try {
-        http.Response response = await http.get(
-          Uri.parse(url),
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-          },
-        );
-
+      var fetchTask = http.get(
+        Uri.parse(url),
+        headers: {
+          'Authorization': 'Bearer $accessToken',
+        },
+      ).then((response) {
         if (response.statusCode == 200) {
           final String decodedBody = utf8.decode(response.bodyBytes);
           final data = json.decode(decodedBody);
-
           if (data['data'] != null) {
             final List<dynamic> ordersJson = data['data'];
-            setState(() {
-              orders =
-                  ordersJson.map((order) => Order.fromJson(order)).toList();
-              isLoading = false;
-            });
+            return ordersJson.map((order) => Order.fromJson(order)).toList();
           }
         } else {
-          print(response.body);
           print('Supply ID $supplyId에 대한 주문내역 조회 실패: ${response.statusCode}');
-          setState(() {
-            isLoading = false;
-          });
         }
-      } catch (e) {
+      }).catchError((e) {
         print('Supply ID $supplyId에 대한 주문내역 조회 실패: $e');
-      }
+      });
+
+      fetchTasks.add(fetchTask);
     }
 
-    if (testmode) {
-      setState(() {
-        orders = dummyOrders;
-        isLoading = false;
-      });
-    }
+    // 모든 주문 데이터 요청을 기다림
+    final results = await Future.wait(fetchTasks);
+
+    // null이 아닌 결과만 필터링하여 주문 리스트 업데이트
+    setState(() {
+      orders = results
+          .where((result) => result != null)
+          .expand((result) => result as List) // 각 결과를 List로 캐스팅
+          .map((item) => item as Order) // 각 아이템을 Order로 캐스팅
+          .toList();
+      isLoading = false;
+    });
   }
 
   Map<String, Object> makeOrderInfo(Order order) {
@@ -249,6 +212,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       if (response.statusCode == 200) {
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (BuildContext context) {
             return AlertDialog(
               title: const Text('삭제 성공'),
@@ -363,6 +327,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       );
 
       if (response.statusCode == 200) {
+        await fetchDeviceData(widget.deviceId);
         showDialog(
           context: context,
           builder: (context) => AlertDialog(
@@ -403,13 +368,13 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
         preferredSize: const Size.fromHeight(kToolbarHeight),
         child: AppBar(
           title: isLoading
-              ? const Text('Loading...', style: TextStyle(fontSize: 28))
+              ? const Text('', style: TextStyle(fontSize: 28))
               : Text(deviceInfo.nickname, style: const TextStyle(fontSize: 28)),
           centerTitle: true,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pushReplacementNamed(context, '/main');
+              Navigator.pop(context);
             },
           ),
           actions: [
@@ -461,6 +426,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                               onPressed: () {
                                 if (deviceName.isNotEmpty) {
                                   _changeDeviceName(deviceName);
+                                  Navigator.of(context).pop();
                                 }
                               },
                               child: const Text(
@@ -524,7 +490,10 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                         ),
                         if (deviceInfo.supplies.isNotEmpty)
                           ...deviceInfo.supplies.map((supply) => SupplyWidget(
-                              deviceId: deviceInfo.id, supplyInfo: supply))
+                                deviceId: deviceInfo.id,
+                                supplyInfo: supply,
+                                onRefresh: refresh,
+                              ))
                         else
                           const SizedBox(
                               height: 50,

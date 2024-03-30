@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -18,7 +17,6 @@ class LocationListScreen extends StatefulWidget {
 }
 
 class _LocationListScreenState extends State<LocationListScreen> {
-
   static const storage = FlutterSecureStorage();
   List<Group> groups = [];
 
@@ -97,7 +95,10 @@ class _LocationListScreenState extends State<LocationListScreen> {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
-        appBar: const MenuBarWidget(titleText: '장소 관리'),
+        appBar: AppBar(
+          title: const Text('장소 관리'),
+          centerTitle: true,
+        ),
         body: ReorderableListView(
           onReorder: (int oldIndex, int newIndex) {
             setState(() {
@@ -115,7 +116,8 @@ class _LocationListScreenState extends State<LocationListScreen> {
               child: ListContainerWidget(
                 children: [
                   ListTile(
-                    title: Text(groups[index].name, style: const TextStyle(fontSize: 20)),
+                    title: Text(groups[index].name,
+                        style: const TextStyle(fontSize: 20)),
                     subtitle: Text(
                       groups[index].managerId == userProvider.username
                           ? '관리자 : 나'
@@ -123,11 +125,16 @@ class _LocationListScreenState extends State<LocationListScreen> {
                       style: const TextStyle(color: Colors.grey),
                     ),
                     onTap: () {
-                      Navigator.pushNamed(context, '/locationSetting', arguments: groups[index].id);
+                      Navigator.pushNamed(context, '/locationSetting',
+                              arguments: groups[index].id)
+                          .then((_) {
+                        fetchData();
+                      });
                     },
                     trailing: ReorderableDragStartListener(
                       index: index,
-                      child: const Icon(Icons.menu, color: Colors.grey), // 햄버거 아이콘
+                      child:
+                          const Icon(Icons.menu, color: Colors.grey), // 햄버거 아이콘
                     ),
                   ),
                 ],
@@ -136,8 +143,7 @@ class _LocationListScreenState extends State<LocationListScreen> {
           }),
         ),
       );
-    }
-    );
+    });
   }
 }
 
@@ -148,7 +154,12 @@ class Group {
   String managerName;
   int order;
 
-  Group({required this.id, required this.name, required this.managerId, required this.managerName, required this.order});
+  Group(
+      {required this.id,
+      required this.name,
+      required this.managerId,
+      required this.managerName,
+      required this.order});
 
   factory Group.fromJson(Map<String, dynamic> json) {
     return Group(

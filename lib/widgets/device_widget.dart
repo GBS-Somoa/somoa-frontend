@@ -5,11 +5,10 @@ import 'package:somoa/widgets/water_saturation_widget.dart';
 
 class DeviceWidget extends StatelessWidget {
   final dynamic deviceInfo;
+  final VoidCallback onDeviceChanged;
 
-  const DeviceWidget({
-    super.key,
-    required this.deviceInfo,
-  });
+  const DeviceWidget(
+      {super.key, required this.deviceInfo, required this.onDeviceChanged});
 
   transformDate(String date) {
     return DateFormat('yyyy-MM-dd').format(DateTime.parse(date));
@@ -38,13 +37,15 @@ class DeviceWidget extends StatelessWidget {
                 IconButton(
                     onPressed: () {
                       // deviceDetailScreen으로 이동하는 코드
-                      Navigator.pushReplacement(
+                      Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) =>
                               DeviceDetailScreen(deviceId: deviceInfo.id),
                         ),
-                      );
+                      ).then((_) {
+                        onDeviceChanged();
+                      });
                     },
                     icon: const Icon(Icons.navigate_next, size: 35))
               ],

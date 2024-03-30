@@ -70,6 +70,7 @@ class UserProvider with ChangeNotifier {
 
   Future<bool> autoLogin() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     final keepLoggedIn = prefs.getBool('keepLoggedIn') ?? false;
 
     if (!keepLoggedIn) {
@@ -109,6 +110,7 @@ class UserProvider with ChangeNotifier {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.reload();
     await prefs.setBool('keepLoggedIn', false);
 
     _username = null;
