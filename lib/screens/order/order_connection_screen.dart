@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:somoa/screens/order/recent_order.dart';
+import 'package:somoa/services/api_services.dart';
 import 'package:somoa/widgets/menu_bar_widget.dart';
 import 'package:somoa/widgets/shop_purchase_button.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 // deviceModel, supplyType, supplyId, manufacture를 받아서 supplyId를 기반으로 최근 주문내역 조회요청을 보내고 응답이 있으면 해당 응답으로부터 productName, productImg(url)를 받아서 상단에 렌더링하고, 아래쪽에는 SSAG에서 구매, SSAPANG에서 구매, 공식몰에서 구매 버튼을 렌더링하는 OrderConnectionScreen
 // 쇼핑몰 구매 링크에는 userId={username}, groupId, supplyId, keyword={검색어}를 포함
@@ -30,27 +32,12 @@ class OrderConnectionScreen extends StatefulWidget {
 }
 
 class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
-  String productName = '';
-  String productImgUrl = '';
+  late Future<List<RecentOrder>> recentOrder;
 
   @override
   void initState() {
     super.initState();
-    fetchOrderDetails();
-  }
-
-  void fetchOrderDetails() {
-    // Send request to retrieve recent order details based on supplyId
-    // Make an API call or perform any necessary logic here
-
-    // Simulating a response
-    Future.delayed(const Duration(seconds: 2), () {
-      setState(() {
-        // Update the productName and productImgUrl with the received response data
-        productName = 'Example Product';
-        productImgUrl = 'https://example.com/product-image.jpg';
-      });
-    });
+    recentOrder = getRecentOrder("$widget.deviceModel");
   }
 
   @override
@@ -80,6 +67,30 @@ class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
       ),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: FutureBuilder(
+              future: recentOrder,
+              builder: (context, snapshot) {
+                if (snapshot.hasData == false) {
+                  // data 로딩 중
+                  return const Text("최근 구매한 제품을 불러오는 중입니다.");
+                } else if (snapshot.hasError) {
+                  // 에러
+                  print("에러: ${snapshot.error}");
+                  return const Text("최근 구매한 제품을 불러오지 못했습니다.");
+                } else {
+                  // 성공
+                  List<RecentOrder>? rol = snapshot.data;
+                  if (rol != null && rol.isNotEmpty) {
+                    return recentPurchase(rol[0]);
+                  } else {
+                    return const Text("최근 구매한 제품이 없습니다.");
+                  }
+                }
+              },
+            ),
+          ),
           const SizedBox(
             height: 20,
           ),
@@ -102,4 +113,48 @@ class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
       ),
     );
   }
+}
+
+Widget recentPurchase(RecentOrder recentOrder) {
+  return Column(
+    children: [
+      const Text(
+        "최근 구매한 제품",
+        style: TextStyle(fontSize: 20),
+      ),
+      const SizedBox(height: 10),
+      Image.network(
+        recentOrder.productImg,
+        height: 200,
+        width: 200,
+      ),
+      const SizedBox(height: 10),
+      Text(
+        recentOrder.productName,
+        style: const TextStyle(
+          fontSize: 15,
+        ),
+      ),
+      const SizedBox(height: 10),
+      ElevatedButton(
+        onPressed: () {
+          launchUrl(
+            Uri.parse('https://shop.somoa.net/products'
+                '?keyword=${recentOrder.productName}'),
+            mode: LaunchMode.inAppBrowserView,
+          );
+        },
+        style: ButtonStyle(
+          minimumSize: MaterialStateProperty.all(const Size(300, 50)),
+        ),
+        child: const Text(
+          '같은 제품 재구매하기',
+          style: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      )
+    ],
+  );
 }
