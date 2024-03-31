@@ -21,29 +21,30 @@ class ConfirmWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.all(10),
+      padding: const EdgeInsets.all(10),
       child: Container(
-        padding: EdgeInsets.fromLTRB(25, 20, 25, 0),
+        padding: const EdgeInsets.fromLTRB(25, 0, 25, 0),
         height: height,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(30),
-        ),
+      ),
         child: Column(
-          children: [
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // 여기를 수정했습니다.
+          children: <Widget>[
             Text(
               title,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
             ),
-            SizedBox(height: 10),
             Text(
               text,
               style: TextStyle(fontSize: 15),
+              textAlign: TextAlign.start,
             ),
-            SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
+              children: <Widget>[
                 TextButton(
                   child: noText,
                   onPressed: () => Navigator.pop(context),
