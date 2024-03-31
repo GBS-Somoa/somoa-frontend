@@ -112,6 +112,7 @@ class UserProvider with ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.reload();
     await prefs.setBool('keepLoggedIn', false);
+    await prefs.setString('notifications', '[]');
 
     _username = null;
 

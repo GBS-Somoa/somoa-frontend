@@ -80,8 +80,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       if (details.containsKey('supplyStatus') &&
           limit.containsKey('supplyStatus')) {
         if (supply.type == 'dustBin') {
-          if (int.parse(details['supplyStatus']) >=
-              int.parse(limit['supplyStatus'])) {
+          if (details['supplyStatus'] >= limit['supplyStatus']) {
             statusSummary++;
           }
         } else {
