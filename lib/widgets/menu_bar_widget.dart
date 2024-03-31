@@ -7,6 +7,7 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final bool showExtraMenu;
   final PopupMenuButton Function()? buildPopupMenuButton;
+  final bool automaticallyImplyLeading;
 
   const MenuBarWidget({
     super.key,
@@ -16,6 +17,7 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
     this.title,
     this.showExtraMenu = false,
     this.buildPopupMenuButton,
+    this.automaticallyImplyLeading = true,
   });
 
   @override
@@ -35,6 +37,7 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
             actions: showExtraMenu && buildPopupMenuButton != null ? [
               buildPopupMenuButton!(),
             ] : [],
+            automaticallyImplyLeading: automaticallyImplyLeading,
           ),
         ),
       ],
