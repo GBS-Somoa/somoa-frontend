@@ -5,24 +5,32 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:somoa/models/device_model.dart';
+import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_detail_screen.dart';
+import 'package:somoa/screens/order/order_connection_screen.dart';
 
 class SupplyWidget extends StatelessWidget {
   final String deviceId;
   final dynamic supplyInfo;
   final VoidCallback onRefresh;
+  final dynamic deviceInfo;
+  final String groupId;
 
   const SupplyWidget({
     super.key,
     required this.deviceId,
     required this.supplyInfo,
     required this.onRefresh,
+    required this.deviceInfo,
+    required this.groupId,
   });
 
   Future<String?> getAccessToken() async {
-    final storage = FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     return await storage.read(key: 'accessToken');
   }
 
@@ -39,7 +47,7 @@ class SupplyWidget extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.done) {
               return snapshot.data!;
             } else {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             }
           },
         );
@@ -107,7 +115,7 @@ class SupplyWidget extends StatelessWidget {
               children: [
                 Text(supplyInfo.name),
                 isSupplyAmountTmp
-                    ? Text('${supplyAmount}(+${supplyInfo.supplyAmountTmp})ml')
+                    ? Text('$supplyAmount(+${supplyInfo.supplyAmountTmp})ml')
                     : Text('${supplyAmount}ml'),
               ],
             ),
@@ -132,7 +140,7 @@ class SupplyWidget extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isSupplyAmountTmp
                                   ? Colors.lightGreen[200]
-                                  : Color.fromARGB(255, 219, 219, 219),
+                                  : const Color.fromARGB(255, 219, 219, 219),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
@@ -220,6 +228,21 @@ class SupplyWidget extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Add functionality to purchase consumables button
+                    var userProvider =
+                        Provider.of<UserProvider>(context, listen: false);
+                    var username = userProvider.username;
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => OrderConnectionScreen(
+                                  deviceModel: deviceInfo.model.toString(),
+                                  supplyType: supplyInfo.type.toString(),
+                                  supplyId: supplyInfo.id.toString(),
+                                  manufacture:
+                                      deviceInfo.manufacturer.toString(),
+                                  username: username.toString(),
+                                  groupId: groupId,
+                                )));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
@@ -320,7 +343,7 @@ class SupplyWidget extends StatelessWidget {
                             width: double.infinity,
                             height: double.infinity,
                             decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 219, 219, 219),
+                              color: const Color.fromARGB(255, 219, 219, 219),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
@@ -418,6 +441,22 @@ class SupplyWidget extends StatelessWidget {
                     : ElevatedButton(
                         onPressed: () {
                           // Add functionality to purchase consumables button
+                          var userProvider =
+                              Provider.of<UserProvider>(context, listen: false);
+                          var username = userProvider.username;
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => OrderConnectionScreen(
+                                        deviceModel:
+                                            deviceInfo.model.toString(),
+                                        supplyType: supplyInfo.type.toString(),
+                                        supplyId: supplyInfo.id.toString(),
+                                        manufacture:
+                                            deviceInfo.manufacturer.toString(),
+                                        username: username.toString(),
+                                        groupId: groupId,
+                                      )));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey[300],
@@ -494,7 +533,7 @@ class SupplyWidget extends StatelessWidget {
                             width: double.infinity,
                             height: double.infinity,
                             decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 219, 219, 219),
+                              color: const Color.fromARGB(255, 219, 219, 219),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
@@ -735,6 +774,21 @@ class SupplyWidget extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Add functionality to purchase consumables button
+                    var userProvider =
+                        Provider.of<UserProvider>(context, listen: false);
+                    var username = userProvider.username;
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => OrderConnectionScreen(
+                                  deviceModel: deviceInfo.model.toString(),
+                                  supplyType: supplyInfo.type.toString(),
+                                  supplyId: supplyInfo.id.toString(),
+                                  manufacture:
+                                      deviceInfo.manufacturer.toString(),
+                                  username: username.toString(),
+                                  groupId: groupId,
+                                )));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
@@ -814,7 +868,7 @@ class SupplyWidget extends StatelessWidget {
 
   // 보유량 변경 다이얼로그
   void _showSupplyAmountChangeDialog(BuildContext context) {
-    TextEditingController _controller = TextEditingController();
+    TextEditingController controller = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -825,7 +879,7 @@ class SupplyWidget extends StatelessWidget {
             style: const TextStyle(fontSize: 20),
           ),
           content: TextFormField(
-            controller: _controller,
+            controller: controller,
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // 숫자만 입력 허용
@@ -838,7 +892,7 @@ class SupplyWidget extends StatelessWidget {
           actions: <Widget>[
             ElevatedButton(
               onPressed: () {
-                String newValue = _controller.text;
+                String newValue = controller.text;
                 // 보유량 변경 api 호출
                 _changeSupplyAmount(
                     context, int.parse(newValue), deviceId, supplyInfo.id);

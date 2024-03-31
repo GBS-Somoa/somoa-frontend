@@ -15,8 +15,10 @@ import 'package:somoa/widgets/supply_widget.dart';
 
 class DeviceDetailScreen extends StatefulWidget {
   final String deviceId;
+  final String groupId;
 
-  DeviceDetailScreen({super.key, required this.deviceId});
+  DeviceDetailScreen(
+      {super.key, required this.deviceId, required this.groupId});
 
   @override
   _DeviceDetailScreenState createState() => _DeviceDetailScreenState();
@@ -364,84 +366,85 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: isLoading ? MenuBarWidget(titleText: '') :
-      MenuBarWidget(
-        titleText: isLoading ? '' : deviceInfo.nickname,
-        showExtraMenu: true,
-        buildPopupMenuButton: () {
-          return PopupMenuButton<String>(
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                child: const Text('기기 정보'),
-                onTap: () {
-                  // deviceInfoScreen으로 이동하는 코드
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DeviceInfoScreen(
-                        deviceInfo: deviceInfo,
-                      ),
-                    ),
-                  );
-                },
-              ),
-              PopupMenuItem<String>(
-                child: const Text('이름 변경'),
-                onTap: () {
-                  showDialog(
-                    context: context,
-                    builder: (BuildContext context) {
-                      String deviceName = '';
-                      return AlertDialog(
-                        title: const Text(
-                          '기기 이름 변경',
-                          textAlign: TextAlign.center,
-                        ),
-                        content: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            TextField(
-                              onChanged: (value) {
-                                deviceName = value;
-                              },
-                              decoration: const InputDecoration(
-                                  hintText: "변경할 이름 입력",
-                                  border: OutlineInputBorder(
-                                      borderSide:
-                                          BorderSide(color: Colors.black))),
-                            ),
-                          ],
-                        ),
-                        actions: [
-                          ElevatedButton(
-                            onPressed: () {
-                              if (deviceName.isNotEmpty) {
-                                _changeDeviceName(deviceName);
-                                Navigator.of(context).pop();
-                              }
-                            },
-                            child: const Text(
-                              '확인',
-                              style: TextStyle(fontSize: 15),
+      appBar: isLoading
+          ? MenuBarWidget(titleText: '')
+          : MenuBarWidget(
+              titleText: isLoading ? '' : deviceInfo.nickname,
+              showExtraMenu: true,
+              buildPopupMenuButton: () {
+                return PopupMenuButton<String>(
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem<String>(
+                      child: const Text('기기 정보'),
+                      onTap: () {
+                        // deviceInfoScreen으로 이동하는 코드
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DeviceInfoScreen(
+                              deviceInfo: deviceInfo,
                             ),
                           ),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-              PopupMenuItem<String>(
-                child:
-                    const Text('기기 삭제', style: TextStyle(color: Colors.red)),
-                onTap: () {
-                  deleteDevice(context, deviceInfo.id);
-                },
-              ),
-            ],
-          );
-        },
-      ),
+                        );
+                      },
+                    ),
+                    PopupMenuItem<String>(
+                      child: const Text('이름 변경'),
+                      onTap: () {
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            String deviceName = '';
+                            return AlertDialog(
+                              title: const Text(
+                                '기기 이름 변경',
+                                textAlign: TextAlign.center,
+                              ),
+                              content: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  TextField(
+                                    onChanged: (value) {
+                                      deviceName = value;
+                                    },
+                                    decoration: const InputDecoration(
+                                        hintText: "변경할 이름 입력",
+                                        border: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.black))),
+                                  ),
+                                ],
+                              ),
+                              actions: [
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (deviceName.isNotEmpty) {
+                                      _changeDeviceName(deviceName);
+                                      Navigator.of(context).pop();
+                                    }
+                                  },
+                                  child: const Text(
+                                    '확인',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      },
+                    ),
+                    PopupMenuItem<String>(
+                      child: const Text('기기 삭제',
+                          style: TextStyle(color: Colors.red)),
+                      onTap: () {
+                        deleteDevice(context, deviceInfo.id);
+                      },
+                    ),
+                  ],
+                );
+              },
+            ),
       body: isLoading
           ? const Center(
               child: CircularProgressIndicator(),
@@ -483,6 +486,8 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
                                 deviceId: deviceInfo.id,
                                 supplyInfo: supply,
                                 onRefresh: refresh,
+                                deviceInfo: deviceInfo,
+                                groupId: widget.groupId,
                               ))
                         else
                           const SizedBox(
