@@ -242,7 +242,9 @@ class SupplyWidget extends StatelessWidget {
                                       deviceInfo.manufacturer.toString(),
                                   username: username.toString(),
                                   groupId: groupId,
-                                )));
+                                ))).then((_) {
+                      onRefresh();
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
@@ -456,7 +458,9 @@ class SupplyWidget extends StatelessWidget {
                                             deviceInfo.manufacturer.toString(),
                                         username: username.toString(),
                                         groupId: groupId,
-                                      )));
+                                      ))).then((_) {
+                            onRefresh();
+                          });
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey[300],
@@ -788,7 +792,9 @@ class SupplyWidget extends StatelessWidget {
                                       deviceInfo.manufacturer.toString(),
                                   username: username.toString(),
                                   groupId: groupId,
-                                )));
+                                ))).then((_) {
+                      onRefresh();
+                    });
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
