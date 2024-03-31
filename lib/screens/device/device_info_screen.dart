@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:somoa/widgets/menu_bar_widget.dart';
 
 class DeviceInfoScreen extends StatelessWidget {
   final dynamic deviceInfo;
@@ -8,8 +9,8 @@ class DeviceInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('기기 정보'),
+      appBar: const MenuBarWidget(
+        titleText: '기기 정보',
       ),
       body: Center(
         child: Padding(
