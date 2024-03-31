@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:somoa/screens/device/device_detail_screen.dart';
+import 'package:somoa/screens/order/order_connection_screen.dart';
 
 class SupplyWidget extends StatelessWidget {
   final String deviceId;
@@ -22,7 +23,7 @@ class SupplyWidget extends StatelessWidget {
   });
 
   Future<String?> getAccessToken() async {
-    final storage = FlutterSecureStorage();
+    const storage = FlutterSecureStorage();
     return await storage.read(key: 'accessToken');
   }
 
@@ -39,7 +40,7 @@ class SupplyWidget extends StatelessWidget {
             if (snapshot.connectionState == ConnectionState.done) {
               return snapshot.data!;
             } else {
-              return CircularProgressIndicator();
+              return const CircularProgressIndicator();
             }
           },
         );
@@ -107,7 +108,7 @@ class SupplyWidget extends StatelessWidget {
               children: [
                 Text(supplyInfo.name),
                 isSupplyAmountTmp
-                    ? Text('${supplyAmount}(+${supplyInfo.supplyAmountTmp})ml')
+                    ? Text('$supplyAmount(+${supplyInfo.supplyAmountTmp})ml')
                     : Text('${supplyAmount}ml'),
               ],
             ),
@@ -132,7 +133,7 @@ class SupplyWidget extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: isSupplyAmountTmp
                                   ? Colors.lightGreen[200]
-                                  : Color.fromARGB(255, 219, 219, 219),
+                                  : const Color.fromARGB(255, 219, 219, 219),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
@@ -220,6 +221,17 @@ class SupplyWidget extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Add functionality to purchase consumables button
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const OrderConnectionScreen(
+                                  deviceModel: "기기명",
+                                  supplyType: "washerDetergent",
+                                  supplyId: "소모품명",
+                                  manufacture: "제조사명",
+                                  username: "유저명",
+                                  groupId: "그룹id",
+                                )));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
@@ -320,7 +332,7 @@ class SupplyWidget extends StatelessWidget {
                             width: double.infinity,
                             height: double.infinity,
                             decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 219, 219, 219),
+                              color: const Color.fromARGB(255, 219, 219, 219),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
@@ -418,6 +430,18 @@ class SupplyWidget extends StatelessWidget {
                     : ElevatedButton(
                         onPressed: () {
                           // Add functionality to purchase consumables button
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const OrderConnectionScreen(
+                                        deviceModel: "기기명",
+                                        supplyType: "washerDetergent",
+                                        supplyId: "소모품명",
+                                        manufacture: "제조사명",
+                                        username: "유저명",
+                                        groupId: "그룹id",
+                                      )));
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey[300],
@@ -494,7 +518,7 @@ class SupplyWidget extends StatelessWidget {
                             width: double.infinity,
                             height: double.infinity,
                             decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 219, 219, 219),
+                              color: const Color.fromARGB(255, 219, 219, 219),
                               borderRadius: BorderRadius.circular(10.0),
                             ),
                           ),
@@ -735,6 +759,17 @@ class SupplyWidget extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Add functionality to purchase consumables button
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const OrderConnectionScreen(
+                                  deviceModel: "기기명",
+                                  supplyType: "washerDetergent",
+                                  supplyId: "소모품명",
+                                  manufacture: "제조사명",
+                                  username: "유저명",
+                                  groupId: "그룹id",
+                                )));
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.grey[300],
@@ -814,7 +849,7 @@ class SupplyWidget extends StatelessWidget {
 
   // 보유량 변경 다이얼로그
   void _showSupplyAmountChangeDialog(BuildContext context) {
-    TextEditingController _controller = TextEditingController();
+    TextEditingController controller = TextEditingController();
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -825,7 +860,7 @@ class SupplyWidget extends StatelessWidget {
             style: const TextStyle(fontSize: 20),
           ),
           content: TextFormField(
-            controller: _controller,
+            controller: controller,
             keyboardType: TextInputType.number,
             inputFormatters: <TextInputFormatter>[
               FilteringTextInputFormatter.allow(RegExp(r'[0-9]')), // 숫자만 입력 허용
@@ -838,7 +873,7 @@ class SupplyWidget extends StatelessWidget {
           actions: <Widget>[
             ElevatedButton(
               onPressed: () {
-                String newValue = _controller.text;
+                String newValue = controller.text;
                 // 보유량 변경 api 호출
                 _changeSupplyAmount(
                     context, int.parse(newValue), deviceId, supplyInfo.id);
