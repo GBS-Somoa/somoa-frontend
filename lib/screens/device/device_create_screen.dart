@@ -58,9 +58,9 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
         Future.microtask(() => showDialog(
               context: context,
               builder: (context) => AlertDialog(
-                title: const Text('기기 등록 되었습니다.'),
+                title: const Text('등록 성공'),
                 content: Text(
-                  '${responseData['data']['deviceId']} \n $nickname',
+                  '기기가 등록되었습니다.\nID : ${responseData['data']['deviceId']}\n기기 이름 : $nickname',
                   textAlign: TextAlign.center,
                 ),
                 actions: [
