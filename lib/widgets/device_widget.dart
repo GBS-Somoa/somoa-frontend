@@ -6,9 +6,13 @@ import 'package:somoa/widgets/water_saturation_widget.dart';
 class DeviceWidget extends StatelessWidget {
   final dynamic deviceInfo;
   final VoidCallback onDeviceChanged;
+  final String groupId;
 
   const DeviceWidget(
-      {super.key, required this.deviceInfo, required this.onDeviceChanged});
+      {super.key,
+      required this.deviceInfo,
+      required this.onDeviceChanged,
+      required this.groupId});
 
   transformDate(String date) {
     return DateFormat('yyyy-MM-dd').format(DateTime.parse(date));
@@ -40,8 +44,8 @@ class DeviceWidget extends StatelessWidget {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              DeviceDetailScreen(deviceId: deviceInfo.id),
+                          builder: (context) => DeviceDetailScreen(
+                              deviceId: deviceInfo.id, groupId: groupId),
                         ),
                       ).then((_) {
                         onDeviceChanged();

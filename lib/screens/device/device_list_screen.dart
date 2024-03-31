@@ -175,9 +175,9 @@ class _DeviceScreenState extends State<DeviceScreen> {
         title: isLoading
             ? const Text('', style: TextStyle(fontSize: 28))
             : Column(
-              children: [
-                SizedBox(height: 25),
-                Row(
+                children: [
+                  SizedBox(height: 25),
+                  Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Row(
@@ -186,14 +186,16 @@ class _DeviceScreenState extends State<DeviceScreen> {
                           SizedBox(
                             width: 150.0,
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 10.0),
                               child: DropdownButton<int>(
                                 isExpanded: true,
                                 value: _selectedLocation,
                                 onChanged: (newValue) {
                                   setState(() {
                                     _selectedLocation = newValue!;
-                                    fetchDeviceData(_selectedLocation.toString());
+                                    fetchDeviceData(
+                                        _selectedLocation.toString());
                                   });
                                 },
                                 items: locationList
@@ -240,7 +242,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                                   hintText: "장소 이름을 입력하세요",
                                                   border: OutlineInputBorder(
                                                       borderSide: BorderSide(
-                                                          color: Colors.black))),
+                                                          color:
+                                                              Colors.black))),
                                             ),
                                           ],
                                         ),
@@ -267,7 +270,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                 value: '장소 관리',
                                 child: const Text('장소 관리'),
                                 onTap: () {
-                                  Navigator.pushNamed(context, '/locationSetting',
+                                  Navigator.pushNamed(
+                                          context, '/locationSetting',
                                           arguments: _selectedLocation)
                                       .then((_) {
                                     fetchLocationData();
@@ -283,11 +287,13 @@ class _DeviceScreenState extends State<DeviceScreen> {
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => DeviceCreateScreen(
-                                          groupId: _selectedLocation.toString()),
+                                          groupId:
+                                              _selectedLocation.toString()),
                                     ),
                                   ).then((result) {
                                     if (result != null) {
-                                      fetchDeviceData(_selectedLocation.toString());
+                                      fetchDeviceData(
+                                          _selectedLocation.toString());
                                     }
                                   });
                                 },
@@ -307,8 +313,8 @@ class _DeviceScreenState extends State<DeviceScreen> {
                       ),
                     ],
                   ),
-              ],
-            ),
+                ],
+              ),
       ),
       body: isLoading
           ? const Center(
@@ -322,6 +328,7 @@ class _DeviceScreenState extends State<DeviceScreen> {
                             .map((device) => DeviceWidget(
                                   deviceInfo: device,
                                   onDeviceChanged: refreshDevices,
+                                  groupId: _selectedLocation.toString(),
                                 ))
                             .toList(),
                       )

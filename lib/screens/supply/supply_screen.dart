@@ -363,9 +363,14 @@ class _SupplyScreenState extends State<SupplyScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 DeviceDetailScreen(
-                                                    deviceId: careNeedSupply[
-                                                            'change']![i]
-                                                        ['deviceId']),
+                                              deviceId:
+                                                  careNeedSupply['change']![i]
+                                                      ['deviceId'],
+                                              groupId:
+                                                  careNeedSupply['change']![i]
+                                                          ['groupId']
+                                                      .toString(),
+                                            ),
                                           ),
                                         ).then((_) {
                                           fetchData();
@@ -428,8 +433,13 @@ class _SupplyScreenState extends State<SupplyScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 DeviceDetailScreen(
-                                                    deviceId: careNeedSupply[
-                                                        'add']![i]['deviceId']),
+                                              deviceId:
+                                                  careNeedSupply['add']![i]
+                                                      ['deviceId'],
+                                              groupId: careNeedSupply['add']![i]
+                                                      ['groupId']
+                                                  .toString(),
+                                            ),
                                           ),
                                         ).then((_) {
                                           fetchData();
@@ -490,9 +500,14 @@ class _SupplyScreenState extends State<SupplyScreen> {
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 DeviceDetailScreen(
-                                                    deviceId: careNeedSupply[
-                                                            'clean']![i]
-                                                        ['deviceId']),
+                                              deviceId:
+                                                  careNeedSupply['clean']![i]
+                                                      ['deviceId'],
+                                              groupId:
+                                                  careNeedSupply['clean']![i]
+                                                          ['groupId']
+                                                      .toString(),
+                                            ),
                                           ),
                                         ).then((_) {
                                           fetchData();

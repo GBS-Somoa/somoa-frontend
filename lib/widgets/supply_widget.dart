@@ -5,8 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:somoa/models/device_model.dart';
+import 'package:somoa/providers/user_provider.dart';
 import 'package:somoa/screens/device/device_detail_screen.dart';
 import 'package:somoa/screens/order/order_connection_screen.dart';
 
@@ -14,12 +17,16 @@ class SupplyWidget extends StatelessWidget {
   final String deviceId;
   final dynamic supplyInfo;
   final VoidCallback onRefresh;
+  final dynamic deviceInfo;
+  final String groupId;
 
   const SupplyWidget({
     super.key,
     required this.deviceId,
     required this.supplyInfo,
     required this.onRefresh,
+    required this.deviceInfo,
+    required this.groupId,
   });
 
   Future<String?> getAccessToken() async {
@@ -221,16 +228,20 @@ class SupplyWidget extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Add functionality to purchase consumables button
+                    var userProvider =
+                        Provider.of<UserProvider>(context, listen: false);
+                    var username = userProvider.username;
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const OrderConnectionScreen(
-                                  deviceModel: "기기명",
-                                  supplyType: "washerDetergent",
-                                  supplyId: "소모품명",
-                                  manufacture: "제조사명",
-                                  username: "유저명",
-                                  groupId: "그룹id",
+                            builder: (context) => OrderConnectionScreen(
+                                  deviceModel: deviceInfo.model.toString(),
+                                  supplyType: supplyInfo.type.toString(),
+                                  supplyId: supplyInfo.id.toString(),
+                                  manufacture:
+                                      deviceInfo.manufacturer.toString(),
+                                  username: username.toString(),
+                                  groupId: groupId,
                                 )));
                   },
                   style: ElevatedButton.styleFrom(
@@ -430,17 +441,21 @@ class SupplyWidget extends StatelessWidget {
                     : ElevatedButton(
                         onPressed: () {
                           // Add functionality to purchase consumables button
+                          var userProvider =
+                              Provider.of<UserProvider>(context, listen: false);
+                          var username = userProvider.username;
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      const OrderConnectionScreen(
-                                        deviceModel: "기기명",
-                                        supplyType: "washerDetergent",
-                                        supplyId: "소모품명",
-                                        manufacture: "제조사명",
-                                        username: "유저명",
-                                        groupId: "그룹id",
+                                  builder: (context) => OrderConnectionScreen(
+                                        deviceModel:
+                                            deviceInfo.model.toString(),
+                                        supplyType: supplyInfo.type.toString(),
+                                        supplyId: supplyInfo.id.toString(),
+                                        manufacture:
+                                            deviceInfo.manufacturer.toString(),
+                                        username: username.toString(),
+                                        groupId: groupId,
                                       )));
                         },
                         style: ElevatedButton.styleFrom(
@@ -759,16 +774,20 @@ class SupplyWidget extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     // Add functionality to purchase consumables button
+                    var userProvider =
+                        Provider.of<UserProvider>(context, listen: false);
+                    var username = userProvider.username;
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const OrderConnectionScreen(
-                                  deviceModel: "기기명",
-                                  supplyType: "washerDetergent",
-                                  supplyId: "소모품명",
-                                  manufacture: "제조사명",
-                                  username: "유저명",
-                                  groupId: "그룹id",
+                            builder: (context) => OrderConnectionScreen(
+                                  deviceModel: deviceInfo.model.toString(),
+                                  supplyType: supplyInfo.type.toString(),
+                                  supplyId: supplyInfo.id.toString(),
+                                  manufacture:
+                                      deviceInfo.manufacturer.toString(),
+                                  username: username.toString(),
+                                  groupId: groupId,
                                 )));
                   },
                   style: ElevatedButton.styleFrom(

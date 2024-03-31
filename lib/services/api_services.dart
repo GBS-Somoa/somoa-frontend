@@ -15,7 +15,7 @@ Future<String?> getAccessToken() async {
 Future<List<RecentOrder>> getRecentOrder(String supplyId) async {
   final accessToken = await getAccessToken();
   String serverUrl = dotenv.get("SERVER_URL");
-  final url = Uri.parse('$serverUrl' 'orders?supply_id=$supplyId?size=1');
+  final url = Uri.parse('$serverUrl' 'orders?supply_id=$supplyId&size=1');
 
   final response = await http.get(
     url,
@@ -26,6 +26,7 @@ Future<List<RecentOrder>> getRecentOrder(String supplyId) async {
 
   if (response.statusCode == 200) {
     final data = json.decode(utf8.decode(response.bodyBytes));
+    print(data);
     if (data["data"] != null) {
       final List<dynamic> json = data['data'];
       return json.map((r) => RecentOrder.fromJson(r)).toList();

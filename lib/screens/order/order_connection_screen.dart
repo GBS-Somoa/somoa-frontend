@@ -37,7 +37,7 @@ class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
   @override
   void initState() {
     super.initState();
-    recentOrder = getRecentOrder("$widget.deviceModel");
+    recentOrder = getRecentOrder(widget.supplyId);
   }
 
   @override
@@ -50,12 +50,12 @@ class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
     ].contains(widget.supplyType);
 
     Map<String, String> title = {
-      "washerDetergent": "세탁 세제",
+      "washerDetergent": "세탁세제",
       "fabricSoftener": "섬유유연제",
       "dishDetergent": "식기세척기 세제",
       "dishRinse": "식기세척기 린스",
-      "cleanableFilter": "청소 필터",
-      "replaceableFilter": "교체 필터",
+      "cleanableFilter": "청소형 필터",
+      "replaceableFilter": "교체형 필터",
       "supplyTank": "급수통",
       "drainTank": "배수통",
       "dustBin": "먼지통",
@@ -83,7 +83,8 @@ class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
                   // 성공
                   List<RecentOrder>? rol = snapshot.data;
                   if (rol != null && rol.isNotEmpty) {
-                    return recentPurchase(rol[0]);
+                    return recentPurchase(
+                        rol[0], widget.username, widget.groupId);
                   } else {
                     return const Text("최근 구매한 제품이 없습니다.");
                   }
@@ -94,10 +95,13 @@ class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
           const SizedBox(
             height: 20,
           ),
-          const ShopPurchaseButton(
+          ShopPurchaseButton(
             shopName: "SSAG",
             // 여기서 url 만들어서 넘기면 됨
-            url: "https://shop.somoa.net/products",
+            url: widget.supplyType == "cleanableFilter" ||
+                    widget.supplyType == "replaceableFilter"
+                ? "https://shop.somoa.net/products?user_id=${widget.username}&group_id=${widget.groupId}&supply_id=${widget.supplyId}&keyword=${widget.deviceModel}"
+                : "https://shop.somoa.net/products?user_id=${widget.username}&group_id=${widget.groupId}&supply_id=${widget.supplyId}&keyword=${title[widget.supplyType]}",
           ),
           const ShopPurchaseButton(
             shopName: "SSAPANG",
@@ -115,7 +119,8 @@ class _OrderConnectionScreenState extends State<OrderConnectionScreen> {
   }
 }
 
-Widget recentPurchase(RecentOrder recentOrder) {
+Widget recentPurchase(
+    RecentOrder recentOrder, String username, String groupId) {
   return Column(
     children: [
       const Text(
@@ -140,7 +145,7 @@ Widget recentPurchase(RecentOrder recentOrder) {
         onPressed: () {
           launchUrl(
             Uri.parse('https://shop.somoa.net/products'
-                '?keyword=${recentOrder.productName}'),
+                '?user_id=${username}&group_id=${groupId}&supply_id=${recentOrder.supplyId}&keyword=${recentOrder.productName}'),
             mode: LaunchMode.inAppBrowserView,
           );
         },

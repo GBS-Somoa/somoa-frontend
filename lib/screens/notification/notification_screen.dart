@@ -274,11 +274,13 @@ class _NotificationScreenState extends State<NotificationScreen>
                                                       Navigator.push(
                                                           context,
                                                           MaterialPageRoute(
-                                                              builder: (context) =>
-                                                                  DeviceDetailScreen(
-                                                                      deviceId:
-                                                                          data['pathData']
-                                                                              as String)));
+                                                              builder: (context) => DeviceDetailScreen(
+                                                                  deviceId: data[
+                                                                          'pathData']
+                                                                      as String,
+                                                                  groupId: data[
+                                                                          'groupId']
+                                                                      as String)));
                                                     } else if (path ==
                                                         'OrderListScreen') {
                                                       Navigator.push(
