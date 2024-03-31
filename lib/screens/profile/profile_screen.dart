@@ -118,7 +118,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return Scaffold(
         appBar: AppBar(
           automaticallyImplyLeading: false,
-          title: const Text('내 정보'),
+          title: const Text(''),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),

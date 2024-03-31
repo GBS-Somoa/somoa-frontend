@@ -5,6 +5,7 @@ import 'package:somoa/screens/device/device_qr_scan.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/services/api_services.dart';
+import 'package:somoa/widgets/menu_bar_widget.dart';
 
 class DeviceCreateScreen extends StatefulWidget {
   final String groupId;
@@ -98,8 +99,8 @@ class _DeviceCreateScreenState extends State<DeviceCreateScreen> {
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('기기 추가'),
+        appBar: const MenuBarWidget(
+          titleText: '기기 추가',
         ),
         body: Padding(
           padding: const EdgeInsets.all(30.0),

@@ -95,9 +95,8 @@ class _LocationListScreenState extends State<LocationListScreen> {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
-        appBar: AppBar(
-          title: const Text('장소 관리'),
-          centerTitle: true,
+        appBar: const MenuBarWidget(
+          titleText: '장소 관리',
         ),
         body: ReorderableListView(
           onReorder: (int oldIndex, int newIndex) {

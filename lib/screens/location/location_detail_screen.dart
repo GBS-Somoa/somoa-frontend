@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:somoa/widgets/menu_bar_widget.dart';
 
 class LocationDetailScreen extends StatefulWidget {
   @override
@@ -15,8 +16,8 @@ class _LocationDetailScreenState extends State<LocationDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Location Detail'),
+      appBar: const MenuBarWidget(
+        titleText: 'Location Detail',
       ),
       body: Column(
         children: [

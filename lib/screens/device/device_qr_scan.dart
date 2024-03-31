@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_code_scanner/qr_code_scanner.dart';
+import 'package:somoa/widgets/menu_bar_widget.dart';
 
 class QrScan extends StatefulWidget {
   const QrScan({Key? key}) : super(key: key);
@@ -24,8 +25,8 @@ class _QrScanState extends State<QrScan> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('QR 코드 스캔'),
+      appBar: const MenuBarWidget(
+        titleText: 'QR 코드 스캔',
       ),
       body: Column(
         children: <Widget>[
