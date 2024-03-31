@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:somoa/screens/device/device_detail_screen.dart';
 import 'package:somoa/screens/device/device_list_screen.dart';
 import 'package:somoa/screens/order/order_list_screen.dart';
+import 'package:somoa/widgets/menu_bar_widget.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -162,12 +163,12 @@ class _NotificationScreenState extends State<NotificationScreen>
       }
     }
     return Scaffold(
-      appBar: AppBar(
+      appBar: MenuBarWidget(
+        titleText: '알림',
+        showExtraMenu: true,
         automaticallyImplyLeading: false,
-        title: const Text('알림', style: TextStyle(fontSize: 26.0)),
-        centerTitle: true,
-        actions: <Widget>[
-          PopupMenuButton<String>(
+        buildPopupMenuButton: () {
+          return PopupMenuButton<String>(
             onSelected: (value) {
               if (value == 'delete_all') {
                 _showDeleteConfirmationDialog();
@@ -182,8 +183,8 @@ class _NotificationScreenState extends State<NotificationScreen>
                 ),
               ];
             },
-          ),
-        ],
+          );
+        },
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())

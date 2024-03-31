@@ -7,15 +7,17 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final bool showExtraMenu;
   final PopupMenuButton Function()? buildPopupMenuButton;
+  final bool automaticallyImplyLeading;
 
   const MenuBarWidget({
     super.key,
     required this.titleText,
     this.appBarHeight = 85.0,
-    this.topPadding = 15.0,
+    this.topPadding = 25.0,
     this.title,
     this.showExtraMenu = false,
     this.buildPopupMenuButton,
+    this.automaticallyImplyLeading = true,
   });
 
   @override
@@ -32,11 +34,10 @@ class MenuBarWidget extends StatelessWidget implements PreferredSizeWidget {
             backgroundColor: Colors.transparent,
             elevation: 0,
             iconTheme: IconThemeData(color: Colors.black),
-            actions: showExtraMenu && buildPopupMenuButton != null
-                ? [
-                    buildPopupMenuButton!(),
-                  ]
-                : [],
+            actions: showExtraMenu && buildPopupMenuButton != null ? [
+              buildPopupMenuButton!(),
+            ] : [],
+            automaticallyImplyLeading: automaticallyImplyLeading,
           ),
         ),
       ],

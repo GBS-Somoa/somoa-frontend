@@ -370,77 +370,70 @@ class _LocationSettingScreenState extends State<LocationSettingScreen> {
   Widget build(BuildContext context) {
     return Consumer<UserProvider>(builder: (context, userProvider, child) {
       return Scaffold(
-        appBar: AppBar(
-          title: Text(_isLoading ? '' : '${_group.name} 설정'),
-          actions: <Widget>[
-            if (!_isLoading)
-              PopupMenuButton<String>(
-                onSelected: (String result) {
-                  if (_group.myRole == ADMIN) {
-                    if (result == 'delete') {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(30)),
-                        ),
-                        builder: (BuildContext context) {
-                          return ConfirmWidget(
-                            title: '${_group.name} 을(를) 삭제할까요?',
-                            text:
-                                '이 장소의 기기와 소모품을 모두 삭제합니다. \n기기를 새 장소에 등록하지 않으면 소모품 관리를 할 수 없습니다.',
-                            height: 200,
-                            onYes: () {
-                              deleteGroup(groupId);
-                            },
-                            yesText: Text('삭제',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red)),
-                          );
+        appBar: _isLoading ? MenuBarWidget(titleText: '') :
+        MenuBarWidget(
+          titleText: '${_group.name} 설정',
+          showExtraMenu: true,
+          buildPopupMenuButton: () => PopupMenuButton<String>(
+            onSelected: (String result) {
+              if (_group.myRole == ADMIN) {
+                if (result == 'delete') {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                    ),
+                    builder: (BuildContext context) {
+                      return ConfirmWidget(
+                        title: '${_group.name} 을(를) 삭제할까요?',
+                        text: '이 장소의 기기와 소모품을 모두 삭제합니다. \n기기를 새 장소에 등록하지 않으면 소모품 관리를 할 수 없습니다.',
+                        height: 200,
+                        onYes: () {
+                          deleteGroup(groupId);
                         },
+                        yesText: Text('삭제', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
                       );
-                    }
-                  } else {
-                    if (result == 'leave') {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: Colors.transparent,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(30)),
-                        ),
-                        builder: (BuildContext context) {
-                          return ConfirmWidget(
-                            title: '${_group.name}에서 나가시겠어요?',
-                            text: '이 장소에 다시 접근하려면 장소 멤버의 초대가 필요합니다.',
-                            height: 180,
-                            onYes: () {
-                              leaveGroup(groupId);
-                            },
-                            yesText: Text('나가기',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red)),
-                          );
+                    },
+                  );
+                }
+              } else {
+                if (result == 'leave') {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
+                    ),
+                    builder: (BuildContext context) {
+                      return ConfirmWidget(
+                        title: '${_group.name}에서 나가시겠어요?',
+                        text: '이 장소에 다시 접근하려면 장소 멤버의 초대가 필요합니다.',
+                        height: 180,
+                        onYes: () {
+                          leaveGroup(groupId);
                         },
+                        yesText: Text('나가기', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.red)),
                       );
-                    }
-                  }
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                  PopupMenuItem<String>(
-                    value: _group.myRole == ADMIN ? 'delete' : 'leave',
-                    child: Text(_group.myRole == ADMIN ? '장소 삭제' : '장소 나가기'),
-                  ),
-                ],
-              )
-          ],
+                    },
+                  );
+                }
+              }
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              _group.myRole == ADMIN ?
+              const PopupMenuItem<String>(
+                value: 'delete',
+                child: Text('장소 삭제'),
+              ) :
+              const PopupMenuItem<String>(
+                value: 'leave',
+                child: Text('장소 나가기'),
+              ),
+            ],
+          ),
         ),
         body: _isLoading
             ? const Center(child: CircularProgressIndicator())

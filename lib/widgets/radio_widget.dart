@@ -24,14 +24,14 @@ class RadioWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(30),
         elevation: 2.0,
         child: Container(
-          padding: EdgeInsets.fromLTRB(25, 20, 25, 0),
-          height: 280,
+          padding: EdgeInsets.fromLTRB(25, 10, 25, 10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(30),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: <Widget>[
               ListTile(
                 title: Text(

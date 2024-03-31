@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:somoa/screens/device/device_detail_screen.dart';
 import 'package:somoa/services/api_services.dart';
+import 'package:somoa/widgets/menu_bar_widget.dart';
 
 class SupplyScreen extends StatefulWidget {
   const SupplyScreen({super.key});
@@ -270,13 +271,17 @@ class _SupplyScreenState extends State<SupplyScreen> {
     });
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text(
-          '소모품 상태 모아보기',
-          style: TextStyle(fontSize: 26.0),
-        ),
-        centerTitle: true,
+      // appBar: AppBar(
+      //   automaticallyImplyLeading: false,
+      //   title: const Text(
+      //     '소모품 상태 모아보기',
+      //     style: TextStyle(fontSize: 26.0),
+      //   ),
+      //   centerTitle: true,
+      // ),
+      appBar: const MenuBarWidget(
+        titleText: '소모품 상태 모아보기',
+        showExtraMenu: false,
       ),
       body: isLoading
           ? const Center(
