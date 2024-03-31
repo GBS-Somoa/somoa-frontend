@@ -276,14 +276,14 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: SizedBox(
-                    height: 120,
+                    height: 100,
                     child: Image.asset(
                       'assets/images/face=good.png',
                     )),
               ),
               const Text(
                 '모든 소모품이 \n 잘 관리되고 있어요!',
-                style: TextStyle(fontSize: 25),
+                style: TextStyle(fontSize: 22),
                 textAlign: TextAlign.center,
               )
             ],

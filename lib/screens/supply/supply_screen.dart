@@ -295,7 +295,7 @@ class _SupplyScreenState extends State<SupplyScreen> {
                             children: [
                               Image.asset(
                                   'assets/images/face=${careNeedTotal == 0 ? "good" : careNeedTotal < careNotNeedTotal ? "normal" : "bad"}.png',
-                                  height: 120),
+                                  height: 100),
                               Padding(
                                 padding: const EdgeInsets.all(8.0),
                                 child: Text(
