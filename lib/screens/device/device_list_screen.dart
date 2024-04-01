@@ -154,6 +154,10 @@ class _DeviceScreenState extends State<DeviceScreen> {
             .map((deviceJson) => Device.fromJson(deviceJson))
             .toList();
 
+        for (var device in devices) {
+          device.supplies.sort((a, b) => a.id.compareTo(b.id));
+        }
+
         setState(() {
           deviceList = devices;
           isLoading = false;

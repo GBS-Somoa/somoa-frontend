@@ -134,6 +134,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
 
         setState(() {
           deviceInfo = _deviceInfo;
+          deviceInfo.supplies.sort((a, b) => a.id.compareTo(b.id));
           statusSummary = calculateStatusSummary(deviceInfo);
           fetchOrderData(deviceInfo);
         });
@@ -154,7 +155,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
       String supplyId = supply.id;
       String serverUrl = dotenv.get("SERVER_URL");
       String? accessToken = await getAccessToken();
-      String url = '${serverUrl}orders?supply_id=$supplyId&order_status=배송 중';
+      String url = '${serverUrl}orders/in-progress?supply_id=$supplyId';
 
       var fetchTask = http.get(
         Uri.parse(url),
