@@ -296,7 +296,7 @@ class _DeviceDetailScreenState extends State<DeviceDetailScreen> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: SizedBox(
-                    height: 120,
+                    height: 100,
                     child: Image.asset('assets/images/face=bad.png')),
               ),
               const Text(
